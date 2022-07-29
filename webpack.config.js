@@ -5,8 +5,8 @@ module.exports = {
   entry: './lib/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'analytics.min.js',
-    library: 'Web3Analytics',
+    filename: 'test-sdk-saad.min.js',
+    library: 'Web3AnalyticsTest',
     libraryTarget: 'umd',
 
   },
