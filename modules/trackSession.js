@@ -1,3 +1,51 @@
+//Get Co-Ordinates
+var getCoordinates = function () {
+    var coords = {};
+    function showPosition(position) {
+        coords.latitude=position.coords.latitude;
+        coords.longitude=position.coords.longitude;
+    }
+    
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        coords.latitude="Geolocation is not supported by this browser";
+        coords.longitude="Geolocation is not supported by this browser";
+    }
+    return coords;
+}
+//Get Metadeta
+var getMetaData = function () {
+    var metaData =  {};
+    metaData.userAgent=navigator.userAgent;
+    metaData.language = navigator.language[0];
+    return metaData;
+}
+
+//Begin Session
+var begin_session=function(){
+    if(sessionStorage.getItem("session_started")){
+        console.log("Session already started");
+        var date=Date.now();
+        sessionStorage.setItem("session_started",date);
+    }
+    else{
+        console.log("Session started");
+        var date=Date.now();
+        sessionStorage.setItem("session_started",date);
+    }
+}
+//End Session
+var end_session=function(){
+    var date = date=sessionStorage.getItem("session_started");
+    var timeSpentOnSite=localStorage.getItem("timeSpentOnSite");
+        console.log("Session expired");
+        sessionStorage.removeItem("session_started");
+        localStorage.removeItem("timeSpentOnSite");
+    
+}
+
+//Track Sessions
 var track_sessions = function () {
   var timer;
   var timerStart;
@@ -13,7 +61,7 @@ var track_sessions = function () {
     return timeSpentOnSite;
   }
 
-  function startSession() {
+  function start_time() {
     timerStart = Date.now();
     timer = setInterval(function () {
       timeSpentOnSite = getTimeSpentOnSite() + (Date.now() - timerStart);
@@ -23,7 +71,8 @@ var track_sessions = function () {
       console.log(parseInt(timeSpentOnSite / 1000));
     }, 1000);
   }
-  startSession();
+  begin_session();
+  start_time();
   // manage sessions on window visibility events
   var hidden = "hidden";
 
@@ -36,7 +85,7 @@ var track_sessions = function () {
       clearInterval(timer);
     } else {
       console.log("Focused");
-      startSession();
+      start_time();
     }
   }
 
@@ -58,7 +107,8 @@ var track_sessions = function () {
    */
   function resetInactivity() {
     if (inactivityCounter >= inactivityTime) {
-      startSession();
+
+      start_time();
     }
     inactivityCounter = 0;
   }
@@ -74,8 +124,22 @@ var track_sessions = function () {
         "You have been inactive for " + inactivityCounter * 3 + " seconds."
       );
       clearInterval(timer);
+      end_session();
     }
   }, 3000);
 };
 
-module.exports = track_sessions;
+class Web2Analytics {
+    constructor() {
+        var _this = this;
+        console.log(_this);
+        this.track = track_sessions;
+        this.getCoordinates = getCoordinates;
+        this.getMetaData = getMetaData;
+    }
+}
+
+// Web2Analytics.track=track_sessions;
+// Web2Analytics.getCoordinates=getCoordinates;
+
+module.exports=Web2Analytics;
