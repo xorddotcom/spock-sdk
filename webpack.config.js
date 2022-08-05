@@ -1,13 +1,34 @@
-const path = require('path');
+const pkg = require('./package.json');
 
-module.exports = {
-  mode: 'production',
-  entry: './lib/index.js',
+const libraryName = pkg.name;
+
+module.exports = (env) => ({
+  mode: env.mode,
+  entry: __dirname + '/src/index.js',
+  devtool: 'source-map',
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'test-sdk-saad.min.js',
-    library: 'Web3AnalyticsTest',
-    libraryTarget: 'umd',
-
+    path: __dirname + `/${env.output === 'umd' ? 'dist' : 'lib'}`,
+    filename: env.mode === 'development' ? `${libraryName}.js` : `${libraryName}.min.js`,
+    library: libraryName,
+    libraryTarget: env.output || 'umd',
+    libraryExport: 'default',
+    umdNamedDefine: true,
+    globalObject: "typeof self !== 'undefined' ? self : this",
   },
-};
+  module: {
+    rules: [
+      {
+        test: /(\.jsx|\.js|\.ts|\.tsx)$/,
+        use: {
+          loader: 'babel-loader',
+        },
+        exclude: /(node_modules|bower_components)/,
+      },
+      // {
+      //   test: /(\.jsx|\.js)$/,
+      //   loader: 'eslint-loader',
+      //   exclude: /(node_modules|bower_components)/,
+      // },
+    ],
+  },
+});
