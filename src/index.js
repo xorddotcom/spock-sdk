@@ -1,28 +1,28 @@
-import { logEnums } from './constants';
 import { log } from './utils';
 import Web3AnalyticsClass from './core';
 
-function overrideLocalStorageSetItem(log) {
-  if (typeof localStorage !== 'undefined') {
-    const originalSetItem = localStorage.setItem;
+function overrideLocalStorage() {
+  Storage.prototype._setItem = Storage.prototype.setItem;
+  Storage.prototype.setItem = function (key, value) {
+    const event = new Event('w3a_lsItemInserted');
+    event.key = key;
+    event.value = value;
+    window.dispatchEvent(event);
+    this._setItem(key, value);
+  };
 
-    localStorage.setItem = function (key, value) {
-      const event = new Event('w3a_lsItemInserted');
-
-      event.key = key;
-      event.value = value;
-
-      window.dispatchEvent(event);
-
-      originalSetItem.apply(this, arguments);
-    };
-  } else {
-    log(logEnums.ERROR, 'Localstorage not found');
-  }
+  Storage.prototype._getItem = Storage.prototype.getItem;
+  Storage.prototype.getItem = function (key) {
+    const event = new Event('w3a_lsItemRetrieve');
+    event.key = key;
+    const noLog = arguments[1] === 'noLog';
+    !noLog && window.dispatchEvent(event);
+    return this._getItem(key);
+  };
 }
 
-function onloadConfig(config) {
-  overrideLocalStorageSetItem(config.logging);
+function onloadConfig() {
+  overrideLocalStorage();
 }
 
 const Web3Analytics = {};
@@ -34,15 +34,14 @@ Web3Analytics.init = function (config) {
 
   const configration = {
     ...userConfig,
-    logging: (level, message) => log(userConfig.debug, level, message),
+    logging: (level, message, ...extraArguments) => log(userConfig.debug, level, message, ...extraArguments),
   };
 
   onloadConfig(configration);
 
   const web3AnalyticsInstance = new Web3AnalyticsClass(configration);
-  web3AnalyticsInstance.initializeEvents();
-
-  // Web3Analytics.core = web3AnalyticsInstance;
+  web3AnalyticsInstance.initialize();
+  Web3Analytics.valueContribution = web3AnalyticsInstance.valueContribution;
 };
 
 export default Web3Analytics;

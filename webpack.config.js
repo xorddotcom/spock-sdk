@@ -4,6 +4,7 @@ const libraryName = pkg.name;
 
 module.exports = (env) => ({
   mode: env.mode,
+  mode: 'production',
   entry: __dirname + '/src/index.js',
   devtool: 'source-map',
   output: {
