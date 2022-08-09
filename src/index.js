@@ -1,5 +1,4 @@
 import Web3AnalyticsClass from './core';
-import { log } from './utils';
 
 function overrideLocalStorage() {
   Storage.prototype._setItem = Storage.prototype.setItem;
@@ -32,17 +31,13 @@ Web3Analytics.init = function (config) {
 
   const userConfig = config || {};
 
-  const configration = {
-    ...userConfig,
-    logging: (level, message, ...extraArguments) => log(userConfig.debug, level, message, ...extraArguments),
-  };
+  onloadConfig();
 
-  onloadConfig(configration);
-
-  const web3AnalyticsInstance = new Web3AnalyticsClass(configration);
+  const web3AnalyticsInstance = new Web3AnalyticsClass(userConfig);
   web3AnalyticsInstance.initialize();
   Web3Analytics.valueContribution = web3AnalyticsInstance.valueContribution;
   Web3Analytics.walletProvider = web3AnalyticsInstance.wallet.walletProvider;
+  Web3Analytics.trackPageView = web3AnalyticsInstance.tracking.trackPageView;
 };
 
 export default Web3Analytics;
