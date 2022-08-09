@@ -9,8 +9,8 @@ export function log(debug, level, message) {
 
     // append level, message and args
     let extraArguments = '';
-    for (var i = 2; i < arguments.length; i++) {
-      extraArguments += arguments[i];
+    for (var i = 3; i < arguments.length; i++) {
+      extraArguments += ` ${arguments[i]}`;
     }
 
     const log = level + message + extraArguments;
@@ -18,14 +18,19 @@ export function log(debug, level, message) {
     switch (level) {
       case logEnums.ERROR:
         console.error(log);
+        break;
       case logEnums.WARNING:
         console.warn(log);
+        break;
       case logEnums.INFO:
         console.info(log);
+        break;
       case logEnums.VERBOSE:
         console.log(log);
+        break;
       default:
         console.debug(log);
+        break;
     }
   }
 }
@@ -135,5 +140,27 @@ export function addEvent(element, type, listener) {
   // for old browser use attachEvent instead
   else {
     element.attachEvent('on' + type, listener);
+  }
+}
+
+export function getConfig(value, defaultValue) {
+  return value ? value : defaultValue;
+}
+
+export function notUndefined(value) {
+  return typeof value !== 'undefined';
+}
+
+export function isSameAddress(address1 = '', address2 = '') {
+  return address1.toLowerCase() === address2.toLowerCase();
+}
+
+export function normalizeChainId(chainId) {
+  if (typeof chainId === 'string') {
+    chainId = chainId.replace(/^Ox/, '0x');
+    const parsedChainId = Number.parseInt(chainId, chainId.trim().substring(0, 2) === '0x' ? 16 : 10);
+    return parsedChainId;
+  } else {
+    return chainId;
   }
 }
