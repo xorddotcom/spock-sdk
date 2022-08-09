@@ -8,10 +8,10 @@ module.exports = (env) => ({
   entry: __dirname + '/src/index.js',
   devtool: 'source-map',
   output: {
-    path: __dirname + `/${env.output === 'umd' ? 'dist' : 'lib'}`,
+    path: __dirname + '/dist',
     filename: env.mode === 'development' ? `${libraryName}.js` : `${libraryName}.min.js`,
     library: libraryName,
-    libraryTarget: env.output || 'umd',
+    libraryTarget: 'umd',
     libraryExport: 'default',
     umdNamedDefine: true,
     globalObject: "typeof self !== 'undefined' ? self : this",

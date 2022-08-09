@@ -1,5 +1,5 @@
-import Web3AnalyticsClass from './core';
 import { log } from './utils';
+import Web3AnalyticsClass from './tempCore';
 
 function overrideLocalStorage() {
   Storage.prototype._setItem = Storage.prototype.setItem;
