@@ -1,4 +1,4 @@
-import { logEnums } from './constants';
+import { logEnums, WALLET_TYPE, EIP1193_STANDARD_WALLETS } from './constants';
 import {
   addEvent,
   getStoredIdOrGenerateId,
@@ -7,6 +7,7 @@ import {
   getConfig,
   notUndefined,
   isSameAddress,
+  normalizeChainId,
 } from './utils';
 
 class Web3Analytics {
@@ -16,9 +17,11 @@ class Web3Analytics {
     this.log = config.logging;
     this.connectedWallet = undefined;
     this.connectedChain = undefined;
+    this.walletProvider = this.walletProvider.bind(this);
   }
 
   initialize() {
+    console.log('hello');
     this.log(logEnums.INFO, 'Web3Analytics initialized');
     this.initializeEvents();
   }
@@ -27,27 +30,72 @@ class Web3Analytics {
     this.handleWalletConnection();
   }
 
-  lsWalletHandler(key, value, self) {
-    if (key === 'walletconnect') {
-      const account = value.accounts ? value.accounts[0] : undefined;
-      self.connectedChain = value.chainId;
-      self.logWalletConnection('WalletConnect', account, self.connectedChain);
-    } else if (key.includes('walletlink')) {
-      if (key.includes('DefaultChainId')) {
-        self.connectedChain = value;
-      } else if (key.includes('Addresses')) {
-        self.logWalletConnection('Coinbase', value, self.connectedChain);
+  getWalletTypeFromProvider(provider) {
+    if (provider.isMetaMask) return WALLET_TYPE.METAMASK;
+    else if (provider.isWalletconnect) return WALLET_TYPE.WALLETCONNECT;
+    else if (provider.isCoinbaseWallet) return WALLET_TYPE.COINBASE;
+    else if (provider.isFortmatic) return WALLET_TYPE.FORTMATIC;
+    else if (provider.isPortis) return WALLET_TYPE.PORTIS;
+    else return WALLET_TYPE.OTHER;
+  }
+
+  walletProvider(provider) {
+    if (notUndefined(provider)) {
+      const walletType = this.getWalletTypeFromProvider(provider);
+      if (notUndefined(provider.request)) {
+        this.eip1193StandardMethods(provider, walletType);
+      } else if (notUndefined(provider.send)) {
+        this.legacyMethods(provider, walletType);
       }
     }
   }
 
-  handleWalletLSSetItem(event, self) {
-    if (notUndefined(event.value)) {
-      this.lsWalletHandler(event.key, event.value, self);
+  legacyMethods(provider, walletType) {
+    Promise.all([provider.send('eth_accounts'), provider.send('eth_chainId')])
+      .then(([accounts, chainId]) => {
+        if (notUndefined(accounts) && notUndefined(chainId)) {
+          this.logWalletConnection(walletType, accounts[0], chainId);
+        }
+      })
+      .catch((e) => {
+        this.log(logEnums.ERROR, 'Failed to extract wallet connection detail from provider', e);
+      });
+  }
+
+  eip1193StandardMethods(provider, walletType) {
+    Promise.all([provider.request({ method: 'eth_accounts' }), provider.request({ method: 'eth_chainId' })])
+      .then(([accounts, chainId]) => {
+        if (notUndefined(accounts) && notUndefined(chainId)) {
+          this.logWalletConnection(walletType, accounts[0], chainId);
+        }
+      })
+      .catch((e) => {
+        this.log(logEnums.ERROR, 'Failed to extract wallet connection detail from provider', e);
+      });
+  }
+
+  lsWalletHandler(key, value) {
+    if (key === 'walletconnect') {
+      const account = value.accounts ? value.accounts[0] : undefined;
+      this.logWalletConnection(WALLET_TYPE.WALLETCONNECT, account, value.chainId);
+    } else if (key.includes('walletlink')) {
+      if (key.includes('DefaultChainId')) {
+        this.connectedChain = value;
+      } else if (key.includes('Addresses')) {
+        this.logWalletConnection(WALLET_TYPE.COINBASE, value, this.connectedChain);
+      }
     }
   }
 
-  handleWalletLSGetItem(event, self) {
+  handleWalletLSSetItem(event) {
+    console.log('setEvent => ', event);
+    if (notUndefined(event.value)) {
+      this.lsWalletHandler(event.key, event.value);
+    }
+  }
+
+  handleWalletLSGetItem(event) {
+    console.log('getEvent => ', event);
     const value = localStorage.getItem(event.key, 'noLog');
     let parsedValue;
     if (value) {
@@ -57,25 +105,33 @@ class Web3Analytics {
         parsedValue = value;
       }
 
-      this.lsWalletHandler(event.key, parsedValue, self);
+      this.lsWalletHandler(event.key, parsedValue);
     }
   }
 
   handleWalletConnection() {
-    if (notUndefined(window.ethereum)) {
+    if (notUndefined(window.ethereum) && window.ethereum.isMetaMask) {
+      //incase when metamask is already coonected on load
+      window.ethereum.on('connect', () => {
+        setTimeout(() => {
+          const chainId = window.ethereum.chainId;
+          const account = window.ethereum.selectedAddress;
+          this.logWalletConnection(WALLET_TYPE.METAMASK, account, chainId);
+        }, 1000 * 5);
+      });
+
       window.ethereum.on('accountsChanged', (account) => {
-        console.log('account fire => ', account);
-        this.logWalletConnection('Metamask', account[0], this.connectedChain);
+        const chainId = window.ethereum.chainId;
+        this.logWalletConnection(WALLET_TYPE.METAMASK, account[0], chainId);
       });
 
       window.ethereum.on('chainChanged', (chainId) => {
-        this.connectedChain = chainId;
         this.log(logEnums.INFO, 'chain changed', chainId);
       });
     }
 
-    addEvent(window, 'w3a_lsItemInserted', (event) => this.handleWalletLSSetItem(event, this.self));
-    addEvent(window, 'w3a_lsItemRetrieve', (event) => this.handleWalletLSGetItem(event, this.self));
+    addEvent(window, 'w3a_lsItemInserted', (event) => this.handleWalletLSSetItem.bind(this)(event));
+    addEvent(window, 'w3a_lsItemRetrieve', (event) => this.handleWalletLSGetItem.bind(this)(event));
   }
 
   valueContribution(label, valueInUSD) {
@@ -90,9 +146,11 @@ class Web3Analytics {
 
   logWalletConnection(walletName, account, chainId) {
     if (typeof walletName === 'string' && typeof account === 'string') {
-      if (!isSameAddress(this.connectedWallet, account)) {
+      const chain = typeof chainId === 'string' ? normalizeChainId(chainId) : chainId ? chainId : this.connectedChain;
+      if (!isSameAddress(this.connectedWallet, account) || chain !== this.connectedChain) {
         this.connectedWallet = account;
-        const data = { walletName, account, chainId };
+        this.connectedChain = chain;
+        const data = { walletName, account, chain };
         this.log(logEnums.INFO, 'wallet connected', JSON.stringify(data));
       }
     }

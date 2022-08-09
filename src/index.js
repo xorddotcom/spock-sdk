@@ -42,6 +42,7 @@ Web3Analytics.init = function (config) {
   const web3AnalyticsInstance = new Web3AnalyticsClass(configration);
   web3AnalyticsInstance.initialize();
   Web3Analytics.valueContribution = web3AnalyticsInstance.valueContribution;
+  Web3Analytics.walletProvider = web3AnalyticsInstance.walletProvider;
 };
 
 export default Web3Analytics;
