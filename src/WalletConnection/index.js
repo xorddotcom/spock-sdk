@@ -1,6 +1,8 @@
 import BaseAnalytics from '../BaseAnalytics';
 import { logEnums, WALLET_TYPE } from '../constants';
-import { addEvent, notUndefined, isSameAddress, normalizeChainId } from '../utils';
+import { addEvent } from '../utils/helpers';
+import { notUndefined, isSameAddress } from '../utils/validators';
+import { normalizeChainId } from '../utils/formatting';
 
 class WalletConnection extends BaseAnalytics {
   constructor(config) {

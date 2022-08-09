@@ -1,5 +1,6 @@
 import AnalyticsStorage from '../AnalyticsStorage';
-import { log, getConfig } from '../utils';
+import { log } from '../utils/logs';
+import { getConfig } from '../utils/helpers';
 
 class BaseAnalytics {
   constructor(config) {

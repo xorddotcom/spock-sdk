@@ -1,4 +1,4 @@
-import { notUndefined } from '../utils';
+import { notUndefined } from '../utils/validators';
 
 const initialState = {
   connectedAccount: undefined,

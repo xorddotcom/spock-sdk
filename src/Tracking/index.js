@@ -1,6 +1,6 @@
 import BaseAnalytics from '../BaseAnalytics';
 import { logEnums } from '../constants';
-import { addEvent, getStoredIdOrGenerateId, getCoordinates, getMetaData, getTimestamp } from '../utils';
+import { addEvent, getStoredIdOrGenerateId, getCoordinates, getMetaData, getTimestamp } from '../utils/helpers';
 
 class Tracking extends BaseAnalytics {
   constructor(config) {
