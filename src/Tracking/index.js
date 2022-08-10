@@ -25,6 +25,7 @@ class Tracking extends BaseAnalytics {
 
   //Track User
   trackUser() {
+    console.log('trackUser');
     this.userId = localStorage.getItem('device_id');
     this.log(logEnums.INFO, 'User', this.userId);
     if (!this.userId) {
@@ -37,6 +38,7 @@ class Tracking extends BaseAnalytics {
     const date = getTimestamp();
     this.reference = document.referrer;
     this.trackUser();
+    console.log('beginSession');
     if (sessionStorage.getItem('session_started')) {
       this.log(logEnums.INFO, 'Session already started');
       sessionStorage.setItem('session_started', date);
@@ -47,6 +49,7 @@ class Tracking extends BaseAnalytics {
   }
   //End Session
   endSession() {
+    console.log('endSession');
     const date = sessionStorage.getItem('session_started');
     const timeSpentOnSite = localStorage.getItem('timeSpentOnSite');
     this.log(logEnums.INFO, 'Session expired');

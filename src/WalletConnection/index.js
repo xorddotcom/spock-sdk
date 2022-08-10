@@ -1,3 +1,5 @@
+import invariant from 'tiny-invariant';
+
 import BaseAnalytics from '../BaseAnalytics';
 import { logEnums, WALLET_TYPE } from '../constants';
 import { addEvent } from '../utils/helpers';
@@ -49,7 +51,7 @@ class WalletConnection extends BaseAnalytics {
   }
 
   walletProvider(provider) {
-    if (notUndefined(provider)) {
+    if (invariant(notUndefined(provider), 'Provider cannot be undefined')) {
       this.dispatch({ provider });
       const walletType = this.getWalletTypeFromProvider(provider);
       if (notUndefined(provider.request)) {
@@ -98,14 +100,12 @@ class WalletConnection extends BaseAnalytics {
   }
 
   handleWalletLSSetItem(event) {
-    console.log('setEvent => ', event);
     if (notUndefined(event.value)) {
       this.lsWalletHandler(event.key, event.value);
     }
   }
 
   handleWalletLSGetItem(event) {
-    console.log('getEvent => ', event);
     const value = localStorage.getItem(event.key, 'noLog');
     let parsedValue;
     if (value) {
