@@ -52,46 +52,79 @@ export function getCoordinates() {
   }
   return coords;
 }
-
-//Useragent Device Detection
-export function userAgentDeviceDetection(uaOverride) {
-  let userAgent;
-  // TODO: refactor here
-  if (uaOverride) {
-    userAgent = uaOverride;
-  } else if (navigator.userAgentData.mobile) {
-    return 'phone';
-  } else {
-    userAgent = uaOverride;
+ // Operating System Detection
+ function getOS(userAgent) {
+  let os = "Unknown OS";
+  if (userAgent.indexOf("Windows NT 10.0") != -1) {
+      os = "Windows 10";
+  } else if (userAgent.indexOf("Windows NT 6.2") != -1) {
+      os = "Windows 8";
+  } else if (userAgent.indexOf("Windows NT 6.1") != -1) {
+      os = "Windows 7";
+  } else if (userAgent.indexOf("Windows NT 6.0") != -1) {
+      os = "Windows Vista";
+  } else if (userAgent.indexOf("Windows NT 5.1") != -1) {
+      os = "Windows XP";
+  } else if (userAgent.indexOf("Windows NT 5.0") != -1) {
+      os = "Windows 2000";
+  } else if (userAgent.indexOf("Mac") != -1) {
+      os = "Mac/iOS";
+  } else if (userAgent.indexOf("X11") != -1) {
+      os = "UNIX";
+  } else if (userAgent.indexOf("Linux") != -1) {
+      os = "Linux";
   }
-  // make it lowercase for regex to work properly
-  userAgent = userAgent.toLowerCase();
-
-  // assign the default device
-  let device = 'desktop';
-
-  // regexps corresponding to tablets or phones that can be found in userAgent string
-  const tabletCheck =
-    /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/;
-  const phoneCheck =
-    /(mobi|ipod|phone|blackberry|opera mini|fennec|minimo|symbian|psp|nintendo ds|archos|skyfire|puffin|blazer|bolt|gobrowser|iris|maemo|semc|teashark|uzard)/;
-
-  // check whether the regexp values corresponds to something in the user agent string
-  if (tabletCheck.test(userAgent)) {
-    device = 'tablet';
-  } else if (phoneCheck.test(userAgent)) {
-    device = 'mobile';
-  }
-
-  // set the device type
-  return device;
+  return os;
 }
+ //Browser Detection
+ function getBrowser(userAgent){
+  let browser;
+  
+  if(userAgent.match(/chrome|chromium|crios/i)){
+      browser = "chrome";
+    }else if(userAgent.match(/firefox|fxios/i)){
+      browser = "firefox";
+    }  else if(userAgent.match(/safari/i)){
+      browser = "safari";
+    }else if(userAgent.match(/opr\//i)){
+      browser = "opera";
+    } else if(userAgent.match(/edg/i)){
+      browser = "edge";
+    }else{
+      browser="No browser detection";
+    }
+    return browser;             
+}
+// Device Detection
+function getDevice(userAgent) {
+  if (navigator.userAgentData.mobile) {
+    return "phone";
+  } 
+  userAgent = userAgent.toLowerCase();
+    // regexps corresponding to tablets or phones that can be found in userAgent string
+    const tabletCheck =
+      /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/;
+      const phoneCheck =
+      /(mobi|ipod|phone|blackberry|opera mini|fennec|minimo|symbian|psp|nintendo ds|archos|skyfire|puffin|blazer|bolt|gobrowser|iris|maemo|semc|teashark|uzard)/;
+  
+    // check whether the regexp values corresponds to something in the user agent string
+    if (tabletCheck.test(userAgent)) {
+      device = 'tablet';
+    } else if (phoneCheck.test(userAgent)) {
+      device = 'mobile';
+    }
+  
+    // set the device type
+    return device;
+  }
 
 //Get Metadeta
 export function getMetaData() {
   let metaData = {};
-  metaData.userAgent = navigator.userAgent;
-  metaData.device = userAgentDeviceDetection(metaData.userAgent);
+  metaData.device = getDevice(metaData.userAgent);
+  metaData.coordinates = getCoordinates();
+  metaData.browser =  getBrowser(metaData.userAgent);
+  metaData.os = getOS(metaData.userAgent);
   metaData.language = navigator.language[0];
   return metaData;
 }
