@@ -19,9 +19,4 @@ export const WALLET_TYPE = {
   OTHER: 'Other',
 };
 
-export const EIP1193_STANDARD_WALLETS = [
-  WALLET_TYPE.METAMASK,
-  WALLET_TYPE.WALLETCONNECT,
-  WALLET_TYPE.COINBASE,
-  WALLET_TYPE.FORTMATIC,
-];
+export const ServerEndooint = 'http://localhost:3000';

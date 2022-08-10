@@ -7,3 +7,9 @@ export function normalizeChainId(chainId) {
     return chainId;
   }
 }
+
+export function stringify(data) {
+  try {
+    return JSON.stringify(data);
+  } catch (e) {}
+}

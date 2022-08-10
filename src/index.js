@@ -1,4 +1,5 @@
 import Web3AnalyticsClass from './core';
+import { addEvent } from './utils/helpers';
 
 function overrideLocalStorage() {
   Storage.prototype._setItem = Storage.prototype.setItem;
@@ -21,7 +22,7 @@ function overrideLocalStorage() {
 }
 
 function onloadConfig() {
-  overrideLocalStorage();
+  addEvent('load', overrideLocalStorage);
 }
 
 const Web3Analytics = {};

@@ -2,7 +2,6 @@ import BaseAnalytics from '../BaseAnalytics';
 import { logEnums } from '../constants';
 import { RequestServer } from '../request';
 import { addEvent, getStoredIdOrGenerateId, getCoordinates, getMetaData, getTimestamp } from '../utils/helpers';
-
 class Tracking extends BaseAnalytics {
   constructor(config) {
     super(config);
@@ -26,7 +25,9 @@ class Tracking extends BaseAnalytics {
   }
 
   initialize() {
+    this.trackUser();
     this.trackSessions();
+     
   }
   //Track User
   trackUser() {

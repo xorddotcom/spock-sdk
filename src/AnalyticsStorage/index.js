@@ -9,7 +9,7 @@ const initialState = {
 class AnalyticsStorage {
   static store = initialState;
 
-  //payload : {[key:string]:value:any}
+  //payload : {[key:string]:value:any
   static dispatch(payload) {
     if (notUndefined(payload)) {
       Object.keys(payload).map((key) => {
