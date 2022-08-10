@@ -1,23 +1,29 @@
 import { logEnums } from './constants';
-import { addEvent, getStoredIdOrGenerateId, getCoordinates, getMetaData,getTimestamp } from './utils';
+import { RequestServer } from './request';
+import { addEvent, getStoredIdOrGenerateId, getCoordinates, getMetaData, getTimestamp } from './utils';
 
 class Web3Analytics {
   constructor(config) {
-    this.debug = config.debug ?? false;
+    this.debug = config.debug ? config.debug : false;
     this.log = config.logging;
     this.connectedWallet = undefined;
     this.connectedChain = undefined;
-    this.userId= undefined;
+    this.userId = undefined;
     this.timeSpentOnSite = 0;
+    this.req={};
     this.reference = undefined;
     this.outboundLink = undefined;
-    this.timerEnd = undefined;
-    this.sessionExpire = false;
     this.timer = undefined;
-    this.timerStart = undefined;
+    this.timerStart = 0;
+    this.timerEnd = 0;
+    this.hideTime= 0;
+    this.unHideTime= 0;
+    this.visiblilty=true;
     this.inactivityCounter = 0;
-    this.inactivityTime = 6;
+    this.inactivityTime = 3;
+    this.inactivity=undefined
     this.trackTime = false;
+    this.lastDurationTime=0
     this.pagesNavigation = [];
   }
 
@@ -39,15 +45,17 @@ class Web3Analytics {
       });
     }
 
-    addEvent(window, 'w3a_lsItemInserted', (res) => {
-      this.log(logEnums.INFO, 'lsSetFired', res);
-    });
+    // addEvent(window, 'w3a_lsItemInserted', (res) => {
+    //   this.log(logEnums.INFO, 'lsSetFired', res);
+    // });
   }
 
   //Track User
   trackUser() {
-    this.userId = localStorage.getItem('device_id');
-    this.log(logEnums.INFO, 'User', this.userId);
+    const user = localStorage.getItem('device_id');
+    this.userId = user;
+    console.log(this.userId);
+    this.log(logEnums.INFO, `User ${this.userId}`);
     if (!user) {
       this.userId = getStoredIdOrGenerateId();
       this.log(logEnums.INFO, 'User is visiting for the first time');
@@ -55,46 +63,100 @@ class Web3Analytics {
   }
   //Begin Session
   beginSession() {
+    this.timerStart = getTimestamp();
+    // this.trackUser();
     const date = getTimestamp();
     this.reference = document.referrer;
-    track_user();
+        this.lastDurationTime= 0;
     if (sessionStorage.getItem('session_started')) {
-      this.log(logEnums.INFO, 'Session already started');
+      // this.log(logEnums.INFO, 'Session already started');
+      console.log('Session already started');
       sessionStorage.setItem('session_started', date);
     } else {
-     this.log(logEnums.INFO, 'Session started');
+      //  this.log(logEnums.INFO, 'Session started');
+      console.log('Session started',this.timerStart);
       sessionStorage.setItem('session_started', date);
     }
-}
+  }
   //End Session
   endSession() {
-    const date = sessionStorage.getItem('session_started');
-    const timeSpentOnSite = localStorage.getItem('timeSpentOnSite');
-    this.log(logEnums.INFO, 'Session expired');
-    this.sessionExpire = true;
-    clearInterval(this.timerEnd);
+    this.timerEnd = getTimestamp();
+    // this.log(logEnums.INFO, 'Session expired');
+    console.log('Session expired',this.timerEnd);
+    const total=this.timerEnd - this.timerStart - this.lastDurationTime;
+    console.log('total', total,this.lastDurationTime);
+    this.timerStart=0;
+    this.timerEnd=0;
+    this.lastDurationTime= 0;
+    clearInterval(this.inactivity);
     sessionStorage.removeItem('session_started');
     localStorage.removeItem('timeSpentOnSite');
+    RequestServer();
+    // RequestServer.sendData(this.pagesNavigation);
   }
   //Track Time
   startTime() {
+    if (!this.trackTime) {
     this.log(logEnums.INFO, 'start time');
-    this.timerStart = getTimestamp();
-    this.timer = setInterval(() => {
-      this.timeSpentOnSite = getTimestamp() - this.timerStart;
-      localStorage.setItem('timeSpentOnSite', this.timeSpentOnSite);
-    }, 1000);
+    this.trackTime = true;
+    this.unHideTime=(getTimestamp() - this.hideTime);
+    console.log("this.unHideTime",this.unHideTime)
+    console.log("this.lastDuration",this.hideTime)
+    this.lastDurationTime= this.lastDurationTime + this.unHideTime
+    console.log('start time',this.unHideTime,this.lastDurationTime,this.hideTime);
+    this.unHideTime=0
+    
+    }
   }
   //End Time
   endTime() {
-    this.log(logEnums.INFO, 'end time');
-    clearInterval(this.timer);
-    this.timerEnd = setInterval(() => {
+    // this.log(logEnums.INFO, 'end time');
+      if(this.trackTime){
+        console.log('this.Endtime',this.hideTime)
+      }
+  }
+  //Reset Inactivity Counter
+  resetInactivity() {
+    if (this.inactivityCounter >= this.inactivityTime) {
+      this.trackTime = false;
+      console.log('start time resetInactivity');
+      this.beginSession();
+      this.checkInactivityCounter("reset");
+    }
+    this.inactivityCounter = 0;
+  }
+  // Handle visibility change eventss
+  onchange() {
+    // if (document[hidden]) {
+    //   console.log('Hidden or not focused');
+    //   clearInterval(timer);
+    // } else {
+    //   console.log('Focused');
+    //   console.log('start time onchange else');
+    //   start_time();
+    // }
+    if (document.visibilityState === 'visible') {
+      // this.log(logEnums.INFO, 'visibilitychange', 'visible');
+      console.log('visibilitychange', 'visible');
+      this.startTime();
+    } else {
+      // this.log(logEnums.INFO, 'visibilitychange', 'hidden');
+      this.hideTime=getTimestamp();
+      this.trackTime=false;
+      console.log('visibilitychange', 'hidden');
+      this.endTime();
+    }
+  }
+  //Check Inactivity Counter
+  checkInactivityCounter(check) {
+     this.inactivity= setInterval(() => {
       this.inactivityCounter++;
-      if (this.inactivityCounter >= this.inactivityTime) {
+      console.log('inactivityCounter', this.inactivityCounter,check);
+      if (this.inactivityCounter === this.inactivityTime) {
+        console.log('you have been inactive for more than ', this.inactivityTime, 'seconds');
         this.endSession();
       }
-    }, 1000);
+    }, 5000);
   }
 
   //Track Sessions
@@ -102,19 +164,16 @@ class Web3Analytics {
     // manage sessions on window visibility events
     let hidden = false;
     this.beginSession();
-    this.log(logEnums.INFO, 'start time track_sessions');
-    this.addEvent(window, 'visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        this.log(logEnums.INFO, 'visibilitychange', 'visible');
-        this.trackTime = true;
-        this.startTime();
-      } else {
-        this.log(logEnums.INFO, 'visibilitychange', 'hidden');
-        this.trackTime = false;
-        this.endTime();
-      }
-    } );
-    
+    // this.startTime();
+    // this.log(logEnums.INFO, 'start time track_sessions');
+    addEvent(window, 'visibilitychange', this.onchange.bind(this));
+    addEvent(window, 'mousemove', this.resetInactivity.bind(this));
+    addEvent(window, 'click', this.resetInactivity.bind(this));
+    // addEvent(window, 'keydown', this.resetInactivity.bind(this));
+    // addEvent(window, 'scroll', this.resetInactivity.bind(this));
+    addEvent(window, 'beforeunload', this.endSession.bind(this));
+    // this.checkInactivityCounter("track")
+    this.checkInactivityCounter("track");
   }
 
   //Track Page
@@ -130,10 +189,10 @@ class Web3Analytics {
 
   //TrackPageNavigation
   trackPageNavigation() {
-    const pageVisit=window.location.pathname;
-    if(pageVisit){
+    const pageVisit = window.location.pathname;
+    if (pageVisit) {
       this.pagesNavigation.push(pageVisit);
-      this.log(logEnums.INFO, 'trackPageNavigation',this.pagesNavigation);
+      this.log(logEnums.INFO, 'trackPageNavigation', this.pagesNavigation);
     }
   }
 
@@ -156,7 +215,6 @@ class Web3Analytics {
       false
     );
   }
-
 }
 
 export default Web3Analytics;

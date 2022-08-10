@@ -24,3 +24,5 @@ example/
 # production
 dist
 lib
+package-lock.json
+yarn.lock
