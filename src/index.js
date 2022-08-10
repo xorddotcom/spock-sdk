@@ -22,7 +22,7 @@ function overrideLocalStorage() {
 }
 
 function onloadConfig() {
-  addEvent('load', overrideLocalStorage);
+  addEvent(window, 'load', overrideLocalStorage);
 }
 
 const Web3Analytics = {};
@@ -39,7 +39,7 @@ Web3Analytics.init = function (config) {
   Web3Analytics.valueContribution = web3AnalyticsInstance.valueContribution;
   Web3Analytics.walletProvider = web3AnalyticsInstance.wallet.walletProvider;
   Web3Analytics.trackPageView = web3AnalyticsInstance.tracking.trackPageView;
-  Web3Analytics.trackOutboundLink= web3AnalyticsInstance.tracking.trackOutboundLink;
+  Web3Analytics.trackOutboundLink = web3AnalyticsInstance.tracking.trackOutboundLink;
 };
 
 export default Web3Analytics;

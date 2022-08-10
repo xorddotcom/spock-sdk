@@ -27,7 +27,6 @@ class Tracking extends BaseAnalytics {
   initialize() {
     this.trackUser();
     this.trackSessions();
-     
   }
   //Track User
   trackUser() {
@@ -48,11 +47,11 @@ class Tracking extends BaseAnalytics {
     this.lastDurationTime = 0;
     if (sessionStorage.getItem('session_started')) {
       console.log('Session already started');
-      sessionStorage.setItem('session_started', date);
+      sessionStorage.setItem('session_started', this.timerStart);
     } else {
       //  this.log(logEnums.INFO, 'Session started');
       console.log('Session started', this.timerStart);
-      sessionStorage.setItem('session_started', date);
+      sessionStorage.setItem('session_started', this.timerStart);
     }
   }
   //End Session
@@ -171,7 +170,6 @@ class Tracking extends BaseAnalytics {
     console.log('trackOutboundLink');
     document.addEventListener('DOMContentLoaded', this.outboundLink.bind(), false);
     addEvent(window, 'visibilitychange', this.outboundLink.bind());
-
   }
 }
 
