@@ -1,33 +1,32 @@
 {
   "name": "projectsdk",
-  "version": "2.0.3",
+  "version": "2.4.7",
   "description": "ProjectV SDK",
-  "main": "src/index.js",
+  "main": "dist/projectsdk.js",
   "files": [
     "src/",
-    "dist/",
-    "lib/"
+    "dist/"
   ],
   "scripts": {
     "lint": "eslint src/**/*.js",
     "build:umdmin": "webpack --env mode=production --env output=umd",
     "build:umd": "webpack --env mode=development --env output=umd",
-    "build:commonjs": "webpack --env mode=development --env output=commonjs2",
-    "build": "yarn build:umdmin && yarn build:umd && yarn build:commonjs",
+    "build": "yarn build:umdmin && yarn build:umd",
     "dev:umd": "webpack --progress --colors --watch --env mode=development --env output umd",
-    "dev:commonjs": "webpack --progress --colors --watch --env mode=development --env output commonjs2",
-    "dev": "yarn dev:umd && yarn dev:commonjs"
+    "dev": "yarn dev:umd"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.18.9",
     "@babel/core": "^7.18.10",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/preset-env": "^7.18.10",
     "babel-loader": "^8.2.5",
+    "eslint": "^7.0.0",
+    "eslint-loader": "^4.0.2",
     "webpack": "^4.44.0",
     "webpack-cli": "^4.10.0",
     "yargs": "^17.5.1"
-  },
-  "dependencies": {}
+  }
 }
