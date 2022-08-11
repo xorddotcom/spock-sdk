@@ -97,6 +97,8 @@ function getBrowser(userAgent) {
 }
 // Device Detection
 function getDevice(userAgent) {
+  let device;
+
   if (navigator.userAgentData.mobile) {
     return 'phone';
   }
@@ -112,6 +114,8 @@ function getDevice(userAgent) {
     device = 'tablet';
   } else if (phoneCheck.test(userAgent)) {
     device = 'mobile';
+  } else {
+    device = 'pc';
   }
 
   // set the device type
