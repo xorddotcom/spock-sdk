@@ -51,14 +51,13 @@ class WalletConnection extends BaseAnalytics {
   }
 
   walletProvider(provider) {
-    if (invariant(notUndefined(provider), 'Provider cannot be undefined')) {
-      this.dispatch({ provider });
-      const walletType = this.getWalletTypeFromProvider(provider);
-      if (notUndefined(provider.request)) {
-        this.eip1193StandardMethods(provider, walletType);
-      } else if (notUndefined(provider.send)) {
-        this.legacyMethods(provider, walletType);
-      }
+    invariant(notUndefined(provider), 'Provider cannot be undefined');
+    this.dispatch({ provider });
+    const walletType = this.getWalletTypeFromProvider(provider);
+    if (notUndefined(provider.request)) {
+      this.eip1193StandardMethods(provider, walletType);
+    } else if (notUndefined(provider.send)) {
+      this.legacyMethods(provider, walletType);
     }
   }
 
@@ -124,9 +123,8 @@ class WalletConnection extends BaseAnalytics {
       const chain = typeof chainId === 'string' ? normalizeChainId(chainId) : chainId ? chainId : this.connectedChain;
       if (!isSameAddress(this.store.connectedWallet, account) || chain !== this.store.connectedChain) {
         this.dispatch({ connectedAccount: account, connectedChain: chain });
-        const metaData = getMetaData();
-        const data = { walletName, account, chain, metaData };
-        //this.request.post('walletConnection', data);
+        const metadata = getMetaData();
+        const data = { walletName, account, chain, metadata };
         this.log(logEnums.INFO, 'wallet connected', JSON.stringify(data));
       }
     }
