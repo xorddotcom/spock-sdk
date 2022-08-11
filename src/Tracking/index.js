@@ -5,19 +5,14 @@ import { addEvent, getStoredIdOrGenerateId, getCoordinates, getMetaData, getTime
 class Tracking extends BaseAnalytics {
   constructor(config) {
     super(config);
-    this.userId = undefined;
-    this.timeSpentOnSite = 0;
-    this.req = {};
     this.reference = undefined;
     this.outboundLink = undefined;
-    this.timer = undefined;
     this.timerStart = 0;
     this.timerEnd = 0;
     this.hideTime = 0;
     this.unHideTime = 0;
     this.visiblilty = true;
     this.inactivityCounter = 0;
-    this.inactivityTime = 3;
     this.inactivity = undefined;
     this.trackTime = false;
     this.lastDurationTime = 0;
@@ -31,23 +26,28 @@ class Tracking extends BaseAnalytics {
   //Track User
   trackUser() {
     const user = localStorage.getItem('device_id');
-    this.userId = user;
-    console.log(this.userId);
-    this.log(logEnums.INFO, `User ${this.userId}`);
+    this.dispatch({ userId: user });
+    this.log(logEnums.INFO, `User ${this.store.userId}`);
+
     if (!user) {
-      this.userId = getStoredIdOrGenerateId();
+      this.dispatch({ userId: getStoredIdOrGenerateId() });
       this.log(logEnums.INFO, 'User is visiting for the first time');
     }
   }
   //Begin Session
   beginSession() {
     this.timerStart = getTimestamp();
-    // this.trackUser();
-    this.reference = document.referrer;
+    this.reference = typeof document.referrer !== 'undefined' ? document.referrer : '';
     this.lastDurationTime = 0;
     if (sessionStorage.getItem('session_started')) {
       console.log('Session already started');
       sessionStorage.setItem('session_started', this.timerStart);
+      // this.request.post('/app-visits/create ', {
+      //   user: this.store.userId,
+      //   reference:this.reference,
+      //   metaData: getMetaData(),
+      //   timestamp: getTimestamp(),
+      // });
     } else {
       //  this.log(logEnums.INFO, 'Session started');
       console.log('Session started', this.timerStart);
@@ -66,7 +66,15 @@ class Tracking extends BaseAnalytics {
     this.lastDurationTime = 0;
     clearInterval(this.inactivity);
     sessionStorage.removeItem('session_started');
-    RequestServer();
+    // this.request.post('/session/create-session', {
+    //   user: this.store.userId,
+    //   duration: total,
+    //   Navigation: this.pagesNavigation,
+    //   metaData: getMetaData(),
+    //   timestamp: getTimestamp(),
+    //   doneTxn: false,
+    //   wallet: this.store.connectedAccount,
+    // });
   }
   //Track Time
   startTime() {
@@ -115,11 +123,11 @@ class Tracking extends BaseAnalytics {
     this.inactivity = setInterval(() => {
       this.inactivityCounter++;
       console.log('inactivityCounter', this.inactivityCounter, check);
-      if (this.inactivityCounter === this.inactivityTime) {
+      if (this.inactivityCounter === 1) {
         console.log('you have been inactive for more than ', this.inactivityTime, 'seconds');
         this.endSession();
       }
-    }, 5000);
+    }, this.inactivityTimeout * 1000);
   }
 
   //Track Sessions
@@ -138,7 +146,11 @@ class Tracking extends BaseAnalytics {
     if (!page) {
       page = window.location.pathname;
       console.log('Page not provided, using current page', page);
-    } else {
+      // this.request.post('/page/create-page', {
+      //   title:page,
+      //   time:getTimestamp(),
+      // });
+    } else{
       page = page;
       console.log('Page provided', page);
     }
@@ -152,24 +164,28 @@ class Tracking extends BaseAnalytics {
       this.log(logEnums.INFO, 'trackPageNavigation', this.pagesNavigation);
     }
   }
-  //OutboundLink
-  outboundLink() {
-    const links = document.querySelectorAll('a');
-    links.forEach(function (link) {
-      if (link.hostname !== window.location.hostname) {
-        link.addEventListener('click', function (e) {
-          outboundLink = link.href;
-          console.log('Send Request To Server', outboundLink); //Send Request To Server
-          console.log('Outbound Link', outboundLink);
-        });
-      }
-    });
-  }
   //Track Outbound Link
   trackOutboundLink() {
     console.log('trackOutboundLink');
-    document.addEventListener('DOMContentLoaded', this.outboundLink.bind(), false);
-    addEvent(window, 'visibilitychange', this.outboundLink.bind());
+    let trackOutbound=function(){
+      const links = document.querySelectorAll('a');
+      console.log("links", links);
+      links.forEach(function (link) {
+        if (link.hostname !== window.location.hostname) {
+          link.addEventListener('click', function (e) {
+            const outboundLink = link.href;
+            // this.request.post('outbound-links/create', {
+            //   link:outboundLink,
+            //   time:getTimestamp(),
+            // });
+            console.log('Send Request To Server', outboundLink); //Send Request To Server
+            console.log('Outbound Link', outboundLink);
+          });
+        }
+      });
+    }
+    document.addEventListener('DOMContentLoaded',trackOutbound, false);
+
   }
 }
 

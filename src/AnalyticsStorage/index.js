@@ -4,6 +4,7 @@ const initialState = {
   connectedAccount: undefined,
   connectedChain: undefined,
   provider: undefined,
+  userId: undefined, 
 };
 
 class AnalyticsStorage {
