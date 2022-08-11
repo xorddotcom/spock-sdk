@@ -1,5 +1,5 @@
 export const configrationDefaultValue = {
-  INACTIVITY_TIME: 30,
+  INACTIVITY_TIMEOUT: 30,
 };
 
 export const logEnums = {
@@ -19,4 +19,4 @@ export const WALLET_TYPE = {
   OTHER: 'Other',
 };
 
-export const ServerEndooint = 'http://localhost:3000';
+export const ServerEndooint = 'http://dapp-server-test.dappzero.io';
