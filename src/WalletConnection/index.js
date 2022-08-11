@@ -2,7 +2,7 @@ import invariant from 'tiny-invariant';
 
 import BaseAnalytics from '../BaseAnalytics';
 import { logEnums, WALLET_TYPE } from '../constants';
-import { addEvent } from '../utils/helpers';
+import { addEvent, getMetaData } from '../utils/helpers';
 import { notUndefined, isSameAddress } from '../utils/validators';
 import { normalizeChainId } from '../utils/formatting';
 
@@ -124,7 +124,9 @@ class WalletConnection extends BaseAnalytics {
       const chain = typeof chainId === 'string' ? normalizeChainId(chainId) : chainId ? chainId : this.connectedChain;
       if (!isSameAddress(this.store.connectedWallet, account) || chain !== this.store.connectedChain) {
         this.dispatch({ connectedAccount: account, connectedChain: chain });
-        const data = { walletName, account, chain };
+        const metaData = getMetaData();
+        const data = { walletName, account, chain, metaData };
+        //this.request.post('walletConnection', data);
         this.log(logEnums.INFO, 'wallet connected', JSON.stringify(data));
       }
     }

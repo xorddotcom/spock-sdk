@@ -23,7 +23,6 @@ class Tracking extends BaseAnalytics {
     this.trackUser();
     this.trackSessions();
   }
-
   //Track User
   trackUser() {
     const user = localStorage.getItem('device_id');
@@ -178,6 +177,7 @@ class Tracking extends BaseAnalytics {
       });
     }
     document.addEventListener('DOMContentLoaded',trackOutbound, false);
+
   }
 }
 
