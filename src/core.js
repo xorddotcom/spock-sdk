@@ -11,6 +11,7 @@ class Web3Analytics extends BaseAnalytics {
   }
 
   initialize() {
+    this.log(logEnums.INFO, 'Web3 Analytics initialized');
     this.wallet.initialize();
     this.tracking.initialize();
   }
