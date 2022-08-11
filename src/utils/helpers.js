@@ -121,12 +121,17 @@ function getDevice(userAgent) {
 //Get Metadeta
 export function getMetaData() {
   let metaData = {};
-  metaData.device = getDevice(metaData.userAgent);
-  metaData.coordinates = getCoordinates();
-  metaData.browser = getBrowser(metaData.userAgent);
-  metaData.os = getOS(metaData.userAgent);
-  metaData.language = navigator.language[0];
-  return metaData;
+  if (typeof navigator !== 'undefined') {
+    const userAgent = navigator.userAgent;
+    metaData.device = getDevice(userAgent);
+    metaData.coordinates = getCoordinates();
+    metaData.browser = getBrowser(userAgent);
+    metaData.os = getOS(userAgent);
+    metaData.language = navigator.language[0];
+    return metaData;
+  } else {
+    return metaData;
+  }
 }
 
 export function addEvent(element, type, listener) {

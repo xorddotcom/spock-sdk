@@ -21,6 +21,7 @@ class Request {
         body: formatedData,
       })
         .then((res) => {
+          this.log(logEnums.DEBUG, 'Response', res);
           return res.json();
         })
         .catch((e) => {
