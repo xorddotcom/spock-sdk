@@ -61,7 +61,6 @@ class Tracking extends BaseAnalytics {
     // this.log(logEnums.INFO, 'Session expired');
     console.log('Session expired', this.timerEnd);
     const total = this.timerEnd - this.timerStart - this.lastDurationTime;
-    console.log('total', total, this.lastDurationTime);
     this.timerStart = 0;
     this.timerEnd = 0;
     this.lastDurationTime = 0;
@@ -83,10 +82,7 @@ class Tracking extends BaseAnalytics {
       this.log(logEnums.INFO, 'start time');
       this.trackTime = true;
       this.unHideTime = getTimestamp() - this.hideTime;
-      console.log('this.unHideTime', this.unHideTime);
-      console.log('this.lastDuration', this.hideTime);
       this.lastDurationTime = this.lastDurationTime + this.unHideTime;
-      console.log('start time', this.unHideTime, this.lastDurationTime, this.hideTime);
       this.unHideTime = 0;
     }
   }
@@ -101,7 +97,6 @@ class Tracking extends BaseAnalytics {
   resetInactivity() {
     if (this.inactivityCounter >= this.inactivityTime) {
       this.trackTime = false;
-      console.log('start time resetInactivity');
       this.beginSession();
       this.checkInactivityCounter('reset');
     }
@@ -123,9 +118,7 @@ class Tracking extends BaseAnalytics {
   checkInactivityCounter(check) {
     this.inactivity = setInterval(() => {
       this.inactivityCounter++;
-      console.log('inactivityCounter', this.inactivityCounter, check);
       if (this.inactivityCounter === 1) {
-        console.log('you have been inactive for more than ', this.inactivityTime, 'seconds');
         this.endSession();
       }
     }, this.inactivityTimeout * 1000);
@@ -179,7 +172,6 @@ class Tracking extends BaseAnalytics {
             //   link:outboundLink,
             //   time:getTimestamp(),
             // });
-            console.log('Send Request To Server', outboundLink); //Send Request To Server
             console.log('Outbound Link', outboundLink);
           });
         }
