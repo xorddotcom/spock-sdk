@@ -36,22 +36,6 @@ export function getTimestamp() {
   return Math.floor(new Date().getTime() / 1000);
 }
 
-//Get Co-Ordinates
-export function getCoordinates() {
-  let coords = {};
-  function showPosition(position) {
-    coords.latitude = position.coords.latitude;
-    coords.longitude = position.coords.longitude;
-  }
-
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  } else {
-    coords.latitude = 'Geolocation is not supported by this browser';
-    coords.longitude = 'Geolocation is not supported by this browser';
-  }
-  return coords;
-}
 // Operating System Detection
 function getOS(userAgent) {
   let os = 'Unknown OS';
@@ -79,8 +63,10 @@ function getOS(userAgent) {
 //Browser Detection
 function getBrowser(userAgent) {
   let browser;
-
-  if (userAgent.match(/chrome|chromium|crios/i)) {
+  if(navigator.brave !== undefined && navigator.brave.isBrave === "isBrave"){
+    browser = 'brave';
+  }
+  else if (userAgent.match(/chrome|chromium|crios/i)) {
     browser = 'chrome';
   } else if (userAgent.match(/firefox|fxios/i)) {
     browser = 'firefox';
@@ -100,7 +86,7 @@ function getDevice(userAgent) {
   let device;
 
   if (navigator.userAgentData.mobile) {
-    return 'phone';
+    return 'mobile';
   }
   userAgent = userAgent.toLowerCase();
   // regexps corresponding to tablets or phones that can be found in userAgent string
@@ -128,7 +114,6 @@ export function getMetaData() {
   if (typeof navigator !== 'undefined') {
     const userAgent = navigator.userAgent;
     metaData.device = getDevice(userAgent);
-    metaData.coordinates = getCoordinates();
     metaData.browser = getBrowser(userAgent);
     metaData.os = getOS(userAgent);
     metaData.language = navigator.language[0];
