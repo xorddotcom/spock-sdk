@@ -1,10 +1,13 @@
 import BaseAnalytics from '../BaseAnalytics';
-import { logEnums } from '../constants';
-import { RequestServer } from '../request';
-import { addEvent, getStoredIdOrGenerateId, getCoordinates, getMetaData, getTimestamp } from '../utils/helpers';
+import { logEnums, STORAGE, configrationDefaultValue } from '../constants';
+import { generateUUID } from './utils';
+import { addEvent, currentTimestamp, setGetValueInStorage, getConfig } from '../utils/helpers';
+import { notUndefined } from '../utils/validators';
+
 class Tracking extends BaseAnalytics {
   constructor(config) {
     super(config);
+    this.inactivityTimeout = getConfig(config.inactivityTimeout, configrationDefaultValue.INACTIVITY_TIMEOUT);
     this.reference = undefined;
     this.outboundLink = undefined;
     this.timerStart = 0;
@@ -23,40 +26,61 @@ class Tracking extends BaseAnalytics {
     this.trackUser();
     this.trackSessions();
   }
+
   //Track User
   trackUser() {
-    const user = localStorage.getItem('device_id');
-    this.dispatch({ userId: user });
-    this.log(logEnums.INFO, `User ${this.store.userId}`);
+    let deciveId;
 
-    if (!user) {
-      this.dispatch({ userId: getStoredIdOrGenerateId() });
+    const storedDeviceId = setGetValueInStorage(STORAGE.LOCAL_STORAGE.DEVICE_ID);
+    if (!storedDeviceId) {
       this.log(logEnums.INFO, 'User is visiting for the first time');
+      deciveId = generateUUID();
+      setGetValueInStorage(STORAGE.LOCAL_STORAGE.DEVICE_ID, deviceId);
+    } else {
+      deciveId = storedDeviceId;
     }
+
+    this.dispatch({ userId: deciveId });
+    this.log(logEnums.INFO, `User ${this.store.userId}`);
   }
+
+  //Track Sessions
+  trackSessions() {
+    //let hidden = false;
+    this.beginSession();
+    addEvent(window, 'visibilitychange', this.handleDocumentVisibilityState.bind(this));
+    addEvent(window, 'mousemove', this.resetInactivity.bind(this));
+    addEvent(window, 'click', this.resetInactivity.bind(this));
+    addEvent(window, 'beforeunload', this.endSession.bind(this));
+    this.checkInactivityCounter('track');
+  }
+
   //Begin Session
   beginSession() {
-    this.timerStart = getTimestamp();
-    this.reference = typeof document.referrer !== 'undefined' ? document.referrer : '';
+    this.timerStart = currentTimestamp();
+    this.reference = notUndefined(document.referrer) ? document.referrer : undefined;
     this.lastDurationTime = 0;
-    if (sessionStorage.getItem('session_started')) {
-      console.log('Session already started');
-      sessionStorage.setItem('session_started', this.timerStart);
+
+    const storedSessionTime = setGetValueInStorage(STORAGE.SESSION_STORAGE.SESSION_STARTED);
+
+    if (storedSessionTime) {
+      console.log('storedSessionTime => ', storedSessionTime);
       // this.request.post('/app-visits/create ', {
       //   user: this.store.userId,
       //   reference:this.reference,
       //   metaData: getMetaData(),
-      //   timestamp: getTimestamp(),
+      //   timestamp: currentTimestamp(),
       // });
     } else {
       //  this.log(logEnums.INFO, 'Session started');
       console.log('Session started', this.timerStart);
-      sessionStorage.setItem('session_started', this.timerStart);
+      setGetValueInStorage(STORAGE.SESSION_STORAGE.SESSION_STARTED, this.timerStart);
     }
   }
+
   //End Session
   endSession() {
-    this.timerEnd = getTimestamp();
+    this.timerEnd = currentTimestamp();
     // this.log(logEnums.INFO, 'Session expired');
     console.log('Session expired', this.timerEnd);
     const total = this.timerEnd - this.timerStart - this.lastDurationTime;
@@ -64,27 +88,29 @@ class Tracking extends BaseAnalytics {
     this.timerEnd = 0;
     this.lastDurationTime = 0;
     clearInterval(this.inactivity);
-    sessionStorage.removeItem('session_started');
+    sessionStorage.removeItem(STORAGE.SESSION_STORAGE.SESSION_STARTED);
     // this.request.post('/session/create-session', {
     //   user: this.store.userId,
     //   duration: total,
     //   Navigation: this.pagesNavigation,
     //   metaData: getMetaData(),
-    //   timestamp: getTimestamp(),
+    //   timestamp: currentTimestamp(),
     //   doneTxn: false,
     //   wallet: this.store.connectedAccount,
     // });
   }
+
   //Track Time
   startTime() {
     if (!this.trackTime) {
       this.log(logEnums.INFO, 'start time');
       this.trackTime = true;
-      this.unHideTime = getTimestamp() - this.hideTime;
+      this.unHideTime = currentTimestamp() - this.hideTime;
       this.lastDurationTime = this.lastDurationTime + this.unHideTime;
       this.unHideTime = 0;
     }
   }
+
   //End Time
   endTime() {
     // this.log(logEnums.INFO, 'end time');
@@ -92,27 +118,30 @@ class Tracking extends BaseAnalytics {
       console.log('this.Endtime', this.hideTime);
     }
   }
+
   //Reset Inactivity Counter
   resetInactivity() {
-    if (this.inactivityCounter >= this.inactivityTime) {
+    if (this.inactivityCounter >= this.inactivityTimeout) {
       this.trackTime = false;
       this.beginSession();
       this.checkInactivityCounter('reset');
     }
     this.inactivityCounter = 0;
   }
+
   // Handle visibility change eventss
-  onchange() {
+  handleDocumentVisibilityState() {
     if (document.visibilityState === 'visible') {
       console.log('visibilitychange', 'visible');
       this.startTime();
     } else {
-      this.hideTime = getTimestamp();
+      this.hideTime = currentTimestamp();
       this.trackTime = false;
       console.log('visibilitychange', 'hidden');
       this.endTime();
     }
   }
+
   //Check Inactivity Counter
   checkInactivityCounter(check) {
     this.inactivity = setInterval(() => {
@@ -123,61 +152,32 @@ class Tracking extends BaseAnalytics {
     }, this.inactivityTimeout * 1000);
   }
 
-  //Track Sessions
-  trackSessions() {
-    let hidden = false;
-    this.beginSession();
-    addEvent(window, 'visibilitychange', this.onchange.bind(this));
-    addEvent(window, 'mousemove', this.resetInactivity.bind(this));
-    addEvent(window, 'click', this.resetInactivity.bind(this));
-    addEvent(window, 'beforeunload', this.endSession.bind(this));
-    this.checkInactivityCounter('track');
-  }
-
   //Track Page
-  trackPageView(page) {
-    if (!page) {
-      page = window.location.pathname;
-      console.log('Page not provided, using current page', page);
-      // this.request.post('/page/create-page', {
-      //   title:page,
-      //   time:getTimestamp(),
-      // });
-    } else{
-      page = page;
-      console.log('Page provided', page);
+  trackPageView(_page) {
+    const page = _page || window.location.pathname;
+    if (page) {
+      this.log(logEnums.INFO, 'track pageview', page);
+      this.pagesNavigation.push(page);
     }
   }
 
-  //TrackPageNavigation
-  trackPageNavigation() {
-    const pageVisit = window.location.pathname;
-    if (pageVisit) {
-      this.pagesNavigation.push(pageVisit);
-      this.log(logEnums.INFO, 'trackPageNavigation', this.pagesNavigation);
-    }
-  }
   //Track Outbound Link
   trackOutboundLink() {
     console.log('trackOutboundLink');
-    let trackOutbound=function(){
+
+    const trackOutbound = function () {
       const links = document.querySelectorAll('a');
-      console.log("links", links);
       links.forEach(function (link) {
         if (link.hostname !== window.location.hostname) {
-          link.addEventListener('click', function (e) {
+          addEvent(link, 'click', function (e) {
             const outboundLink = link.href;
-            // this.request.post('outbound-links/create', {
-            //   link:outboundLink,
-            //   time:getTimestamp(),
-            // });
-            console.log('Outbound Link', outboundLink);
+            this.log(logEnums.INFO, 'track outbound link', outboundLink);
           });
         }
       });
-    }
-    document.addEventListener('DOMContentLoaded',trackOutbound, false);
+    };
 
+    addEvent(document, 'DOMContentLoaded', trackOutbound);
   }
 }
 

@@ -1,4 +1,4 @@
-import { ServerEndooint, logEnums } from '../constants';
+import { SERVER_ENDPOINT, logEnums } from '../constants';
 import { stringify } from '../utils/formatting';
 
 class Request {
@@ -15,7 +15,7 @@ class Request {
   post(route, data = {}) {
     const formatedData = stringify(data);
     if (formatedData) {
-      fetch(`${ServerEndooint}/${route}`, {
+      fetch(`${SERVER_ENDPOINT}/${route}`, {
         method: 'POST',
         headers: this.headers,
         body: formatedData,

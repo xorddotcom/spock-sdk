@@ -1,3 +1,9 @@
+export const SERVER_ENDPOINT = 'http://dapp-server-test.dappzero.io';
+
+const ALIAS = 'dz';
+
+const withAlias = (label) => `${ALIAS}_${label}`;
+
 export const configrationDefaultValue = {
   INACTIVITY_TIMEOUT: 30,
 };
@@ -19,12 +25,6 @@ export const WALLET_TYPE = {
   OTHER: 'Other',
 };
 
-const ALIAS = 'dz';
-
-const withAlias = (label) => `${ALIAS}_${label}`;
-
-export const ServerEndooint = 'http://dapp-server-test.dappzero.io';
-
 export const EVENTS = {
   SEND_TXN: withAlias('sendTxn'),
   LEGACY_TXN_CALLBACK: withAlias('legacyTxnCallback'),
@@ -32,12 +32,21 @@ export const EVENTS = {
   STORAGET_GET_ITEM: withAlias('storageGetItem'),
 };
 
-export const COOKIES = {
-  CACHE_ADDRESS: withAlias('cacheAddress'),
-  CACHE_CHAINID: withAlias('cacheChain'),
+const COOKIES = {
+  CACHE_ADDRESS: withAlias('cache_address'),
+  CACHE_CHAINID: withAlias('cache_chain'),
 };
 
-export const PROVIDER_TYPE = {
-  EIP1193: 'eip1193',
-  LEGACY: 'legacy',
+const LOCAL_STORAGE = {
+  DEVICE_ID: withAlias('device_Id'),
+};
+
+const SESSION_STORAGE = {
+  SESSION_STARTED: withAlias('session_started'),
+};
+
+export const STORAGE = {
+  COOKIES,
+  LOCAL_STORAGE,
+  SESSION_STORAGE,
 };
