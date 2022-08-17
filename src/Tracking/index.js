@@ -29,18 +29,18 @@ class Tracking extends BaseAnalytics {
 
   //Track User
   trackUser() {
-    let deciveId;
+    let deviceId;
 
     const storedDeviceId = setGetValueInStorage(STORAGE.LOCAL_STORAGE.DEVICE_ID);
     if (!storedDeviceId) {
       this.log(logEnums.INFO, 'User is visiting for the first time');
-      deciveId = generateUUID();
+      deviceId = generateUUID();
       setGetValueInStorage(STORAGE.LOCAL_STORAGE.DEVICE_ID, deviceId);
     } else {
-      deciveId = storedDeviceId;
+      deviceId = storedDeviceId;
     }
 
-    this.dispatch({ userId: deciveId });
+    this.dispatch({ userId: deviceId });
     this.log(logEnums.INFO, `User ${this.store.userId}`);
   }
 

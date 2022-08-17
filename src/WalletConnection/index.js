@@ -63,7 +63,7 @@ class WalletConnection extends BaseAnalytics {
     addEvent(window, EVENTS.LEGACY_TXN_CALLBACK, (payload) => {
       console.log('payload legacy => ', payload);
       if (notUndefined(payload)) {
-        if (payload.result) {
+        if (payload.result && payload.params) {
           this.log(logEnums.INFO, 'Transaction hash', payload.result);
         } else if (payload.error && txnRejected(payload.error)) {
           this.log(logEnums.INFO, 'Transaction rejected', payload.error);
@@ -100,6 +100,7 @@ class WalletConnection extends BaseAnalytics {
               const event = new Event(EVENTS.LEGACY_TXN_CALLBACK);
               event.error = error;
               event.result = result;
+              event.params = arg?.params;
               allowLog(error, result, arg?.method) && window.dispatchEvent(event);
               originalCallback.apply(this, arguments);
             };

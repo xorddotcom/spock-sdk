@@ -11,9 +11,7 @@
     "lint": "eslint src/**/*.js",
     "build:umdmin": "webpack --env mode=production --env output=umd",
     "build:umd": "webpack --env mode=development --env output=umd",
-    "build": "yarn build:umdmin && yarn build:umd",
-    "dev:umd": "webpack --progress --colors --watch --env mode=development --env output umd",
-    "dev": "yarn dev:umd"
+    "build": "yarn build:umdmin && yarn build:umd"
   },
   "author": "",
   "license": "ISC",
