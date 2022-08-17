@@ -25,13 +25,13 @@ class UserInfo extends BaseAnalytics {
       return 'mobile';
     }
     userAgent = userAgent.toLowerCase();
-    // regexps corresponding to tablets or phones that can be found in userAgent string
+    // regex to check if device is a tablet or a phone based on userAgent
     const tabletCheck =
       /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/;
     const phoneCheck =
       /(mobi|ipod|phone|blackberry|opera mini|fennec|minimo|symbian|psp|nintendo ds|archos|skyfire|puffin|blazer|bolt|gobrowser|iris|maemo|semc|teashark|uzard)/;
 
-    // check whether the regexp values corresponds to something in the user agent string
+    // check for tablet first, then phone
     if (tabletCheck.test(userAgent)) {
       device = 'tablet';
     } else if (phoneCheck.test(userAgent)) {
