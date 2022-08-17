@@ -18,7 +18,7 @@ class Tracking extends BaseAnalytics {
     this.inactivityCounter = 0;
     this.inactivity = undefined;
     this.trackTime = false;
-    this.lastDurationTime = 0;
+    this.totalInactivityTime = 0;
     this.pagesNavigation = [];
   }
 
@@ -30,7 +30,6 @@ class Tracking extends BaseAnalytics {
   //Track User
   trackUser() {
     let deviceId;
-
     const storedDeviceId = setGetValueInStorage(STORAGE.LOCAL_STORAGE.DEVICE_ID);
     if (!storedDeviceId) {
       this.log(logEnums.INFO, 'User is visiting for the first time');
@@ -39,31 +38,30 @@ class Tracking extends BaseAnalytics {
     } else {
       deviceId = storedDeviceId;
     }
-
     this.dispatch({ userId: deviceId });
     this.log(logEnums.INFO, `User ${this.store.userId}`);
   }
 
   //Track Sessions
   trackSessions() {
-    //let hidden = false;
     this.beginSession();
     addEvent(window, 'visibilitychange', this.handleDocumentVisibilityState.bind(this));
     addEvent(window, 'mousemove', this.resetInactivity.bind(this));
     addEvent(window, 'click', this.resetInactivity.bind(this));
     addEvent(window, 'beforeunload', this.endSession.bind(this));
-    this.checkInactivityCounter('track');
+    this.checkInactivityCounter();
   }
 
   //Begin Session
   beginSession() {
     this.timerStart = currentTimestamp();
     this.reference = notUndefined(document.referrer) ? document.referrer : undefined;
-    this.lastDurationTime = 0;
-
+    this.totalInactivityTime = 0;
+    this.inactivityCounter = 0; // reset inactivity counter
     const storedSessionTime = setGetValueInStorage(STORAGE.SESSION_STORAGE.SESSION_STARTED);
 
     if (storedSessionTime) {
+      this.timerStart = storedSessionTime;
       console.log('storedSessionTime => ', storedSessionTime);
       // this.request.post('/app-visits/create ', {
       //   user: this.store.userId,
@@ -83,10 +81,10 @@ class Tracking extends BaseAnalytics {
     this.timerEnd = currentTimestamp();
     // this.log(logEnums.INFO, 'Session expired');
     console.log('Session expired', this.timerEnd);
-    const total = this.timerEnd - this.timerStart - this.lastDurationTime;
+    const total = this.timerEnd - this.timerStart - this.totalInactivityTime;
     this.timerStart = 0;
     this.timerEnd = 0;
-    this.lastDurationTime = 0;
+    this.totalInactivityTime = 0;
     clearInterval(this.inactivity);
     sessionStorage.removeItem(STORAGE.SESSION_STORAGE.SESSION_STARTED);
     // this.request.post('/session/create-session', {
@@ -106,7 +104,7 @@ class Tracking extends BaseAnalytics {
       this.log(logEnums.INFO, 'start time');
       this.trackTime = true;
       this.unHideTime = currentTimestamp() - this.hideTime;
-      this.lastDurationTime = this.lastDurationTime + this.unHideTime;
+      this.totalInactivityTime = this.totalInactivityTime + this.unHideTime;
       this.unHideTime = 0;
     }
   }
@@ -121,12 +119,15 @@ class Tracking extends BaseAnalytics {
 
   //Reset Inactivity Counter
   resetInactivity() {
-    if (this.inactivityCounter >= this.inactivityTimeout) {
+    if (this.inactivityCounter === 1) {
       this.trackTime = false;
       this.beginSession();
-      this.checkInactivityCounter('reset');
+      this.checkInactivityCounter();
+    } else {
+      clearInterval(this.inactivity);
+      this.checkInactivityCounter();
+      this.inactivityCounter = 0;
     }
-    this.inactivityCounter = 0;
   }
 
   // Handle visibility change eventss
@@ -143,13 +144,13 @@ class Tracking extends BaseAnalytics {
   }
 
   //Check Inactivity Counter
-  checkInactivityCounter(check) {
+  checkInactivityCounter() {
     this.inactivity = setInterval(() => {
       this.inactivityCounter++;
       if (this.inactivityCounter === 1) {
         this.endSession();
       }
-    }, this.inactivityTimeout * 1000);
+    }, 5000);
   }
 
   //Track Page
@@ -163,15 +164,13 @@ class Tracking extends BaseAnalytics {
 
   //Track Outbound Link
   trackOutboundLink() {
-    console.log('trackOutboundLink');
-
     const trackOutbound = function () {
       const links = document.querySelectorAll('a');
       links.forEach(function (link) {
         if (link.hostname !== window.location.hostname) {
           addEvent(link, 'click', function (e) {
             const outboundLink = link.href;
-            this.log(logEnums.INFO, 'track outbound link', outboundLink);
+            console.log(logEnums.INFO, 'track outbound link', outboundLink);
           });
         }
       });
