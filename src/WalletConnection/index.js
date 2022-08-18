@@ -90,6 +90,8 @@ class WalletConnection extends BaseAnalytics {
       return function () {
         const arg = arguments[0];
 
+        //console.log('arguments => ', arguments);
+
         //add event in callback of send txn method for legacy provider
         if (isLegacy) {
           const originalCallback = arguments[1];
