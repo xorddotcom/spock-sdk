@@ -6,6 +6,8 @@ const initialState = {
   provider: undefined,
   userId: undefined,
   userInfo: undefined,
+  pageNavigation: [],
+  doneTxn: false,
 };
 
 class AnalyticsStorage {

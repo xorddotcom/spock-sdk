@@ -5,6 +5,7 @@ import WalletConnection from './WalletConnection';
 import UserInfo from './UserInfo';
 import Tracking from './Tracking';
 import { logEnums } from './constants';
+import { isType, notUndefined } from './utils/validators';
 
 class Web3Analytics extends BaseAnalytics {
   constructor(config) {
@@ -12,6 +13,7 @@ class Web3Analytics extends BaseAnalytics {
     this.userInfo = new UserInfo(config);
     this.wallet = new WalletConnection(config);
     this.tracking = new Tracking(config);
+    this.valueContribution = this.valueContribution.bind(this);
   }
 
   initialize() {
@@ -22,8 +24,15 @@ class Web3Analytics extends BaseAnalytics {
   }
 
   valueContribution(label, valueInUSD) {
-    invariant(typeof label !== 'string' || typeof valueInUSD !== 'number', 'Invalid arguments');
-    this.log(logEnums.INFO, 'Value Contributed', label, valueInUSD);
+    invariant(isType(label, 'string') && isType(valueInUSD, 'number'), 'Invalid arguments');
+    if (notUndefined(this.store.connectedAccount)) {
+      this.log(logEnums.INFO, 'Value Contributed', label, valueInUSD);
+      //@dev change walletAddress to account and remove walletAssetsInUSD
+      const data = { label, valueInUSD, walletAddress: this.store.connectedAccount, walletAssetsInUSD: 100 };
+      this.request.post('value-contribution/create', { data });
+    } else {
+      this.log(logEnums.ERROR, 'Wallet connot undefined');
+    }
   }
 }
 

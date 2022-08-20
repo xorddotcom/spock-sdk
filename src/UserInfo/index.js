@@ -11,9 +11,9 @@ class UserInfo extends BaseAnalytics {
     if (notUndefined(navigator)) {
       const userAgent = navigator.userAgent;
       userInfo.device = this.getDevice(userAgent);
-      userInfo.browser = this.getBrowser(userAgent);
-      userInfo.os = this.getOS(userAgent);
-      userInfo.language = navigator.language[0];
+      userInfo.system = this.getBrowser(userAgent);
+      userInfo.OS = this.getOS(userAgent);
+      userInfo.language = navigator.language;
       this.dispatch({ userInfo });
     }
   }

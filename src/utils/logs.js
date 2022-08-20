@@ -1,4 +1,5 @@
 import { logEnums } from '../constants';
+import { isType } from './validators';
 
 export function log(debug, level, message) {
   if (debug && typeof console !== 'undefined') {
@@ -7,13 +8,13 @@ export function log(debug, level, message) {
       arguments[2] = JSON.stringify(arguments[2]);
     }
 
-    // append level, message and args
-    let extraArguments = '';
-    for (var i = 3; i < arguments.length; i++) {
-      extraArguments += ` ${arguments[i]}`;
-    }
+    const extraArguments = arguments[3]
+      ? isType(arguments[3], 'object')
+        ? JSON.stringify(arguments[3])
+        : arguments[3]
+      : '';
 
-    const log = level + message + extraArguments;
+    const log = level + message + ' ' + extraArguments;
 
     switch (level) {
       case logEnums.ERROR:

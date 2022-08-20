@@ -1,19 +1,19 @@
-export const SERVER_ENDPOINT = 'http://dapp-server-test.dappzero.io';
+export const SERVER_ENDPOINT = 'https://dapp-server-test.dappzero.io';
 
 const ALIAS = 'dz';
 
-const withAlias = (label) => `${ALIAS}_${label}`;
+export const withAlias = (label) => `${ALIAS}_${label}`;
 
 export const configrationDefaultValue = {
   INACTIVITY_TIMEOUT: 30,
 };
 
 export const logEnums = {
-  ERROR: '[ERROR] ',
-  WARNING: '[WARNING] ',
-  INFO: '[INFO] ',
-  DEBUG: '[DEBUG] ',
-  VERBOSE: '[VERBOSE] ',
+  ERROR: `[${withAlias('ERROR')}] `,
+  WARNING: `[${withAlias('WARNING')}] `,
+  INFO: `[${withAlias('INFO')}] `,
+  DEBUG: `[${withAlias('DEBUG')}] `,
+  VERBOSE: `[${withAlias('VERBOSE')}] `,
 };
 
 export const WALLET_TYPE = {
@@ -34,7 +34,8 @@ export const EVENTS = {
 
 const COOKIES = {
   CACHE_ADDRESS: withAlias('cache_address'),
-  CACHE_CHAINID: withAlias('cache_chain'),
+  CACHE_CHAIN: withAlias('cache_chain'),
+  CACHE_DEVICE_ID: withAlias('cache_deviceId'),
 };
 
 const LOCAL_STORAGE = {

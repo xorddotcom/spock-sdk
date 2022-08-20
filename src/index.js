@@ -39,8 +39,8 @@ Web3Analytics.init = function (config) {
   web3AnalyticsInstance.initialize();
   Web3Analytics.valueContribution = web3AnalyticsInstance.valueContribution;
   Web3Analytics.walletProvider = web3AnalyticsInstance.wallet.walletProvider;
+  Web3Analytics.logWalletConnection = web3AnalyticsInstance.wallet.logWalletConnection;
   Web3Analytics.trackPageView = web3AnalyticsInstance.tracking.trackPageView;
-  Web3Analytics.trackOutboundLink = web3AnalyticsInstance.tracking.trackOutboundLink;
 };
 
 export default Web3Analytics;

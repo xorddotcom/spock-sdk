@@ -1,16 +1,19 @@
 import invariant from 'tiny-invariant';
 
 import BaseAnalytics from '../BaseAnalytics';
-import { logEnums, WALLET_TYPE, EVENTS } from '../constants';
+import { logEnums, WALLET_TYPE, EVENTS, STORAGE } from '../constants';
 import { txnRejected } from './utils';
 import { addEvent } from '../utils/helpers';
-import { notUndefined, isSameAddress } from '../utils/validators';
+import { notUndefined, isSameAddress, isType } from '../utils/validators';
 import { normalizeChainId } from '../utils/formatting';
+import { getCookie, setCookie } from '../utils/cookies';
 
 class WalletConnection extends BaseAnalytics {
   constructor(config) {
     super(config);
+    this.cacheTxnHash = undefined;
     this.walletProvider = this.walletProvider.bind(this);
+    this.logWalletConnection = this.logWalletConnection.bind(this);
   }
 
   initialize() {
@@ -31,7 +34,7 @@ class WalletConnection extends BaseAnalytics {
 
       window.ethereum.on('accountsChanged', (account) => {
         const chainId = window.ethereum.chainId;
-        this.logWalletConnectionFromEvents(WALLET_TYPE.METAMASK, account[0], chainId);
+        this.logWalletConnectionFromEvents(WALLET_TYPE.METAMASK, account[0], chainId, true);
       });
 
       window.ethereum.on('chainChanged', (chainId) => {
@@ -49,12 +52,12 @@ class WalletConnection extends BaseAnalytics {
       console.log('payload eip1193 => ', payload);
       if (notUndefined(payload?.result)) {
         payload.result
-          .then((txnHas) => {
-            this.log(logEnums.INFO, 'Transaction hash', txnHas);
+          .then((txnHash) => {
+            this.logTransaction('submitted', payload.params, txnHash);
           })
           .catch((e) => {
             if (txnRejected(e)) {
-              this.log(logEnums.INFO, 'Transaction rejected', e);
+              this.logTransaction('rejected', payload.params);
             }
           });
       }
@@ -64,12 +67,38 @@ class WalletConnection extends BaseAnalytics {
       console.log('payload legacy => ', payload);
       if (notUndefined(payload)) {
         if (payload.result && payload.params) {
-          this.log(logEnums.INFO, 'Transaction hash', payload.result);
+          this.logTransaction('submitted', payload.params, payload.result);
         } else if (payload.error && txnRejected(payload.error)) {
-          this.log(logEnums.INFO, 'Transaction rejected', payload.error);
+          this.logTransaction('rejected', payload.params);
         }
       }
     });
+  }
+
+  logTransaction(status, txnObj, txnHash) {
+    const address = this.store.connectedAccount;
+    if (status === 'rejected') {
+      const data = { address, txnObj };
+      //this.request.post('/rejectTransaction', { data });
+      this.log(logEnums.INFO, 'Transaction rejected', data);
+    } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
+      const data = { address, txnObj, txnHash };
+      // this.request.post('/submitTransaction', {
+      //   data,
+      //   callback: () => {
+      //     this.cacheTxnHash = txnHash;
+      //   },
+      // });
+      this.cacheTxnHash = txnHash;
+      const pageNavigation = this.store.pageNavigation;
+      const page = this.store.pageNavigation.find(({ pageTitle }) => pageTitle === window.location.pathname);
+      const index = pageNavigation.indexOf(page);
+      if (index >= 0) {
+        pageNavigation[index] = { ...page, doneTxn: true };
+        this.dispatch({ pageNavigation });
+      }
+      this.log(logEnums.INFO, 'Transaction hash', data);
+    }
   }
 
   customizeProvider(proivder, walletType) {
@@ -89,8 +118,6 @@ class WalletConnection extends BaseAnalytics {
     function attachEvent(originalMethod, isLegacy) {
       return function () {
         const arg = arguments[0];
-
-        //console.log('arguments => ', arguments);
 
         //add event in callback of send txn method for legacy provider
         if (isLegacy) {
@@ -212,22 +239,42 @@ class WalletConnection extends BaseAnalytics {
     }
   }
 
-  logWalletConnectionFromEvents(walletName, account, chainId) {
-    if (this.store.provider) {
+  logWalletConnectionFromEvents(walletType, account, chainId, overrideRule) {
+    if (this.store.provider && !overrideRule) {
       return;
     } else {
-      this.logWalletConnection(walletName, account, chainId);
+      this.logWalletConnection(walletType, account, chainId);
     }
   }
 
-  logWalletConnection(walletName, account, chainId) {
-    if (typeof walletName === 'string' && typeof account === 'string') {
-      const chain = typeof chainId === 'string' ? normalizeChainId(chainId) : chainId ? chainId : this.connectedChain;
-      if (!isSameAddress(this.store.connectedWallet, account) || chain !== this.store.connectedChain) {
-        this.dispatch({ connectedAccount: account, connectedChain: chain });
-        const userInfo = this.store.userInfo;
-        const data = { walletName, account, chain, userInfo };
-        this.log(logEnums.INFO, 'wallet connected', JSON.stringify(data));
+  logWalletConnection(walletType, account, chainId) {
+    invariant(isType(walletType, 'string') && isType(account, 'string'), 'Invalid arguments');
+
+    const chain = isType(chainId, 'string') ? normalizeChainId(chainId) : chainId ? chainId : this.connectedChain;
+
+    // not log already logged conectedWallet with same network
+    if (!isSameAddress(this.store.connectedAccount, account) || chain !== this.store.connectedChain) {
+      this.dispatch({ connectedAccount: account, connectedChain: chain });
+
+      const userInfo = this.store.userInfo;
+      const { device, system, OS, language } = userInfo ? userInfo : {};
+      const data = { walletType, address: account, chain, device, system, OS, language };
+
+      this.log(logEnums.INFO, 'wallet connected', JSON.stringify(data));
+
+      const cacheAddress = getCookie(STORAGE.COOKIES.CACHE_ADDRESS);
+      const cacheChain = getCookie(STORAGE.COOKIES.CACHE_CHAIN);
+
+      // return in-case same wallet with same network is already logged on server
+      if (!isSameAddress(cacheAddress, account) || Number(cacheChain) !== chain) {
+        this.request.post('wallet-connection/create', {
+          data,
+          callback: () => {
+            //cache for current date
+            setCookie(STORAGE.COOKIES.CACHE_ADDRESS, account);
+            setCookie(STORAGE.COOKIES.CACHE_CHAIN, chain);
+          },
+        });
       }
     }
   }
