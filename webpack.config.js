@@ -1,13 +1,36 @@
 const path = require('path');
+const pkg = require('./package.json');
 
-module.exports = {
+const libraryName = pkg.name;
+
+module.exports = (env) => ({
+  mode: env.mode,
   mode: 'production',
-  entry: './lib/index.js',
+  entry: __dirname + '/src/index.js',
+  devtool: 'source-map',
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'analytics.min.js',
-    library: 'Web3Analytics',
+    path: __dirname + '/dist',
+    filename: env.mode === 'development' ? `${libraryName}.js` : `${libraryName}.min.js`,
+    library: libraryName,
     libraryTarget: 'umd',
-
+    libraryExport: 'default',
+    umdNamedDefine: true,
+    globalObject: "typeof self !== 'undefined' ? self : this",
   },
-};
+  module: {
+    rules: [
+      {
+        test: /(\.jsx|\.js|\.ts|\.tsx)$/,
+        use: {
+          loader: 'babel-loader',
+        },
+        exclude: /(node_modules|bower_components)/,
+      },
+      // {
+      //   test: /(\.jsx|\.js)$/,
+      //   loader: 'eslint-loader',
+      //   exclude: /(node_modules|bower_components)/,
+      // },
+    ],
+  },
+});
