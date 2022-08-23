@@ -2,9 +2,10 @@ import { SERVER_ENDPOINT, logEnums } from '../constants';
 import { stringify } from '../utils/formatting';
 
 class Request {
-  constructor(appKey, log) {
+  constructor(appKey, log, testMode) {
     this.appKey = appKey;
     this.log = log;
+    this.testMode = testMode;
     this.headers = {
       appkey: '51e0aef1ebc5c0aa53612485a02c6acfca2f81423f9950790596272c7052b85e',
       'Content-type': 'application/json; charset=UTF-8',
@@ -14,8 +15,12 @@ class Request {
 
   post(route, { data, callback }) {
     const formatedData = stringify(data);
-    console.log('formatedData => ', formatedData);
     if (formatedData) {
+      if (this.testMode) {
+        callback && callback();
+        return;
+      }
+
       fetch(`${SERVER_ENDPOINT}/${route}`, {
         method: 'POST',
         headers: this.headers,
@@ -23,12 +28,11 @@ class Request {
       })
         .then((response) => response.json())
         .then((json) => {
-          console.log('json => ', json);
           callback && callback();
+          this.log(logEnums.INFO, `${route} logged`);
         })
         .catch((e) => {
-          console.log('error => ', e);
-          this.log(logEnums.ERROR, 'Post request failed', e);
+          this.log(logEnums.ERROR, `${route} request failed`, e);
         });
     }
   }

@@ -4,6 +4,7 @@ import { notUndefined } from '../utils/validators';
 class UserInfo extends BaseAnalytics {
   constructor(config) {
     super(config);
+    this.getUserInfo = this.getUserInfo.bind(this);
   }
 
   getUserInfo() {

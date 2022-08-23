@@ -49,7 +49,7 @@ class WalletConnection extends BaseAnalytics {
 
   transactionEvents() {
     addEvent(window, EVENTS.SEND_TXN, (payload) => {
-      console.log('payload eip1193 => ', payload);
+      this.log(logEnums.INFO, 'payload eip1193 => ', payload);
       if (notUndefined(payload?.result)) {
         payload.result
           .then((txnHash) => {
@@ -64,7 +64,7 @@ class WalletConnection extends BaseAnalytics {
     });
 
     addEvent(window, EVENTS.LEGACY_TXN_CALLBACK, (payload) => {
-      console.log('payload legacy => ', payload);
+      this.log(logEnums.INFO, 'payload legacy => ', payload);
       if (notUndefined(payload)) {
         if (payload.result && payload.params) {
           this.logTransaction('submitted', payload.params, payload.result);
@@ -251,6 +251,8 @@ class WalletConnection extends BaseAnalytics {
     invariant(isType(walletType, 'string') && isType(account, 'string'), 'Invalid arguments');
 
     const chain = isType(chainId, 'string') ? normalizeChainId(chainId) : chainId ? chainId : this.connectedChain;
+
+    invariant(notUndefined(chain), 'Invalid chainId');
 
     // not log already logged conectedWallet with same network
     if (!isSameAddress(this.store.connectedAccount, account) || chain !== this.store.connectedChain) {

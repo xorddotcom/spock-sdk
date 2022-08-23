@@ -11,7 +11,7 @@ class Tracking extends BaseAnalytics {
     this.inactivityTimeout = getConfig(config.inactivityTimeout, configrationDefaultValue.INACTIVITY_TIMEOUT);
     this.reference = undefined; //document reference
     this.inactivityInterval = undefined; //inactivity interval for checking session inactivity
-    this.sessionInactive = false; //Is ongoing session is inactive
+    this.sessionInactive = false; //is ongoing session is inactive
     this.sessionStartTime = 0; //session start time
     this.sessionHiddenTime = 0; //session inactive time
     this.sessionTotalInactivetime = 0; //total duration in which session was inactive
@@ -27,7 +27,6 @@ class Tracking extends BaseAnalytics {
     this.trackOutboundLink();
   }
 
-  //Track User
   trackUser() {
     let deviceId;
     const storedDeviceId = setGetValueInStorage(STORAGE.LOCAL_STORAGE.DEVICE_ID);
@@ -57,7 +56,6 @@ class Tracking extends BaseAnalytics {
     }
   }
 
-  //Track Sessions
   trackSessions() {
     this.beginSession();
     addEvent(window, 'visibilitychange', this.handleDocumentVisibilityState.bind(this));
@@ -67,15 +65,13 @@ class Tracking extends BaseAnalytics {
     this.generateInactivityInterval();
   }
 
-  //Begin Session
   beginSession() {
     this.sessionStartTime = currentTimestamp();
     this.sessionTotalInactivetime = 0;
     this.sessionInactive = false;
-    console.log('Session started');
+    this.log(logEnums.INFO, 'Session started');
   }
 
-  //End Session
   endSession() {
     const totalSessionDuration = currentTimestamp() - this.sessionStartTime;
     const sessionDuration = totalSessionDuration - this.sessionTotalInactivetime;
@@ -85,13 +81,11 @@ class Tracking extends BaseAnalytics {
 
     const userInfo = this.store.userInfo;
     const { device, system, OS, language } = userInfo ? userInfo : {};
-    //@dev change walletAddress, navigation
     const data = {
-      walletAddress: this.store.connectedAccount,
+      address: this.store.connectedAccount,
       sessionDuration,
       doneTxn: this.store.doneTxn,
-      //navigation: this.store.pageNavigation,
-      navigation: [{ page: '/tes', abc: 'tes' }],
+      navigation: this.store.pageNavigation,
       pagesFlow: this.store.pagesFlow,
       device,
       system,
@@ -99,7 +93,7 @@ class Tracking extends BaseAnalytics {
       language,
       userId: this.store.userId,
     };
-    this.log(logEnums.INFO, 'Session ecpired => ', data);
+    this.log(logEnums.INFO, 'Session expired => ', data);
     this.request.post('session/create-session', { data });
   }
 
@@ -115,7 +109,6 @@ class Tracking extends BaseAnalytics {
     }
   }
 
-  // Handle visibility change eventss
   handleDocumentVisibilityState() {
     if (document.visibilityState === 'visible') {
       const hiddenInactiveTime = currentTimestamp() - this.sessionHiddenTime;
@@ -125,7 +118,6 @@ class Tracking extends BaseAnalytics {
     }
   }
 
-  //Check Inactivity Counter
   generateInactivityInterval() {
     this.inactivityInterval = setInterval(() => {
       this.sessionInactive = true;
@@ -133,25 +125,22 @@ class Tracking extends BaseAnalytics {
     }, 10 * 1000);
   }
 
-  //Track Page
   trackPageView(_page) {
     const page = _page || window.location.pathname;
     if (page) {
       const pageNavigation = this.store.pageNavigation;
       const alreadyNavigated = pageNavigation.find(({ pageTitle }) => pageTitle === page);
       if (!alreadyNavigated) {
-        pageNavigation.push({ pageTitle: page, doneTxn: false });
+        pageNavigation.push({ page, doneTxn: false });
         this.dispatch({ pageNavigation });
       }
       this.pagesFlow.push(page);
-      // @dev remove count
-      const data = { pageTitle: page, count: 0 };
+      const data = { pageTitle: page };
       this.request.post('page-views/create', { data });
       this.log(logEnums.INFO, 'Track pageview', data);
     }
   }
 
-  //Track Outbound Link
   trackOutboundLink() {
     function findParentByTagName(element, tagName) {
       var parent = element;
