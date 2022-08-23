@@ -83,6 +83,7 @@ class Tracking extends BaseAnalytics {
     const { device, system, OS, language } = userInfo ? userInfo : {};
     const data = {
       address: this.store.connectedAccount,
+      chainId: this.store.connectedChain,
       sessionDuration,
       doneTxn: this.store.doneTxn,
       navigation: this.store.pageNavigation,
@@ -97,7 +98,6 @@ class Tracking extends BaseAnalytics {
     this.request.post('session/create-session', { data });
   }
 
-  //Reset Inactivity Counter
   resetInactivity() {
     if (this.sessionInactive) {
       this.beginSession();
@@ -122,7 +122,7 @@ class Tracking extends BaseAnalytics {
     this.inactivityInterval = setInterval(() => {
       this.sessionInactive = true;
       this.endSession();
-    }, 10 * 1000);
+    }, this.inactivityTimeout * 60 * 60 * 1000);
   }
 
   trackPageView(_page) {
@@ -155,9 +155,11 @@ class Tracking extends BaseAnalytics {
     function trackAnchorClick(event) {
       const anchorTag = findParentByTagName(event.target || event.srcElement, 'A');
       if (anchorTag) {
-        const data = { link: anchorTag.href };
-        this.request.post('outbound-links/create', { data });
-        this.log(logEnums.INFO, 'Track outbound link', data);
+        if (anchorTag.hostname !== window.location.hostname) {
+          const data = { link: anchorTag.href };
+          this.request.post('outbound-links/create', { data });
+          this.log(logEnums.INFO, 'Track outbound link', data);
+        }
       }
     }
 

@@ -260,7 +260,7 @@ class WalletConnection extends BaseAnalytics {
 
       const userInfo = this.store.userInfo;
       const { device, system, OS, language } = userInfo ? userInfo : {};
-      const data = { walletType, address: account, chain, device, system, OS, language };
+      const data = { walletType, address: account, chainId: chain, device, system, OS, language };
 
       this.log(logEnums.INFO, 'wallet connected', JSON.stringify(data));
 

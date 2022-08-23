@@ -3,11 +3,10 @@ import { stringify } from '../utils/formatting';
 
 class Request {
   constructor(appKey, log, testMode) {
-    this.appKey = appKey;
     this.log = log;
     this.testMode = testMode;
     this.headers = {
-      appkey: '51e0aef1ebc5c0aa53612485a02c6acfca2f81423f9950790596272c7052b85e',
+      appkey: appKey,
       'Content-type': 'application/json; charset=UTF-8',
     };
     this.post = this.post.bind(this);
