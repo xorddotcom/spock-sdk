@@ -1,11 +1,11 @@
 import invariant from 'tiny-invariant';
 
-import BaseAnalytics from './BaseAnalytics';
-import WalletConnection from './WalletConnection';
-import UserInfo from './UserInfo';
-import Tracking from './Tracking';
-import { logEnums } from './constants';
-import { isType, notUndefined } from './utils/validators';
+import BaseAnalytics from '../BaseAnalytics';
+import WalletConnection from '../WalletConnection';
+import UserInfo from '../UserInfo';
+import Tracking from '../Tracking';
+import { logEnums } from '../constants';
+import { isType, notUndefined } from '../utils/validators';
 
 class Web3Analytics extends BaseAnalytics {
   constructor(config) {
@@ -25,13 +25,12 @@ class Web3Analytics extends BaseAnalytics {
 
   valueContribution(label, valueInUSD) {
     invariant(isType(label, 'string') && isType(valueInUSD, 'number'), 'Invalid arguments');
-    if (notUndefined(this.store.connectedAccount)) {
+    if (notUndefined(this.store.connectedAccount) && notUndefined(this.store.connectedChain)) {
       this.log(logEnums.INFO, 'Value Contributed', label, valueInUSD);
-      //@dev change walletAddress to account and remove walletAssetsInUSD
-      const data = { label, valueInUSD, walletAddress: this.store.connectedAccount, walletAssetsInUSD: 100 };
+      const data = { label, valueInUSD, address: this.store.connectedAccount, chainId: this.store.connectedChain };
       this.request.post('value-contribution/create', { data });
     } else {
-      this.log(logEnums.ERROR, 'Wallet connot undefined');
+      this.log(logEnums.ERROR, 'Wallet or chain connot undefined');
     }
   }
 }
