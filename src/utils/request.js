@@ -2,9 +2,10 @@ import { SERVER_ENDPOINT, logEnums } from '../constants';
 import { stringify } from '../utils/formatting';
 
 class Request {
-  constructor(appKey, log, testMode) {
+  constructor({ appKey, log, testMode, store }) {
     this.log = log;
     this.testMode = testMode;
+    this.ipaddress = undefined;
     this.headers = {
       appkey: appKey,
       'Content-type': 'application/json; charset=UTF-8',
@@ -12,7 +13,21 @@ class Request {
     this.post = this.post.bind(this);
   }
 
-  post(route, { data, callback }) {
+  async getUserIp() {
+    let ipaddress = this.ipaddress;
+    if (!ipaddress) {
+      const result = await this.externalGet('https://api.ipify.org?format=json');
+      if (result?.ip) {
+        ipaddress = result?.ip;
+        this.ipaddress = ipaddress;
+        return ipaddress;
+      }
+    } else {
+      return ipaddress;
+    }
+  }
+
+  async post(route, { data, callback, withIp }) {
     const formatedData = stringify(data);
     if (formatedData) {
       if (this.testMode) {
@@ -20,19 +35,31 @@ class Request {
         return;
       }
 
-      fetch(`${SERVER_ENDPOINT}/${route}`, {
-        method: 'POST',
-        headers: this.headers,
-        body: formatedData,
-      })
-        .then((response) => response.json())
-        .then((json) => {
-          callback && callback();
-          this.log(logEnums.INFO, `${route} logged`);
-        })
-        .catch((e) => {
-          this.log(logEnums.ERROR, `${route} request failed`, e);
+      const headers = withIp ? { ...this.headers, ipaddress: await this.getUserIp() } : this.headers;
+
+      try {
+        const response = await fetch(`${SERVER_ENDPOINT}/${route}`, {
+          method: 'POST',
+          headers,
+          body: formatedData,
         });
+        await response.json();
+        callback && callback();
+        this.log(logEnums.INFO, `${route} logged`);
+      } catch (e) {
+        this.log(logEnums.ERROR, `${route} request failed`, e.toString());
+      }
+    }
+  }
+
+  async externalGet(api) {
+    try {
+      const response = await fetch(api, {
+        method: 'GET',
+      });
+      return await response.json();
+    } catch (e) {
+      console.log('error => ', e);
     }
   }
 }

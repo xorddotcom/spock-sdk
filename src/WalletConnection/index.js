@@ -271,6 +271,7 @@ class WalletConnection extends BaseAnalytics {
       if (!isSameAddress(cacheAddress, account) || Number(cacheChain) !== chain) {
         this.request.post('wallet-connection/create', {
           data,
+          withIp: true,
           callback: () => {
             //cache for current date
             setCookie(STORAGE.COOKIES.CACHE_ADDRESS, account);

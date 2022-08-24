@@ -49,6 +49,7 @@ class Tracking extends BaseAnalytics {
     else {
       this.request.post('app-visits/create', {
         data,
+        withIp: true,
         callback: () => {
           setCookie(STORAGE.COOKIES.CACHE_DEVICE_ID, deviceId);
         },
@@ -95,7 +96,7 @@ class Tracking extends BaseAnalytics {
       userId: this.store.userId,
     };
     this.log(logEnums.INFO, 'Session expired => ', data);
-    this.request.post('session/create-session', { data });
+    this.request.post('session/create-session', { data, withIp: true });
   }
 
   resetInactivity() {

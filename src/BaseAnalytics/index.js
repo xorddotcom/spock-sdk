@@ -11,7 +11,7 @@ class BaseAnalytics {
     this.log = (message, ...extraArguments) => log(this.debug, message, ...extraArguments);
     this.store = AnalyticsStorage.store;
     this.dispatch = AnalyticsStorage.dispatch;
-    this.request = new Request(this.appKey, this.log, this.testMode);
+    this.request = new Request({ appKey: this.appKey, log: this.log, testMode: this.testMode, store: this.store });
   }
 }
 
