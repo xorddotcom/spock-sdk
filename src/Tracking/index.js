@@ -89,6 +89,7 @@ class Tracking extends BaseAnalytics {
       doneTxn: this.store.doneTxn,
       navigation: this.store.pageNavigation,
       pagesFlow: this.store.pagesFlow,
+      rejectTxn: this.store.rejectTxn,
       device,
       system,
       OS,
@@ -96,7 +97,15 @@ class Tracking extends BaseAnalytics {
       userId: this.store.userId,
     };
     this.log(logEnums.INFO, 'Session expired => ', data);
-    this.request.post('session/create-session', { data, withIp: true });
+    this.request.post('session/create-session', {
+      data,
+      withIp: true,
+      callback: () => {
+        this.dispatch({ pageNavigation: [], doneTxn: false, rejectTxn: false });
+        //add current page in navigation after clearing all navigation data
+        this.trackPageView();
+      },
+    });
   }
 
   resetInactivity() {
@@ -123,7 +132,7 @@ class Tracking extends BaseAnalytics {
     this.inactivityInterval = setInterval(() => {
       this.sessionInactive = true;
       this.endSession();
-    }, this.inactivityTimeout * 60 * 60 * 1000);
+    }, this.inactivityTimeout * 60 * 1000);
   }
 
   trackPageView(_page) {

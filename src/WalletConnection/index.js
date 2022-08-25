@@ -80,6 +80,10 @@ class WalletConnection extends BaseAnalytics {
     if (status === 'rejected') {
       const data = { address, txnObj };
       //this.request.post('/rejectTransaction', { data });
+      //not to set rejectTxn if session already have doneTxn
+      if (this.store.doneTxn !== true) {
+        this.dispatch({ rejectTxn: true });
+      }
       this.log(logEnums.INFO, 'Transaction rejected', data);
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
       const data = { address, txnObj, txnHash };
@@ -91,12 +95,13 @@ class WalletConnection extends BaseAnalytics {
       // });
       this.cacheTxnHash = txnHash;
       const pageNavigation = this.store.pageNavigation;
-      const page = this.store.pageNavigation.find(({ pageTitle }) => pageTitle === window.location.pathname);
+      const page = this.store.pageNavigation.find(({ page }) => page === window.location.pathname);
       const index = pageNavigation.indexOf(page);
       if (index >= 0) {
         pageNavigation[index] = { ...page, doneTxn: true };
         this.dispatch({ pageNavigation });
       }
+      this.dispatch({ doneTxn: true, rejectTxn: false });
       this.log(logEnums.INFO, 'Transaction hash', data);
     }
   }
