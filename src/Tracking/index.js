@@ -88,7 +88,7 @@ class Tracking extends BaseAnalytics {
       sessionDuration,
       doneTxn: this.store.doneTxn,
       navigation: this.store.pageNavigation,
-      pagesFlow: this.store.pagesFlow,
+      pagesFlow: this.pagesFlow,
       rejectTxn: this.store.rejectTxn,
       device,
       system,
@@ -102,6 +102,7 @@ class Tracking extends BaseAnalytics {
       withIp: true,
       callback: () => {
         this.dispatch({ pageNavigation: [], doneTxn: false, rejectTxn: false });
+        this.pagesFlow = [];
         //add current page in navigation after clearing all navigation data
         this.trackPageView();
       },

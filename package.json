@@ -1,6 +1,6 @@
 {
   "name": "projectsdk",
-  "version": "3.0.10",
+  "version": "3.0.11",
   "description": "ProjectV SDK",
   "main": "dist/projectsdk.js",
   "files": [
