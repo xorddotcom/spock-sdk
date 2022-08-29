@@ -53,11 +53,11 @@ class WalletConnection extends BaseAnalytics {
       if (notUndefined(payload?.result)) {
         payload.result
           .then((txnHash) => {
-            this.logTransaction('submitted', payload.params, txnHash);
+            this.logTransaction('submitted', payload.params[0], txnHash);
           })
           .catch((e) => {
             if (txnRejected(e)) {
-              this.logTransaction('rejected', payload.params);
+              this.logTransaction('rejected', payload.params[0]);
             }
           });
       }
@@ -67,32 +67,32 @@ class WalletConnection extends BaseAnalytics {
       this.log(logEnums.INFO, 'payload legacy => ', payload);
       if (notUndefined(payload)) {
         if (payload.result && payload.params) {
-          this.logTransaction('submitted', payload.params, payload.result);
+          this.logTransaction('submitted', payload.params[0], payload.result);
         } else if (payload.error && txnRejected(payload.error)) {
-          this.logTransaction('rejected', payload.params);
+          this.logTransaction('rejected', payload.params[0]);
         }
       }
     });
   }
 
   logTransaction(status, txnObj, txnHash) {
-    const address = this.store.connectedAccount;
+    const chainId = this.store.connectedChain;
     if (status === 'rejected') {
-      const data = { address, txnObj };
-      //this.request.post('/rejectTransaction', { data });
+      const data = { ...txnObj, chainId };
+      this.request.post('transactions/create', { data });
       //not to set rejectTxn if session already have doneTxn
       if (this.store.doneTxn !== true) {
         this.dispatch({ rejectTxn: true });
       }
       this.log(logEnums.INFO, 'Transaction rejected', data);
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
-      const data = { address, txnObj, txnHash };
-      // this.request.post('/submitTransaction', {
-      //   data,
-      //   callback: () => {
-      //     this.cacheTxnHash = txnHash;
-      //   },
-      // });
+      const data = { ...txnObj, txHash: txnHash, chainId };
+      this.request.post('transactions/create', {
+        data,
+        callback: () => {
+          this.cacheTxnHash = txnHash;
+        },
+      });
       this.cacheTxnHash = txnHash;
       const pageNavigation = this.store.pageNavigation;
       const page = this.store.pageNavigation.find(({ page }) => page === window.location.pathname);

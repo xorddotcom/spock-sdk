@@ -35,6 +35,8 @@ class Request {
         return;
       }
 
+      console.log('formatedData => ', formatedData);
+
       const headers = withIp ? { ...this.headers, ipaddress: await this.getUserIp() } : this.headers;
 
       try {
