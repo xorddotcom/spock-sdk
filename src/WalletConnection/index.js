@@ -167,9 +167,16 @@ class WalletConnection extends BaseAnalytics {
   }
 
   getWalletTypeFromProvider(provider) {
-    if (provider.isMetaMask && !provider.overrideIsMetaMask) return WALLET_TYPE.METAMASK;
+    //in-case metamask and wallet connect both are connected
+    if (provider.overrideIsMetaMask) {
+      if (provider.selectedProvider) {
+        return provider.selectedProvider.isMetaMask ? WALLET_TYPE.METAMASK : WALLET_TYPE.WALLETCONNECT;
+      }
+    }
+
+    if (provider.isMetaMask) return WALLET_TYPE.METAMASK;
     else if (provider.isWalletConnect) return WALLET_TYPE.WALLETCONNECT;
-    else if (provider.isCoinbaseWallet || provider.overrideIsMetaMask) return WALLET_TYPE.COINBASE;
+    else if (provider.isCoinbaseWallet) return WALLET_TYPE.COINBASE;
     else if (provider.isFortmatic) return WALLET_TYPE.FORTMATIC;
     else if (provider.isPortis) return WALLET_TYPE.PORTIS;
     else return WALLET_TYPE.OTHER;

@@ -2,7 +2,7 @@ import { SERVER_ENDPOINT, logEnums } from '../constants';
 import { stringify } from '../utils/formatting';
 
 class Request {
-  constructor({ appKey, log, testMode, store }) {
+  constructor({ appKey, log, testMode }) {
     this.log = log;
     this.testMode = testMode;
     this.ipaddress = undefined;
@@ -34,8 +34,6 @@ class Request {
         callback && callback();
         return;
       }
-
-      console.log('formatedData => ', formatedData);
 
       const headers = withIp ? { ...this.headers, ipaddress: await this.getUserIp() } : this.headers;
 
