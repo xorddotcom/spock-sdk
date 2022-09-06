@@ -16,6 +16,7 @@ class Tracking extends BaseAnalytics {
     this.sessionHiddenTime = 0; //session inactive time
     this.sessionTotalInactivetime = 0; //total duration in which session was inactive
     this.pagesFlow = []; //all the pages open in one session
+    this.initialEnd = false;
 
     this.trackPageView = this.trackPageView.bind(this);
   }
@@ -25,6 +26,9 @@ class Tracking extends BaseAnalytics {
     this.trackUser();
     this.trackSessions();
     this.trackOutboundLink();
+
+    //log once time to handle unload log
+    this.endSession();
   }
 
   trackUser() {
@@ -63,6 +67,7 @@ class Tracking extends BaseAnalytics {
     addEvent(window, 'mousemove', this.resetInactivity.bind(this));
     addEvent(window, 'click', this.resetInactivity.bind(this));
     addEvent(window, 'beforeunload', this.endSession.bind(this));
+
     this.generateInactivityInterval();
   }
 
@@ -97,9 +102,11 @@ class Tracking extends BaseAnalytics {
       userId: this.store.userId,
     };
     this.log(logEnums.INFO, 'Session expired => ', data);
+
     this.request.post('session/create-session', {
       data,
       withIp: true,
+      noLog: !this.initialEnd,
       callback: () => {
         this.dispatch({ pageNavigation: [], doneTxn: false, rejectTxn: false });
         this.pagesFlow = [];
@@ -107,6 +114,7 @@ class Tracking extends BaseAnalytics {
         this.trackPageView();
       },
     });
+    this.initialEnd = true;
   }
 
   resetInactivity() {
