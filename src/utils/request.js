@@ -27,8 +27,9 @@ class Request {
     }
   }
 
-  async post(route, { data, callback, withIp, noLog }) {
+  async post(route, { data, callback, withIp }) {
     const formatedData = stringify(data);
+    localStorage.setItem(route, formatedData);
     if (formatedData) {
       if (this.testMode) {
         callback && callback();
@@ -37,19 +38,17 @@ class Request {
 
       const headers = withIp ? { ...this.headers, ipaddress: await this.getUserIp() } : this.headers;
 
-      if (!noLog) {
-        try {
-          const response = await fetch(`${SERVER_ENDPOINT}/${route}`, {
-            method: 'POST',
-            headers,
-            body: formatedData,
-          });
-          await response.json();
-          callback && callback();
-          this.log(logEnums.INFO, `${route} logged`);
-        } catch (e) {
-          this.log(logEnums.ERROR, `${route} request failed`, e.toString());
-        }
+      try {
+        const response = await fetch(`${SERVER_ENDPOINT}/${route}`, {
+          method: 'POST',
+          headers,
+          body: formatedData,
+        });
+        await response.json();
+        callback && callback();
+        this.log(logEnums.INFO, `${route} logged`);
+      } catch (e) {
+        this.log(logEnums.ERROR, `${route} request failed`, e.toString());
       }
     }
   }

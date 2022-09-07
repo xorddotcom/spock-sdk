@@ -51,3 +51,5 @@ export const STORAGE = {
   LOCAL_STORAGE,
   SESSION_STORAGE,
 };
+
+export const EMPTY_STRING = '';
