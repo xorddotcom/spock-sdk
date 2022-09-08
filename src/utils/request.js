@@ -27,9 +27,8 @@ class Request {
     }
   }
 
-  async post(route, { data, callback, withIp }) {
+  async post(route, { data, callback, withIp, keepalive }) {
     const formatedData = stringify(data);
-    localStorage.setItem(route, formatedData);
     if (formatedData) {
       if (this.testMode) {
         callback && callback();
@@ -43,6 +42,7 @@ class Request {
           method: 'POST',
           headers,
           body: formatedData,
+          keepalive,
         });
         await response.json();
         callback && callback();
