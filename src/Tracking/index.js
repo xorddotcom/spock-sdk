@@ -1,5 +1,5 @@
 import BaseAnalytics from '../BaseAnalytics';
-import { logEnums, STORAGE, configrationDefaultValue } from '../constants';
+import { logEnums, STORAGE, configrationDefaultValue, EMPTY_STRING } from '../constants';
 import { generateUUID } from './utils';
 import { addEvent, currentTimestamp, setGetValueInStorage, getConfig } from '../utils/helpers';
 import { notUndefined } from '../utils/validators';
@@ -16,15 +16,41 @@ class Tracking extends BaseAnalytics {
     this.sessionHiddenTime = 0; //session inactive time
     this.sessionTotalInactivetime = 0; //total duration in which session was inactive
     this.pagesFlow = []; //all the pages open in one session
+    this.doneSessionPreflightReq = false;
 
     this.trackPageView = this.trackPageView.bind(this);
   }
 
   initialize() {
+    //preflight req for cors cache
+    this.sessionPreflightReq();
+
     this.reference = notUndefined(document.referrer) ? document.referrer : undefined;
     this.trackUser();
     this.trackSessions();
     this.trackOutboundLink();
+  }
+
+  sessionPreflightReq() {
+    const data = {
+      sessionDuration: 0,
+      doneTxn: false,
+      navigation: [],
+      pagesFlow: [],
+      rejectTxn: false,
+      device: EMPTY_STRING,
+      system: EMPTY_STRING,
+      OS: EMPTY_STRING,
+      language: EMPTY_STRING,
+      userId: EMPTY_STRING,
+      noLog: true,
+    };
+
+    this.request.post('session/create-session', {
+      data,
+      withIp: true,
+    });
+    this.doneSessionPreflightReq = true;
   }
 
   trackUser() {
@@ -49,6 +75,7 @@ class Tracking extends BaseAnalytics {
     else {
       this.request.post('app-visits/create', {
         data,
+        withIp: true,
         callback: () => {
           setCookie(STORAGE.COOKIES.CACHE_DEVICE_ID, deviceId);
         },
@@ -61,7 +88,8 @@ class Tracking extends BaseAnalytics {
     addEvent(window, 'visibilitychange', this.handleDocumentVisibilityState.bind(this));
     addEvent(window, 'mousemove', this.resetInactivity.bind(this));
     addEvent(window, 'click', this.resetInactivity.bind(this));
-    addEvent(window, 'beforeunload', this.endSession.bind(this));
+    addEvent(window, 'unload', this.endSession.bind(this));
+
     this.generateInactivityInterval();
   }
 
@@ -87,7 +115,8 @@ class Tracking extends BaseAnalytics {
       sessionDuration,
       doneTxn: this.store.doneTxn,
       navigation: this.store.pageNavigation,
-      pagesFlow: this.store.pagesFlow,
+      pagesFlow: this.pagesFlow,
+      rejectTxn: this.store.rejectTxn,
       device,
       system,
       OS,
@@ -95,7 +124,18 @@ class Tracking extends BaseAnalytics {
       userId: this.store.userId,
     };
     this.log(logEnums.INFO, 'Session expired => ', data);
-    this.request.post('session/create-session', { data });
+
+    this.request.post('session/create-session', {
+      data,
+      withIp: true,
+      keepalive: true,
+      callback: () => {
+        this.dispatch({ pageNavigation: [], doneTxn: false, rejectTxn: false });
+        this.pagesFlow = [];
+        //add current page in navigation after clearing all navigation data
+        this.trackPageView();
+      },
+    });
   }
 
   resetInactivity() {
@@ -122,7 +162,7 @@ class Tracking extends BaseAnalytics {
     this.inactivityInterval = setInterval(() => {
       this.sessionInactive = true;
       this.endSession();
-    }, this.inactivityTimeout * 60 * 60 * 1000);
+    }, this.inactivityTimeout * 60 * 1000);
   }
 
   trackPageView(_page) {

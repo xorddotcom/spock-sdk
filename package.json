@@ -1,10 +1,9 @@
 {
   "name": "projectsdk",
-  "version": "3.0.3",
+  "version": "3.1.9",
   "description": "ProjectV SDK",
   "main": "dist/projectsdk.js",
   "files": [
-    "src/",
     "dist/"
   ],
   "scripts": {
@@ -14,7 +13,6 @@
     "build": "yarn build:umdmin && yarn build:umd"
   },
   "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.18.9",
     "@babel/core": "^7.18.10",
@@ -24,6 +22,7 @@
     "eslint": "^7.0.0",
     "eslint-loader": "^4.0.2",
     "tiny-invariant": "^1.2.0",
+    "ua-parser-js": "^1.0.2",
     "webpack": "^4.44.0",
     "webpack-cli": "^4.10.0",
     "yargs": "^17.5.1"

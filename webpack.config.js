@@ -1,4 +1,3 @@
-const path = require('path');
 const pkg = require('./package.json');
 
 const libraryName = pkg.name;

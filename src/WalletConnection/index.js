@@ -13,7 +13,7 @@ class WalletConnection extends BaseAnalytics {
     super(config);
     this.cacheTxnHash = undefined;
     this.walletProvider = this.walletProvider.bind(this);
-    this.logWalletConnection = this.logWalletConnection.bind(this);
+    this.trackWalletConnection = this.trackWalletConnection.bind(this);
   }
 
   initialize() {
@@ -53,11 +53,11 @@ class WalletConnection extends BaseAnalytics {
       if (notUndefined(payload?.result)) {
         payload.result
           .then((txnHash) => {
-            this.logTransaction('submitted', payload.params, txnHash);
+            this.logTransaction('submitted', payload.params[0], txnHash);
           })
           .catch((e) => {
             if (txnRejected(e)) {
-              this.logTransaction('rejected', payload.params);
+              this.logTransaction('rejected', payload.params[0]);
             }
           });
       }
@@ -67,36 +67,41 @@ class WalletConnection extends BaseAnalytics {
       this.log(logEnums.INFO, 'payload legacy => ', payload);
       if (notUndefined(payload)) {
         if (payload.result && payload.params) {
-          this.logTransaction('submitted', payload.params, payload.result);
+          this.logTransaction('submitted', payload.params[0], payload.result);
         } else if (payload.error && txnRejected(payload.error)) {
-          this.logTransaction('rejected', payload.params);
+          this.logTransaction('rejected', payload.params[0]);
         }
       }
     });
   }
 
   logTransaction(status, txnObj, txnHash) {
-    const address = this.store.connectedAccount;
+    const chainId = this.store.connectedChain;
     if (status === 'rejected') {
-      const data = { address, txnObj };
-      //this.request.post('/rejectTransaction', { data });
+      const data = { ...txnObj, chainId };
+      this.request.post('transactions/create', { data });
+      //not to set rejectTxn if session already have doneTxn
+      if (this.store.doneTxn !== true) {
+        this.dispatch({ rejectTxn: true });
+      }
       this.log(logEnums.INFO, 'Transaction rejected', data);
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
-      const data = { address, txnObj, txnHash };
-      // this.request.post('/submitTransaction', {
-      //   data,
-      //   callback: () => {
-      //     this.cacheTxnHash = txnHash;
-      //   },
-      // });
+      const data = { ...txnObj, txHash: txnHash, chainId };
+      this.request.post('transactions/create', {
+        data,
+        callback: () => {
+          this.cacheTxnHash = txnHash;
+        },
+      });
       this.cacheTxnHash = txnHash;
       const pageNavigation = this.store.pageNavigation;
-      const page = this.store.pageNavigation.find(({ pageTitle }) => pageTitle === window.location.pathname);
+      const page = this.store.pageNavigation.find(({ page }) => page === window.location.pathname);
       const index = pageNavigation.indexOf(page);
       if (index >= 0) {
         pageNavigation[index] = { ...page, doneTxn: true };
         this.dispatch({ pageNavigation });
       }
+      this.dispatch({ doneTxn: true, rejectTxn: false });
       this.log(logEnums.INFO, 'Transaction hash', data);
     }
   }
@@ -162,9 +167,16 @@ class WalletConnection extends BaseAnalytics {
   }
 
   getWalletTypeFromProvider(provider) {
-    if (provider.isMetaMask && !provider.overrideIsMetaMask) return WALLET_TYPE.METAMASK;
+    //in-case metamask and wallet connect both are connected
+    if (provider.overrideIsMetaMask) {
+      if (provider.selectedProvider) {
+        return provider.selectedProvider.isMetaMask ? WALLET_TYPE.METAMASK : WALLET_TYPE.WALLETCONNECT;
+      }
+    }
+
+    if (provider.isMetaMask) return WALLET_TYPE.METAMASK;
     else if (provider.isWalletConnect) return WALLET_TYPE.WALLETCONNECT;
-    else if (provider.isCoinbaseWallet || provider.overrideIsMetaMask) return WALLET_TYPE.COINBASE;
+    else if (provider.isCoinbaseWallet) return WALLET_TYPE.COINBASE;
     else if (provider.isFortmatic) return WALLET_TYPE.FORTMATIC;
     else if (provider.isPortis) return WALLET_TYPE.PORTIS;
     else return WALLET_TYPE.OTHER;
@@ -186,7 +198,7 @@ class WalletConnection extends BaseAnalytics {
     Promise.all([provider.send('eth_accounts'), provider.send('eth_chainId')])
       .then(([accounts, chainId]) => {
         if (notUndefined(accounts) && notUndefined(chainId)) {
-          this.logWalletConnection(walletType, accounts[0], chainId);
+          this.trackWalletConnection(walletType, accounts[0], chainId);
         }
       })
       .catch((e) => {
@@ -198,7 +210,7 @@ class WalletConnection extends BaseAnalytics {
     Promise.all([provider.request({ method: 'eth_accounts' }), provider.request({ method: 'eth_chainId' })])
       .then(([accounts, chainId]) => {
         if (notUndefined(accounts) && notUndefined(chainId)) {
-          this.logWalletConnection(walletType, accounts[0], chainId);
+          this.trackWalletConnection(walletType, accounts[0], chainId);
         }
       })
       .catch((e) => {
@@ -243,11 +255,11 @@ class WalletConnection extends BaseAnalytics {
     if (this.store.provider && !overrideRule) {
       return;
     } else {
-      this.logWalletConnection(walletType, account, chainId);
+      this.trackWalletConnection(walletType, account, chainId);
     }
   }
 
-  logWalletConnection(walletType, account, chainId) {
+  trackWalletConnection(walletType, account, chainId) {
     invariant(isType(walletType, 'string') && isType(account, 'string'), 'Invalid arguments');
 
     const chain = isType(chainId, 'string') ? normalizeChainId(chainId) : chainId ? chainId : this.connectedChain;
@@ -271,6 +283,7 @@ class WalletConnection extends BaseAnalytics {
       if (!isSameAddress(cacheAddress, account) || Number(cacheChain) !== chain) {
         this.request.post('wallet-connection/create', {
           data,
+          withIp: true,
           callback: () => {
             //cache for current date
             setCookie(STORAGE.COOKIES.CACHE_ADDRESS, account);
