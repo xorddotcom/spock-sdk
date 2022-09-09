@@ -13,7 +13,7 @@ class WalletConnection extends BaseAnalytics {
     super(config);
     this.cacheTxnHash = undefined;
     this.walletProvider = this.walletProvider.bind(this);
-    this.logWalletConnection = this.logWalletConnection.bind(this);
+    this.trackWalletConnection = this.trackWalletConnection.bind(this);
   }
 
   initialize() {
@@ -198,7 +198,7 @@ class WalletConnection extends BaseAnalytics {
     Promise.all([provider.send('eth_accounts'), provider.send('eth_chainId')])
       .then(([accounts, chainId]) => {
         if (notUndefined(accounts) && notUndefined(chainId)) {
-          this.logWalletConnection(walletType, accounts[0], chainId);
+          this.trackWalletConnection(walletType, accounts[0], chainId);
         }
       })
       .catch((e) => {
@@ -210,7 +210,7 @@ class WalletConnection extends BaseAnalytics {
     Promise.all([provider.request({ method: 'eth_accounts' }), provider.request({ method: 'eth_chainId' })])
       .then(([accounts, chainId]) => {
         if (notUndefined(accounts) && notUndefined(chainId)) {
-          this.logWalletConnection(walletType, accounts[0], chainId);
+          this.trackWalletConnection(walletType, accounts[0], chainId);
         }
       })
       .catch((e) => {
@@ -255,11 +255,11 @@ class WalletConnection extends BaseAnalytics {
     if (this.store.provider && !overrideRule) {
       return;
     } else {
-      this.logWalletConnection(walletType, account, chainId);
+      this.trackWalletConnection(walletType, account, chainId);
     }
   }
 
-  logWalletConnection(walletType, account, chainId) {
+  trackWalletConnection(walletType, account, chainId) {
     invariant(isType(walletType, 'string') && isType(account, 'string'), 'Invalid arguments');
 
     const chain = isType(chainId, 'string') ? normalizeChainId(chainId) : chainId ? chainId : this.connectedChain;
