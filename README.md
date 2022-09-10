@@ -1,4 +1,4 @@
-# dappzero
+# DAppzero
 
 DAppzero Web SDK is a Javascript module to collect and log all the data and events of DApp for analytics.
 
