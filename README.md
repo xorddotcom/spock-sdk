@@ -4,7 +4,7 @@ DAppzero Web SDK is a Javascript module to collect and log all the data and even
 
 ## Table of Contents
 
-- [dappzero](#dappzero)
+- [DAppzero](#dappzero)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -35,19 +35,19 @@ yarn add dappzero
 Initialize and track wallet connection and transactions by passing web3 provider.
 
 ```js
-import DZ_Analytics from 'dappzero';
-DZ_Analytics.init({ appKey: 'eba6...28c' });
-DZ_Analytics.walletProvider(window.ethereum);
+import DZAnalytics from 'dappzero';
+DZAnalytics.init({ appKey: 'eba6...28c' });
+DZAnalytics.walletProvider(window.ethereum);
 ```
 
 ## API
 
-### DZ_Analytics.init(options)
+### DZAnalytics.init(options)
 
-DZ_Analytics must be initialized with `appKey` by invoking init method at the top level of application before using other methods.
+DZAnalytics must be initialized with `appKey` by invoking init method at the top level of application before using other methods.
 
 ```js
-DZ_Analytics.init({ appKey: 'eba6...28c', debug: true });
+DZAnalytics.init({ appKey: 'eba6...28c', debug: true });
 ```
 
 <!-- Disable table formatting because Prettier messing it up. -->
@@ -60,12 +60,12 @@ DZ_Analytics.init({ appKey: 'eba6...28c', debug: true });
 |  testMode               |`Boolean`| Deafults to `false`. Enable testMode in which you can test tracking events without logging data onto server. Inordre to avoid store testing data.|
 |  inactivityTimeout      |`number` | Deafults to `30`. This field takes time in mins to specify the inactivity duration in which the session will expires.|
 
-### DZ_Analytics.walletProvider(provider)
+### DZAnalytics.walletProvider(provider)
 
 Pass `web3 provider` to track wallet connectinons for all [Supporting Wallets](#supporting-wallets) and transactions state that are submitted or rejected from DApp.
 
 ```js
-DZ_Analytics.walletProvider(window.ethereum);
+DZAnalytics.walletProvider(window.ethereum);
 ```
 
 In-case of handling multiple wallets on DApp. Example in `React`.
@@ -78,7 +78,7 @@ const { provider } = useWeb3React();
 // in-order to pass updated provider if user changes wallet, account or chain.
 useEffect(() => {
   if (provider?.provider) {
-    DZ_Analytics.walletProvider(provider.provider);
+    DZAnalytics.walletProvider(provider.provider);
   }
 }, [provider]);
 ```
@@ -89,12 +89,12 @@ useEffect(() => {
 | --------------| --------------| ---------------------------------------------------------------|
 | provider      |`Web3Provider` | EIP-1193 Standard Provider or Web3Provider-compatible Provider.|
 
-### DZ_Analytics.trackWalletConnection(walletType,account,chainId)
+### DZAnalytics.trackWalletConnection(walletType,account,chainId)
 
 To track other wallets that currently not include in [Supporting Wallets](#supporting-wallets).
 
 ```js
-DZ_Analytics.trackWalletConnection('Ledger', '0x...96', 1);
+DZAnalytics.trackWalletConnection('Ledger', '0x...96', 1);
 ```
 
 <!-- Disable table formatting because Prettier messing it up. -->
@@ -105,12 +105,12 @@ DZ_Analytics.trackWalletConnection('Ledger', '0x...96', 1);
 | account         |`String` | User ethereum address |
 | chainId         |`number` | User connected chainId |
 
-### DZ_Analytics.trackPageView(path)
+### DZAnalytics.trackPageView(path)
 
 Track all the pages visited on a DApp.
 
 ```js
-DZ_Analytics.trackPageView('/home');
+DZAnalytics.trackPageView('/home');
 ```
 
 <!-- Disable table formatting because Prettier messing it up. -->
@@ -119,12 +119,12 @@ DZ_Analytics.trackPageView('/home');
 | ----------------| --------| ---------------------------------------------------|
 | path            |`String` | Path of the page. e.g. '/about', '/dashboard/stats'|
 
-### DZ_Analytics.valueContribution(label,valueInUSD)
+### DZAnalytics.valueContribution(label,valueInUSD)
 
 Track amount in USD that end-user will contribute on protocol ecosystem through DApp. You can inovke this method in the callback of transaction submission.
 
 ```js
-DZ_Analytics.valueContribution('Add Liquidity', 25_000);
+DZAnalytics.valueContribution('Add Liquidity', 25_000);
 ```
 
 <!-- Disable table formatting because Prettier messing it up. -->
