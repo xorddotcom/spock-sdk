@@ -1,5 +1,5 @@
 import BaseAnalytics from '../BaseAnalytics';
-import { logEnums, STORAGE, configrationDefaultValue, EMPTY_STRING } from '../constants';
+import { logEnums, STORAGE, configrationDefaultValue, EMPTY_STRING, SERVER_ROUTES } from '../constants';
 import { generateUUID } from './utils';
 import { addEvent, currentTimestamp, setGetValueInStorage, getConfig } from '../utils/helpers';
 import { notUndefined } from '../utils/validators';
@@ -46,7 +46,7 @@ class Tracking extends BaseAnalytics {
       noLog: true,
     };
 
-    this.request.post('session/create-session', {
+    this.request.post(SERVER_ROUTES.SESSION, {
       data,
       withIp: true,
     });
@@ -73,7 +73,7 @@ class Tracking extends BaseAnalytics {
     const cacheDeviceId = getCookie(STORAGE.COOKIES.CACHE_DEVICE_ID);
     if (notUndefined(cacheDeviceId)) return;
     else {
-      this.request.post('app-visits/create', {
+      this.request.post(SERVER_ROUTES.APP_VISIT, {
         data,
         withIp: true,
         callback: () => {
@@ -125,7 +125,7 @@ class Tracking extends BaseAnalytics {
     };
     this.log(logEnums.INFO, 'Session expired => ', data);
 
-    this.request.post('session/create-session', {
+    this.request.post(SERVER_ROUTES.SESSION, {
       data,
       withIp: true,
       keepalive: true,
@@ -169,14 +169,14 @@ class Tracking extends BaseAnalytics {
     const page = _page || window.location.pathname;
     if (page) {
       const pageNavigation = this.store.pageNavigation;
-      const alreadyNavigated = pageNavigation.find(({ pageTitle }) => pageTitle === page);
+      const alreadyNavigated = pageNavigation.find(({ page }) => page === page);
       if (!alreadyNavigated) {
         pageNavigation.push({ page, doneTxn: false });
         this.dispatch({ pageNavigation });
       }
       this.pagesFlow.push(page);
       const data = { pageTitle: page };
-      this.request.post('page-views/create', { data });
+      this.request.post(SERVER_ROUTES.PAGE_VIEW, { data });
       this.log(logEnums.INFO, 'Track pageview', data);
     }
   }
@@ -197,7 +197,7 @@ class Tracking extends BaseAnalytics {
       if (anchorTag) {
         if (anchorTag.hostname !== window.location.hostname) {
           const data = { link: anchorTag.href };
-          this.request.post('outbound-links/create', { data });
+          this.request.post(SERVER_ROUTES.OUTBOUND, { data });
           this.log(logEnums.INFO, 'Track outbound link', data);
         }
       }

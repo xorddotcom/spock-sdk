@@ -5,7 +5,9 @@ const ALIAS = 'dz';
 export const withAlias = (label) => `${ALIAS}_${label}`;
 
 export const configrationDefaultValue = {
+  DEBUG: false,
   INACTIVITY_TIMEOUT: 30,
+  TEST_MODE: false,
 };
 
 export const logEnums = {
@@ -53,3 +55,12 @@ export const STORAGE = {
 };
 
 export const EMPTY_STRING = '';
+
+export const SERVER_ROUTES = {
+  APP_VISIT: 'app-visits/create',
+  OUTBOUND: 'outbound-links/create',
+  PAGE_VIEW: 'page-views/create',
+  SESSION: 'session/create-session',
+  TRANSACTION: 'transactions/create',
+  WALLET_CONNECTION: 'wallet-connection/create',
+};

@@ -1,11 +1,13 @@
 {
   "name": "projectsdk",
-  "version": "3.1.9",
+  "version": "3.1.14",
   "description": "ProjectV SDK",
   "main": "dist/projectsdk.js",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
+  "types": "types/index.d.ts",
   "scripts": {
     "lint": "eslint src/**/*.js",
     "build:umdmin": "webpack --env mode=production --env output=umd",
