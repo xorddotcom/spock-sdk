@@ -169,7 +169,7 @@ class Tracking extends BaseAnalytics {
     const page = _page || window.location.pathname;
     if (page) {
       const pageNavigation = this.store.pageNavigation;
-      const alreadyNavigated = pageNavigation.find(({ pageTitle }) => pageTitle === page);
+      const alreadyNavigated = pageNavigation.find(({ page }) => page === page);
       if (!alreadyNavigated) {
         pageNavigation.push({ page, doneTxn: false });
         this.dispatch({ pageNavigation });

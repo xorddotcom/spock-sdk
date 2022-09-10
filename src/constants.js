@@ -5,7 +5,9 @@ const ALIAS = 'dz';
 export const withAlias = (label) => `${ALIAS}_${label}`;
 
 export const configrationDefaultValue = {
+  DEBUG: false,
   INACTIVITY_TIMEOUT: 30,
+  TEST_MODE: false,
 };
 
 export const logEnums = {
