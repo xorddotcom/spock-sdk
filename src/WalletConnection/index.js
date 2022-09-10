@@ -1,7 +1,7 @@
 import invariant from 'tiny-invariant';
 
 import BaseAnalytics from '../BaseAnalytics';
-import { logEnums, WALLET_TYPE, EVENTS, STORAGE } from '../constants';
+import { logEnums, WALLET_TYPE, EVENTS, STORAGE, SERVER_ROUTES } from '../constants';
 import { txnRejected } from './utils';
 import { addEvent } from '../utils/helpers';
 import { notUndefined, isSameAddress, isType } from '../utils/validators';
@@ -79,7 +79,7 @@ class WalletConnection extends BaseAnalytics {
     const chainId = this.store.connectedChain;
     if (status === 'rejected') {
       const data = { ...txnObj, chainId };
-      this.request.post('transactions/create', { data });
+      this.request.post(SERVER_ROUTES.TRANSACTION, { data });
       //not to set rejectTxn if session already have doneTxn
       if (this.store.doneTxn !== true) {
         this.dispatch({ rejectTxn: true });
@@ -87,7 +87,7 @@ class WalletConnection extends BaseAnalytics {
       this.log(logEnums.INFO, 'Transaction rejected', data);
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
       const data = { ...txnObj, txHash: txnHash, chainId };
-      this.request.post('transactions/create', {
+      this.request.post(SERVER_ROUTES.TRANSACTION, {
         data,
         callback: () => {
           this.cacheTxnHash = txnHash;
@@ -281,7 +281,7 @@ class WalletConnection extends BaseAnalytics {
 
       // return in-case same wallet with same network is already logged on server
       if (!isSameAddress(cacheAddress, account) || Number(cacheChain) !== chain) {
-        this.request.post('wallet-connection/create', {
+        this.request.post(SERVER_ROUTES.WALLET_CONNECTION, {
           data,
           withIp: true,
           callback: () => {
