@@ -101,7 +101,8 @@ class Tracking extends BaseAnalytics {
   }
 
   endSession() {
-    const totalSessionDuration = currentTimestamp() - this.sessionStartTime;
+    const sessionEndTime = currentTimestamp();
+    const totalSessionDuration = sessionEndTime - this.sessionStartTime;
     const sessionDuration = totalSessionDuration - this.sessionTotalInactivetime;
     this.sessionStartTime = 0;
     this.sessionTotalInactivetime = 0;
