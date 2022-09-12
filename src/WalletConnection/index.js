@@ -78,17 +78,22 @@ class WalletConnection extends BaseAnalytics {
   logTransaction(status, txnObj, txnHash) {
     const chainId = this.store.connectedChain;
     if (status === 'rejected') {
-      const data = { ...txnObj, chainId };
-      this.request.post(SERVER_ROUTES.TRANSACTION, { data });
+      const userInfo = this.store.userInfo;
+      const { device, system, OS, language } = userInfo ? userInfo : {};
+      const data = { ...txnObj, chainId, device, system, OS, language };
+      this.request.post(SERVER_ROUTES.TRANSACTION, { data, withIp: true });
       //not to set rejectTxn if session already have doneTxn
       if (this.store.doneTxn !== true) {
         this.dispatch({ rejectTxn: true });
       }
       this.log(logEnums.INFO, 'Transaction rejected', data);
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
-      const data = { ...txnObj, txHash: txnHash, chainId };
+      const userInfo = this.store.userInfo;
+      const { device, system, OS, language } = userInfo ? userInfo : {};
+      const data = { ...txnObj, txHash: txnHash, chainId, device, system, OS, language };
       this.request.post(SERVER_ROUTES.TRANSACTION, {
         data,
+        withIp: true,
         callback: () => {
           this.cacheTxnHash = txnHash;
         },
