@@ -26,7 +26,7 @@ class Web3Analytics extends BaseAnalytics {
   valueContribution(label, valueInUSD) {
     invariant(isType(label, 'string') && isType(valueInUSD, 'number'), 'Invalid arguments');
     if (notUndefined(this.store.connectedAccount) && notUndefined(this.store.connectedChain)) {
-      this.log(logEnums.INFO, 'Value Contributed', label, valueInUSD);
+      this.log(logEnums.INFO, 'Value Contributed', { label, valueInUSD });
       const data = { label, valueInUSD, address: this.store.connectedAccount, chainId: this.store.connectedChain };
       this.request.post('value-contribution/create', { data });
     } else {
