@@ -20,6 +20,7 @@ DAppzero aims to accelerate your growth by tracking & analyzing crucial and oppo
     - [Page View](#web3analyticstrackpageviewpath)
     - [Value Contribution](#web3analyticsvaluecontributionlabelvalueinusd)
   - [Supporting Wallets](#supporting-wallets)
+  - [Demo](#demo)
 
 ## Installation
 
@@ -149,3 +150,7 @@ Web3Analytics.valueContribution('Add Liquidity', 25_000);
 - Fortmatic
 
 To track wallet not includling in the list you can use [trackWalletConnection](#web3analyticstrackwalletconnectionwallettypeaccountchainid) method.
+
+## Demo
+
+Example code for `web3-analytics` integration [DAppzero Analytics Demo](https://github.com/xorddotcom/DAppzero-Analytics-Demo)
