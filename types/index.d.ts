@@ -3,6 +3,7 @@ declare namespace Web3Analytics {
     appKey: string;
     debug?: boolean;
     testMode?: boolean;
+    testENV?: boolean;
     inactivityTimeout?: number;
   }): void;
 
