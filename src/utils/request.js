@@ -1,10 +1,11 @@
-import { SERVER_ENDPOINT, logEnums } from '../constants';
+import { SERVER_ENDPOINT, TEST_SERVER_ENDPOINT, logEnums } from '../constants';
 import { stringify } from '../utils/formatting';
 
 class Request {
-  constructor({ appKey, log, testMode }) {
+  constructor({ appKey, log, testENV, testMode }) {
     this.log = log;
     this.testMode = testMode;
+    this.endPoint = testENV ? TEST_SERVER_ENDPOINT : SERVER_ENDPOINT;
     this.ipaddress = undefined;
     this.headers = {
       appkey: appKey,
@@ -35,10 +36,17 @@ class Request {
         return;
       }
 
-      const headers = withIp ? { ...this.headers, ipaddress: await this.getUserIp() } : this.headers;
+      let headers = this.headers;
+
+      if (withIp) {
+        const ipaddress = await this.getUserIp();
+        if (ipaddress) {
+          headers['ipaddress'] = ipaddress;
+        }
+      }
 
       try {
-        const response = await fetch(`${SERVER_ENDPOINT}/${route}`, {
+        const response = await fetch(`${this.endPoint}/${route}`, {
           method: 'POST',
           headers,
           body: formatedData,
@@ -60,7 +68,7 @@ class Request {
       });
       return await response.json();
     } catch (e) {
-      console.log('error => ', e);
+      this.log(logEnums.ERROR, `externalGet`, e.toString());
     }
   }
 }
