@@ -49,7 +49,6 @@ class WalletConnection extends BaseAnalytics {
 
   transactionEvents() {
     addEvent(window, EVENTS.SEND_TXN, (payload) => {
-      this.log(logEnums.INFO, 'payload eip1193 => ', payload);
       if (notUndefined(payload?.result)) {
         payload.result
           .then((txnHash) => {
@@ -64,7 +63,6 @@ class WalletConnection extends BaseAnalytics {
     });
 
     addEvent(window, EVENTS.LEGACY_TXN_CALLBACK, (payload) => {
-      this.log(logEnums.INFO, 'payload legacy => ', payload);
       if (notUndefined(payload)) {
         if (payload.result && payload.params) {
           this.logTransaction('submitted', payload.params[0], payload.result);
