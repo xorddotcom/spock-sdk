@@ -1,8 +1,8 @@
 {
-  "name": "web3-analytics",
+  "name": "analytics-web3",
   "version": "0.1.0-beta.0",
-  "description": "DAppzero analytics SDK web3-analytics is a js module to collect and log all the data and events of DApp for analytics.",
-  "main": "dist/web3-analytics.min.js",
+  "description": "DAppzero analytics SDK analytics-web3 is a js module to collect and log all the data and events of DApp for analytics.",
+  "main": "dist/analytics-web3.min.js",
   "license": "UNLICENSED",
   "files": [
     "dist/",

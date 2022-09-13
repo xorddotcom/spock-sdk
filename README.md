@@ -1,6 +1,6 @@
 # DAppzero Analytics SDK
 
-DAppzero analytics SDK `web3-analytics` is a Javascript module to collect and log all the data and events of DApp for analytics.
+DAppzero analytics SDK `analytics-web3` is a Javascript module to collect and log all the data and events of DApp for analytics.
 
 ## DAppzero
 
@@ -24,16 +24,16 @@ DAppzero aims to accelerate your growth by tracking & analyzing crucial and oppo
 
 ## Installation
 
-Install web3-analytics sdk by using npm
+Install analytics-web3 sdk by using npm
 
 ```bash
-npm install web3-analytics --save
+npm install analytics-web3 --save
 ```
 
 or yarn
 
 ```bash
-yarn add web3-analytics
+yarn add analytics-web3
 ```
 
 ## Usage
@@ -41,7 +41,7 @@ yarn add web3-analytics
 Initialize and track wallet connection and transactions by passing web3 provider.
 
 ```js
-import Web3Analytics from 'web3-analytics';
+import Web3Analytics from 'analytics-web3';
 Web3Analytics.init({ appKey: 'eba6...28c' });
 Web3Analytics.walletProvider(window.ethereum);
 ```
@@ -153,4 +153,4 @@ To track wallet not includling in the list you can use [trackWalletConnection](#
 
 ## Demo
 
-Example code for `web3-analytics` integration [DAppzero Analytics Demo](https://github.com/xorddotcom/DAppzero-Analytics-Demo)
+Example code for `analytics-web3` integration [DAppzero Analytics Demo](https://github.com/xorddotcom/DAppzero-Analytics-Demo)
