@@ -10,9 +10,9 @@
   "types": "types/index.d.ts",
   "scripts": {
     "lint": "eslint src/**/*.js",
-    "build:umdmin": "webpack --env mode=production --env output=umd",
-    "build:umd": "webpack --env mode=development --env output=umd",
-    "build": "yarn build:umdmin && yarn build:umd"
+    "build:prod": "webpack --env mode=production --env output=umd",
+    "build:dev": "webpack --env mode=development --env output=umd",
+    "build": "yarn build:prod && yarn build:dev"
   },
   "author": "",
   "devDependencies": {

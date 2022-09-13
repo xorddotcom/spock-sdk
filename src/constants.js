@@ -1,6 +1,7 @@
-export const SERVER_ENDPOINT = 'https://dapp-server-test.dappzero.io';
+export const SERVER_ENDPOINT = 'https://dapp-server.dappzero.io';
+export const TEST_SERVER_ENDPOINT = 'https://dapp-server-test.dappzero.io';
 
-const ALIAS = 'dz';
+const ALIAS = 'w3a';
 
 export const withAlias = (label) => `${ALIAS}_${label}`;
 
@@ -8,6 +9,7 @@ export const configrationDefaultValue = {
   DEBUG: false,
   INACTIVITY_TIMEOUT: 30,
   TEST_MODE: false,
+  TEST_ENV: false,
 };
 
 export const logEnums = {
@@ -62,5 +64,6 @@ export const SERVER_ROUTES = {
   PAGE_VIEW: 'page-views/create',
   SESSION: 'session/create-session',
   TRANSACTION: 'transactions/create',
+  VALUE_CONTRIBUTION: 'value-contribution/create',
   WALLET_CONNECTION: 'wallet-connection/create',
 };

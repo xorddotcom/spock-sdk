@@ -2,6 +2,7 @@ declare namespace Web3Analytics {
   export function init(config: {
     appKey: string;
     debug?: boolean;
+    testENV?: boolean;
     testMode?: boolean;
     inactivityTimeout?: number;
   }): void;
