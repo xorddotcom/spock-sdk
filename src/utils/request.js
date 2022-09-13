@@ -54,7 +54,6 @@ class Request {
         });
         await response.json();
         callback && callback();
-        this.log(logEnums.INFO, `${route} logged`);
       } catch (e) {
         this.log(logEnums.ERROR, `${route} request failed`, e.toString());
       }
