@@ -1,8 +1,9 @@
 {
-  "name": "projectsdk",
-  "version": "3.1.14",
-  "description": "ProjectV SDK",
-  "main": "dist/projectsdk.js",
+  "name": "web3-analytics",
+  "version": "0.1.0-beta.0",
+  "description": "",
+  "main": "dist/web3-analytics.min.js",
+  "license": "UNLICENSED",
   "files": [
     "dist/",
     "types/"
@@ -14,7 +15,7 @@
     "build:dev": "webpack --env mode=development --env output=umd",
     "build": "yarn build:prod && yarn build:dev"
   },
-  "author": "",
+  "author": "Bilal Mir(@BilalMir135), Muhammad Saad(@SaadMS10)",
   "devDependencies": {
     "@babel/cli": "^7.18.9",
     "@babel/core": "^7.18.10",
