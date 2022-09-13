@@ -2,9 +2,14 @@
 
 DAppzero analytics SDK `web3-analytics` is a Javascript module to collect and log all the data and events of DApp for analytics.
 
+## DAppzero
+
+DAppzero aims to accelerate your growth by tracking & analyzing crucial and opportunity-centric metrics that will help you to amplify your growth and reach to the right customer segment.
+
 ## Table of Contents
 
 - [DAppzero Analytics SDK](#dappzero-analytics-sdk)
+  - [About DAppzero](#dappzero)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -143,4 +148,4 @@ Web3Analytics.valueContribution('Add Liquidity', 25_000);
 - Portis
 - Fortmatic
 
-To track wallet not includling in the list you can use [trackWalletConnection](#dzanalyticstrackwalletconnectionwallettypeaccountchainid) method.
+To track wallet not includling in the list you can use [trackWalletConnection](#web3analyticstrackwalletconnectionwallettypeaccountchainid) method.
