@@ -1,7 +1,7 @@
 {
   "name": "web3-analytics",
   "version": "0.1.0-beta.0",
-  "description": "",
+  "description": "DAppzero analytics SDK web3-analytics is a js module to collect and log all the data and events of DApp for analytics.",
   "main": "dist/web3-analytics.min.js",
   "license": "UNLICENSED",
   "files": [
@@ -9,6 +9,14 @@
     "types/"
   ],
   "types": "types/index.d.ts",
+  "keywords": [
+    "DAppzero",
+    "web3-analytics",
+    "web3",
+    "dapp-analytics",
+    "token-analytics",
+    "analytics"
+  ],
   "scripts": {
     "lint": "eslint src/**/*.js",
     "build:prod": "webpack --env mode=production --env output=umd",
@@ -27,8 +35,7 @@
     "tiny-invariant": "^1.2.0",
     "ua-parser-js": "^1.0.2",
     "webpack": "^4.44.0",
-    "webpack-cli": "^4.10.0",
-    "yargs": "^17.5.1"
+    "webpack-cli": "^4.10.0"
   },
   "dependencies": {}
 }
