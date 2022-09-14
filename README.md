@@ -21,6 +21,8 @@ DAppzero aims to accelerate your growth by tracking & analyzing crucial and oppo
     - [Value Contribution](#web3analyticsvaluecontributionlabelvalueinusd)
   - [Supporting Wallets](#supporting-wallets)
   - [Demo](#demo)
+  - [Onboarding](#onboarding)
+  - [Credits](#credits)
 
 ## Installation
 
@@ -60,7 +62,7 @@ Web3Analytics.init({ appKey: 'eba6...28c', debug: true });
 <!-- prettier-ignore -->
 | Value                   | Type    | Description                                                 |
 | ------------------------| --------| ------------------------------------------------------------|
-|  appKey                 |`String` | Unique appKey obtained from [DAppzero](http://dappzero.io) for tracking, like `eba6...28c`.|
+|  appKey                 |`String` | Unique appKey like `eba6...28c` for trackig. Can be obtained by getting [onboarded](#onboarding) in DAppzero.|
 | **Optional**            | | |
 |  debug                  |`Boolean`| Deafults to `false`. Enable consoles for all the tracking events.|
 |  testENV                |`Boolean`| Deafults to `false`. Enable testing version of SDK in which SDK will interact with testing servers.|
@@ -153,4 +155,12 @@ To track wallet not includling in the list you can use [trackWalletConnection](#
 
 ## Demo
 
-Example code for `analytics-web3` integration [DAppzero Analytics Demo](https://github.com/xorddotcom/DAppzero-Analytics-Demo)
+Example code for `analytics-web3` integration [DAppzero Analytics Demo](https://github.com/xorddotcom/dappzero-analytics-demo)
+
+## Onboarding
+
+Follow this [README.md](https://github.com/xorddotcom/dappzero-analytics-demo/blob/main/README.md) to get onboarded in DAppzero.
+
+## Credits
+
+Backed by [xord.com](https://xord.com)
