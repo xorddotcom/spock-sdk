@@ -14,6 +14,7 @@ class Web3Analytics extends BaseAnalytics {
     this.wallet = new WalletConnection(config);
     this.tracking = new Tracking(config);
     this.valueContribution = this.valueContribution.bind(this);
+    this.valueExtraction = this.valueExtraction.bind(this);
   }
 
   initialize() {
@@ -23,15 +24,29 @@ class Web3Analytics extends BaseAnalytics {
     this.tracking.initialize();
   }
 
-  valueContribution(label, valueInUSD) {
+  protocolValue(label, valueInUSD, extraction) {
     invariant(isType(label, 'string') && isType(valueInUSD, 'number'), 'Invalid arguments');
     if (notUndefined(this.store.connectedAccount) && notUndefined(this.store.connectedChain)) {
-      this.log(logEnums.INFO, 'Value Contributed', { label, valueInUSD });
-      const data = { label, valueInUSD, address: this.store.connectedAccount, chainId: this.store.connectedChain };
+      const data = {
+        label,
+        valueInUSD,
+        extraction,
+        address: this.store.connectedAccount,
+        chainId: this.store.connectedChain,
+      };
+      this.log(logEnums.INFO, 'Value Contributed', data);
       this.request.post(SERVER_ROUTES.VALUE_CONTRIBUTION, { data });
     } else {
       this.log(logEnums.ERROR, 'Wallet or chain connot undefined');
     }
+  }
+
+  valueContribution(label, valueInUSD) {
+    this.protocolValue(label, valueInUSD, false);
+  }
+
+  valueExtraction(label, valueInUSD) {
+    this.protocolValue(label, valueInUSD, true);
   }
 }
 
