@@ -1,0 +1,33 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0-beta.0] - 2022-09-14
+
+### Added
+
+- Initial version of sdk.
+
+## [0.1.0-beta.1] - 2022-09-15
+
+### Added
+
+- On-boarding and credits section in README ([fbe62](https://github.com/xorddotcom/spock-sdk/pull/21/commits/fbe62afaf3d38b992fe02e6b1608fdb8a172a09b))
+
+## [Unreleased]
+
+## [0.1.0-beta.2]
+
+### Added
+
+- Value Extraction feature
+- Add license and value extraction in API section of README.
+- Add CHANGELOG.md file.
+
+### Changed
+
+- Moved `valueContribution` code into generalized function `protocolValue`.
+- Rename brand name from DAppzero to Spock in README.
