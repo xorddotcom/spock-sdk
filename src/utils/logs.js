@@ -1,6 +1,12 @@
-import { logEnums } from '../constants';
+import { LOG } from '../constants';
 import { isType } from './validators';
 
+/**
+ *  Logging stuff, works only when debug mode is true
+ * @param {boolean} debug - debug mode
+ * @param {String} level - log level (error, warning, info, debug, verbose)
+ * @param {string} message - any string message
+ */
 export function log(debug, level, message) {
   if (debug && typeof console !== 'undefined') {
     // parse the arguments into a string if it is an object
@@ -17,16 +23,16 @@ export function log(debug, level, message) {
     const log = level + message + ' ' + extraArguments;
 
     switch (level) {
-      case logEnums.ERROR:
+      case LOG.ERROR:
         console.error(log);
         break;
-      case logEnums.WARNING:
+      case LOG.WARNING:
         console.warn(log);
         break;
-      case logEnums.INFO:
+      case LOG.INFO:
         console.info(log);
         break;
-      case logEnums.VERBOSE:
+      case LOG.VERBOSE:
         console.log(log);
         break;
       default:

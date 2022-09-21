@@ -4,7 +4,7 @@ import BaseAnalytics from '../BaseAnalytics';
 import WalletConnection from '../WalletConnection';
 import UserInfo from '../UserInfo';
 import Tracking from '../Tracking';
-import { SERVER_ROUTES, logEnums } from '../constants';
+import { SERVER_ROUTES, LOG } from '../constants';
 import { isType, notUndefined } from '../utils/validators';
 
 class Web3Analytics extends BaseAnalytics {
@@ -18,7 +18,7 @@ class Web3Analytics extends BaseAnalytics {
   }
 
   initialize() {
-    this.log(logEnums.INFO, 'Web3 Analytics initialized');
+    this.log(LOG.INFO, 'Web3 Analytics initialized');
     this.userInfo.getUserInfo();
     this.wallet.initialize();
     this.tracking.initialize();
@@ -34,10 +34,10 @@ class Web3Analytics extends BaseAnalytics {
         address: this.store.connectedAccount,
         chainId: this.store.connectedChain,
       };
-      this.log(logEnums.INFO, 'Value Contributed', data);
+      this.log(LOG.INFO, 'Value Contributed', data);
       this.request.post(SERVER_ROUTES.VALUE_CONTRIBUTION, { data });
     } else {
-      this.log(logEnums.ERROR, 'Wallet or chain connot undefined');
+      this.log(LOG.ERROR, 'Wallet or chain connot undefined');
     }
   }
 

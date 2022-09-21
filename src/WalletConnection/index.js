@@ -1,7 +1,7 @@
 import invariant from 'tiny-invariant';
 
 import BaseAnalytics from '../BaseAnalytics';
-import { logEnums, WALLET_TYPE, EVENTS, STORAGE, SERVER_ROUTES } from '../constants';
+import { LOG, WALLET_TYPE, EVENTS, STORAGE, SERVER_ROUTES } from '../constants';
 import { txnRejected } from './utils';
 import { addEvent } from '../utils/helpers';
 import { notUndefined, isSameAddress, isType } from '../utils/validators';
@@ -38,7 +38,7 @@ class WalletConnection extends BaseAnalytics {
       });
 
       window.ethereum.on('chainChanged', (chainId) => {
-        this.log(logEnums.INFO, 'chain changed', chainId);
+        this.log(LOG.INFO, 'chain changed', chainId);
       });
     }
 
@@ -84,7 +84,7 @@ class WalletConnection extends BaseAnalytics {
       if (this.store.doneTxn !== true) {
         this.dispatch({ rejectTxn: true });
       }
-      this.log(logEnums.INFO, 'Transaction rejected', data);
+      this.log(LOG.INFO, 'Transaction rejected', data);
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
       const userInfo = this.store.userInfo;
       const { device, system, OS, language } = userInfo ? userInfo : {};
@@ -105,7 +105,7 @@ class WalletConnection extends BaseAnalytics {
         this.dispatch({ pageNavigation });
       }
       this.dispatch({ doneTxn: true, rejectTxn: false });
-      this.log(logEnums.INFO, 'Transaction hash', data);
+      this.log(LOG.INFO, 'Transaction hash', data);
     }
   }
 
@@ -205,7 +205,7 @@ class WalletConnection extends BaseAnalytics {
         }
       })
       .catch((e) => {
-        this.log(logEnums.ERROR, 'Failed to extract wallet connection detail from provider', e);
+        this.log(LOG.ERROR, 'Failed to extract wallet connection detail from provider', e);
       });
   }
 
@@ -217,7 +217,7 @@ class WalletConnection extends BaseAnalytics {
         }
       })
       .catch((e) => {
-        this.log(logEnums.ERROR, 'Failed to extract wallet connection detail from provider', e);
+        this.log(LOG.ERROR, 'Failed to extract wallet connection detail from provider', e);
       });
   }
 
@@ -277,7 +277,7 @@ class WalletConnection extends BaseAnalytics {
       const { device, system, OS, language } = userInfo ? userInfo : {};
       const data = { walletType, address: account, chainId: chain, device, system, OS, language };
 
-      this.log(logEnums.INFO, 'wallet connected', JSON.stringify(data));
+      this.log(LOG.INFO, 'wallet connected', JSON.stringify(data));
 
       const cacheAddress = getCookie(STORAGE.COOKIES.CACHE_ADDRESS);
       const cacheChain = getCookie(STORAGE.COOKIES.CACHE_CHAIN);

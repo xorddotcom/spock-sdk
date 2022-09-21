@@ -1,4 +1,4 @@
-import { SERVER_ENDPOINT, TEST_SERVER_ENDPOINT, logEnums } from '../constants';
+import { SERVER_ENDPOINT, TEST_SERVER_ENDPOINT, LOG } from '../constants';
 import { stringify } from '../utils/formatting';
 
 class Request {
@@ -55,7 +55,7 @@ class Request {
         await response.json();
         callback && callback();
       } catch (e) {
-        this.log(logEnums.ERROR, `${route} request failed`, e.toString());
+        this.log(LOG.ERROR, `${route} request failed`, e.toString());
       }
     }
   }
@@ -67,7 +67,7 @@ class Request {
       });
       return await response.json();
     } catch (e) {
-      this.log(logEnums.ERROR, `externalGet`, e.toString());
+      this.log(LOG.ERROR, `externalGet`, e.toString());
     }
   }
 }
