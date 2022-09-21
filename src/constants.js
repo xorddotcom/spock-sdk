@@ -1,5 +1,5 @@
-export const SERVER_ENDPOINT = 'https://dapp-server.dappzero.io';
-export const TEST_SERVER_ENDPOINT = 'https://dapp-server-test.dappzero.io';
+export const SERVER_ENDPOINT = 'https://dapp-server.thespock.xyz';
+export const TEST_SERVER_ENDPOINT = 'https://dapp-server-test.thespock.xyz';
 
 const ALIAS = 'w3a';
 
