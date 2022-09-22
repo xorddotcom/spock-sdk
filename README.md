@@ -1,15 +1,15 @@
-# DAppzero Analytics SDK
+# Spock Analytics SDK
 
-DAppzero analytics SDK `analytics-web3` is a Javascript module to collect and log all the data and events of DApp for analytics.
+Spock analytics SDK `analytics-web3` is a Javascript module to collect and log all the data and events of DApp for analytics.
 
-## DAppzero
+## Spock
 
-DAppzero aims to accelerate your growth by tracking & analyzing crucial and opportunity-centric metrics that will help you to amplify your growth and reach to the right customer segment.
+Spock aims to accelerate your growth by tracking & analyzing crucial and opportunity-centric metrics that will help you to amplify your growth and reach to the right customer segment.
 
 ## Table of Contents
 
-- [DAppzero Analytics SDK](#dappzero-analytics-sdk)
-  - [About DAppzero](#dappzero)
+- [Spock Analytics SDK](#spock-analytics-sdk)
+  - [About Spock](#spock)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -19,7 +19,9 @@ DAppzero aims to accelerate your growth by tracking & analyzing crucial and oppo
     - [Wallet Connection](#web3analyticstrackwalletconnectionwallettypeaccountchainid)
     - [Page View](#web3analyticstrackpageviewpath)
     - [Value Contribution](#web3analyticsvaluecontributionlabelvalueinusd)
+    - [Value Extraction](#web3analyticsvalueextractionlabelvalueinusd)
   - [Supporting Wallets](#supporting-wallets)
+  - [License](#license)
   - [Demo](#demo)
   - [Onboarding](#onboarding)
   - [Credits](#credits)
@@ -62,7 +64,7 @@ Web3Analytics.init({ appKey: 'eba6...28c', debug: true });
 <!-- prettier-ignore -->
 | Value                   | Type    | Description                                                 |
 | ------------------------| --------| ------------------------------------------------------------|
-|  appKey                 |`String` | Unique appKey like `eba6...28c` for trackig. Can be obtained by getting [onboarded](#onboarding) in DAppzero.|
+|  appKey                 |`String` | Unique appKey like `eba6...28c` for trackig. Can be obtained by getting [onboarded](#onboarding) in Spock.|
 | **Optional**            | | |
 |  debug                  |`Boolean`| Deafults to `false`. Enable consoles for all the tracking events.|
 |  testENV                |`Boolean`| Deafults to `false`. Enable testing version of SDK in which SDK will interact with testing servers.|
@@ -130,7 +132,7 @@ Web3Analytics.trackPageView('/home');
 
 ### Web3Analytics.valueContribution(label,valueInUSD)
 
-Track amount in USD that end-user will contribute on protocol ecosystem through DApp. You can inovke this method in the callback of transaction submission.
+Track amount in USD that end-user has contribute in protocol ecosystem through DApp. You can inovke this method in the callback of transaction submission.
 
 ```js
 Web3Analytics.valueContribution('Add Liquidity', 25_000);
@@ -143,6 +145,21 @@ Web3Analytics.valueContribution('Add Liquidity', 25_000);
 | label           |`String` | Label to represent contribution. e.g. 'Add Liquidity', 'Stake'|
 | valueInUSD      |`number` | Amount in USD that user has contributed.           |
 
+### Web3Analytics.valueExtraction(label,valueInUSD)
+
+Track amount in USD that end-user has removed from protocol ecosystem through DApp. You can inovke this method in the callback of transaction submission.
+
+```js
+Web3Analytics.valueExtraction('Remove Liquidity', 25_000);
+```
+
+<!-- Disable table formatting because Prettier messing it up. -->
+<!-- prettier-ignore -->
+| Value           | Type    | Description                                        |
+| ----------------| --------| ---------------------------------------------------|
+| label           |`String` | Label to represent extraction. e.g. 'Remove Liquidity', 'Unstake'|
+| valueInUSD      |`number` | Amount in USD that user has removed.           |
+
 ## Supporting Wallets
 
 - MetaMask
@@ -153,13 +170,17 @@ Web3Analytics.valueContribution('Add Liquidity', 25_000);
 
 To track wallet not includling in the list you can use [trackWalletConnection](#web3analyticstrackwalletconnectionwallettypeaccountchainid) method.
 
+## License
+
+[UNLICENSED](https://github.com/xorddotcom/spock-sdk/blob/main/LICENSE)
+
 ## Demo
 
-Example code for `analytics-web3` integration [DAppzero Analytics Demo](https://github.com/xorddotcom/dappzero-analytics-demo)
+Example code for `analytics-web3` integration [Spock Analytics Demo](https://github.com/xorddotcom/spock-analytics-demo)
 
 ## Onboarding
 
-Follow this [README.md](https://github.com/xorddotcom/dappzero-analytics-demo/blob/main/README.md) to get onboarded in DAppzero.
+Follow this [README.md](https://github.com/xorddotcom/spock-analytics-demo/blob/main/README.md) to get onboarded in Spock.
 
 ## Credits
 

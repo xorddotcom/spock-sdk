@@ -1,7 +1,7 @@
 {
   "name": "analytics-web3",
-  "version": "0.1.0-beta.2",
-  "description": "DAppzero analytics SDK analytics-web3 is a js module to collect and log all the data and events of DApp for analytics.",
+  "version": "0.1.0-beta.1",
+  "description": "Spock analytics SDK analytics-web3 is a js module to collect and log all the data and events of DApp for analytics.",
   "main": "dist/analytics-web3.min.js",
   "license": "UNLICENSED",
   "files": [
@@ -10,7 +10,7 @@
   ],
   "types": "types/index.d.ts",
   "keywords": [
-    "DAppzero",
+    "Spock",
     "web3-analytics",
     "web3",
     "dapp-analytics",

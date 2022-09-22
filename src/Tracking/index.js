@@ -1,5 +1,5 @@
 import BaseAnalytics from '../BaseAnalytics';
-import { logEnums, STORAGE, configrationDefaultValue, EMPTY_STRING, SERVER_ROUTES } from '../constants';
+import { LOG, STORAGE, DEFAULT_CONFIG, EMPTY_STRING, SERVER_ROUTES } from '../constants';
 import { generateUUID } from './utils';
 import { addEvent, currentTimestamp, setGetValueInStorage, getConfig } from '../utils/helpers';
 import { notUndefined } from '../utils/validators';
@@ -8,7 +8,7 @@ import { getCookie, setCookie } from '../utils/cookies';
 class Tracking extends BaseAnalytics {
   constructor(config) {
     super(config);
-    this.inactivityTimeout = getConfig(config.inactivityTimeout, configrationDefaultValue.INACTIVITY_TIMEOUT);
+    this.inactivityTimeout = getConfig(config.inactivityTimeout, DEFAULT_CONFIG.INACTIVITY_TIMEOUT);
     this.reference = undefined; //document reference
     this.inactivityInterval = undefined; //inactivity interval for checking session inactivity
     this.sessionInactive = false; //is ongoing session is inactive
@@ -68,7 +68,7 @@ class Tracking extends BaseAnalytics {
     const { device, system, OS, language } = userInfo ? userInfo : {};
     const data = { reference: this.reference, userId: deviceId, device, system, OS, language };
 
-    this.log(logEnums.INFO, `Track User`, data);
+    this.log(LOG.INFO, `Track User`, data);
 
     const cacheDeviceId = getCookie(STORAGE.COOKIES.CACHE_DEVICE_ID);
     if (notUndefined(cacheDeviceId)) return;
@@ -97,7 +97,7 @@ class Tracking extends BaseAnalytics {
     this.sessionStartTime = currentTimestamp();
     this.sessionTotalInactivetime = 0;
     this.sessionInactive = false;
-    this.log(logEnums.INFO, 'Session started');
+    this.log(LOG.INFO, 'Session started');
   }
 
   endSession() {
@@ -123,7 +123,7 @@ class Tracking extends BaseAnalytics {
       language,
       userId: this.store.userId,
     };
-    this.log(logEnums.INFO, 'Session expired => ', data);
+    this.log(LOG.INFO, 'Session expired => ', data);
 
     this.request.post(SERVER_ROUTES.SESSION, {
       data,
@@ -177,7 +177,7 @@ class Tracking extends BaseAnalytics {
       this.pagesFlow.push(page);
       const data = { pageTitle: page };
       this.request.post(SERVER_ROUTES.PAGE_VIEW, { data });
-      this.log(logEnums.INFO, 'Track pageview', data);
+      this.log(LOG.INFO, 'Track pageview', data);
     }
   }
 
@@ -198,7 +198,7 @@ class Tracking extends BaseAnalytics {
         if (anchorTag.hostname !== window.location.hostname) {
           const data = { link: anchorTag.href };
           this.request.post(SERVER_ROUTES.OUTBOUND, { data });
-          this.log(logEnums.INFO, 'Track outbound link', data);
+          this.log(LOG.INFO, 'Track outbound link', data);
         }
       }
     }

@@ -13,6 +13,8 @@ declare namespace Web3Analytics {
 
   export function valueContribution(label: string, valueInUSD: number): void;
 
+  export function valueExtraction(label: string, valueInUSD: number): void;
+
   export function walletProvider(provider: any): void;
 }
 

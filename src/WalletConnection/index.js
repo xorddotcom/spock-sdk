@@ -1,11 +1,11 @@
 import invariant from 'tiny-invariant';
 
 import BaseAnalytics from '../BaseAnalytics';
-import { logEnums, WALLET_TYPE, EVENTS, STORAGE, SERVER_ROUTES } from '../constants';
+import { LOG, WALLET_TYPE, EVENTS, STORAGE, SERVER_ROUTES } from '../constants';
 import { txnRejected } from './utils';
 import { addEvent } from '../utils/helpers';
 import { notUndefined, isSameAddress, isType } from '../utils/validators';
-import { normalizeChainId } from '../utils/formatting';
+import { JSON_Formatter, normalizeChainId } from '../utils/formatting';
 import { getCookie, setCookie } from '../utils/cookies';
 
 class WalletConnection extends BaseAnalytics {
@@ -21,6 +21,9 @@ class WalletConnection extends BaseAnalytics {
     this.transactionEvents();
   }
 
+  /**
+   *  Setup wallet event listeners
+   */
   walletConnectionEvents() {
     if (notUndefined(window.ethereum) && window.ethereum.isMetaMask) {
       //incase when metamask is already coonected on load
@@ -38,16 +41,20 @@ class WalletConnection extends BaseAnalytics {
       });
 
       window.ethereum.on('chainChanged', (chainId) => {
-        this.log(logEnums.INFO, 'chain changed', chainId);
+        this.log(LOG.INFO, 'chain changed', chainId);
       });
     }
 
     //listen localstorage activity for walletconnect and coinbase
-    addEvent(window, EVENTS.STORAGE_SET_ITEM, (event) => this.handleWalletLSSetItem.bind(this)(event));
-    addEvent(window, EVENTS.STORAGET_GET_ITEM, (event) => this.handleWalletLSGetItem.bind(this)(event));
+    addEvent(window, EVENTS.STORAGE_SET_ITEM, this.handleWalletLSSetItem.bind(this));
+    addEvent(window, EVENTS.STORAGET_GET_ITEM, this.handleWalletLSGetItem.bind(this));
   }
 
+  /**
+   *  Setup transaction event listeners
+   */
   transactionEvents() {
+    //eip1193 wallet txn listener
     addEvent(window, EVENTS.SEND_TXN, (payload) => {
       if (notUndefined(payload?.result)) {
         payload.result
@@ -62,6 +69,7 @@ class WalletConnection extends BaseAnalytics {
       }
     });
 
+    //legacy wallet txn listener
     addEvent(window, EVENTS.LEGACY_TXN_CALLBACK, (payload) => {
       if (notUndefined(payload)) {
         if (payload.result && payload.params) {
@@ -73,6 +81,12 @@ class WalletConnection extends BaseAnalytics {
     });
   }
 
+  /**
+   *  Log txn to the server
+   *  @param {'rejected' | 'submitted'} status - transaction status
+   *  @param {*} txnObj - transaction object
+   *  @param {String | undefined} txnHash - hash of submitted transaction
+   */
   logTransaction(status, txnObj, txnHash) {
     const chainId = this.store.connectedChain;
     if (status === 'rejected') {
@@ -84,7 +98,7 @@ class WalletConnection extends BaseAnalytics {
       if (this.store.doneTxn !== true) {
         this.dispatch({ rejectTxn: true });
       }
-      this.log(logEnums.INFO, 'Transaction rejected', data);
+      this.log(LOG.INFO, 'Transaction rejected', data);
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
       const userInfo = this.store.userInfo;
       const { device, system, OS, language } = userInfo ? userInfo : {};
@@ -105,11 +119,16 @@ class WalletConnection extends BaseAnalytics {
         this.dispatch({ pageNavigation });
       }
       this.dispatch({ doneTxn: true, rejectTxn: false });
-      this.log(logEnums.INFO, 'Transaction hash', data);
+      this.log(LOG.INFO, 'Transaction hash', data);
     }
   }
 
-  customizeProvider(proivder, walletType) {
+  /**
+   *  Customize user given provider
+   *  @param {Web3Provider} provider - wallet provider
+   *  @param {String} walletType - type of connected wallet
+   */
+  customizeProvider(provider, walletType) {
     const isFortmatic = walletType === WALLET_TYPE.FORTMATIC;
 
     //log only relevant eth method
@@ -157,23 +176,28 @@ class WalletConnection extends BaseAnalytics {
     }
 
     //for eip1193 providers
-    if (notUndefined(proivder.request)) {
-      const originalReqMethod = proivder.request;
-      proivder.request = attachEvent(originalReqMethod);
-    } else if (notUndefined(proivder.sendAsync)) {
-      const originalSendAsyncMethod = proivder.sendAsync;
-      proivder.sendAsync = attachEvent(originalSendAsyncMethod, true);
-    } else if (notUndefined(proivder.send)) {
-      const originalSendMethod = proivder.send;
-      proivder.send = attachEvent(originalSendMethod);
+    if (notUndefined(provider.request)) {
+      const originalReqMethod = provider.request;
+      provider.request = attachEvent(originalReqMethod);
+    } else if (notUndefined(provider.sendAsync)) {
+      const originalSendAsyncMethod = provider.sendAsync;
+      provider.sendAsync = attachEvent(originalSendAsyncMethod, true);
+    } else if (notUndefined(provider.send)) {
+      const originalSendMethod = provider.send;
+      provider.send = attachEvent(originalSendMethod);
     }
   }
 
+  /**
+   *  Find wallet type from provider
+   *  @param {Web3Provider} provider - wallet provider
+   *  @returns {String} type of connected wallet
+   */
   getWalletTypeFromProvider(provider) {
-    //in-case metamask and wallet connect both are connected
+    //in-case metamask and coinbase both are connected
     if (provider.overrideIsMetaMask) {
       if (provider.selectedProvider) {
-        return provider.selectedProvider.isMetaMask ? WALLET_TYPE.METAMASK : WALLET_TYPE.WALLETCONNECT;
+        return provider.selectedProvider.isMetaMask ? WALLET_TYPE.METAMASK : WALLET_TYPE.COINBASE;
       }
     }
 
@@ -185,11 +209,17 @@ class WalletConnection extends BaseAnalytics {
     else return WALLET_TYPE.OTHER;
   }
 
+  /**
+   *  Get provider from user
+   *  @param {Web3Provider} provider - wallet provider
+   */
   walletProvider(provider) {
     invariant(notUndefined(provider), 'Provider cannot be undefined');
-    this.dispatch({ provider });
     const walletType = this.getWalletTypeFromProvider(provider);
-    this.customizeProvider(provider, walletType);
+    if (!this.isSameProvider(provider)) {
+      this.customizeProvider(provider, walletType);
+    }
+    this.dispatch({ provider });
     if (notUndefined(provider.request)) {
       this.eip1193StandardMethods(provider, walletType);
     } else if (notUndefined(provider.send)) {
@@ -197,6 +227,31 @@ class WalletConnection extends BaseAnalytics {
     }
   }
 
+  /**
+   *  Check the newly connected provider is same previous one or not
+   *  @param {Web3Provider} provider - wallet provider
+   */
+  isSameProvider(provider) {
+    const storedProvider = this.store.provider;
+    if (!storedProvider) {
+      return false;
+    }
+
+    if (provider.request && storedProvider.request) {
+      return provider.request.toString().includes('SEND_TXN');
+    } else if (provider.send && storedProvider.send) {
+      return provider.send.toString().includes('SEND_TXN');
+    } else if (provider.sendAsync && storedProvider.sendAsync) {
+      return provider.sendAsync.toString().includes('SEND_TXN');
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   *  Get account and chain fron legacy wallet providers
+   *  @param {Web3Provider} provider - wallet provider
+   */
   legacyMethods(provider, walletType) {
     Promise.all([provider.send('eth_accounts'), provider.send('eth_chainId')])
       .then(([accounts, chainId]) => {
@@ -205,10 +260,14 @@ class WalletConnection extends BaseAnalytics {
         }
       })
       .catch((e) => {
-        this.log(logEnums.ERROR, 'Failed to extract wallet connection detail from provider', e);
+        this.log(LOG.ERROR, 'Failed to extract wallet connection detail from provider', e);
       });
   }
 
+  /**
+   *  Get account and chain fron eip1193 wallet providers
+   *  @param {Web3Provider} provider - wallet provider
+   */
   eip1193StandardMethods(provider, walletType) {
     Promise.all([provider.request({ method: 'eth_accounts' }), provider.request({ method: 'eth_chainId' })])
       .then(([accounts, chainId]) => {
@@ -217,10 +276,15 @@ class WalletConnection extends BaseAnalytics {
         }
       })
       .catch((e) => {
-        this.log(logEnums.ERROR, 'Failed to extract wallet connection detail from provider', e);
+        this.log(LOG.ERROR, 'Failed to extract wallet connection detail from provider', e);
       });
   }
 
+  /**
+   *  Handle wallet connect and coinbase wallet status by local storage
+   *  @param {String} key - stored data key
+   *  @param {*} value - stored data
+   */
   lsWalletHandler(key, value) {
     if (key === 'walletconnect') {
       const account = value.accounts ? value.accounts[0] : undefined;
@@ -234,35 +298,49 @@ class WalletConnection extends BaseAnalytics {
     }
   }
 
+  /**
+   *  Local storage set item event listener
+   *  @param {*} event
+   */
   handleWalletLSSetItem(event) {
-    if (notUndefined(event.value)) {
-      this.lsWalletHandler(event.key, event.value);
-    }
+    const parsedValue = JSON_Formatter.parse(event.value);
+    parsedValue && this.lsWalletHandler(event.key, parsedValue);
   }
 
+  /**
+   *  Local storage get item event listener
+   *  @param {*} event
+   */
   handleWalletLSGetItem(event) {
     const value = localStorage.getItem(event.key, 'noLog');
-    let parsedValue;
-    if (value) {
-      try {
-        parsedValue = JSON.parse(value);
-      } catch (e) {
-        parsedValue = value;
-      }
-
-      this.lsWalletHandler(event.key, parsedValue);
-    }
+    const parsedValue = JSON_Formatter.parse(value);
+    parsedValue && this.lsWalletHandler(event.key, parsedValue);
   }
 
+  /**
+   *  Log wallet connection data on server fired from events
+   *  @param {String} walletType - type of connected wallet
+   *  @param {String | undefined} account - user coonected wallet address
+   *  @param {String | number | undefined} chainId - user connected network
+   *  @param {boolean | undefined} overrideRule - override provider existance rule of storing data
+   */
   logWalletConnectionFromEvents(walletType, account, chainId, overrideRule) {
     if (this.store.provider && !overrideRule) {
       return;
-    } else {
+      //to avoid exception while using trackWalletConnection internally
+    } else if (account && (chainId || this.connectedChain)) {
       this.trackWalletConnection(walletType, account, chainId);
     }
   }
 
+  /**
+   *  Log wallet connection data on server fired from events
+   *  @param {String} walletType - type of connected wallet
+   *  @param {String} account - user coonected wallet address
+   *  @param {String} chainId - user connected network
+   */
   trackWalletConnection(walletType, account, chainId) {
+    //throw exception in-case trackWalletConnection is used with invalid parameters bu end-user
     invariant(isType(walletType, 'string') && isType(account, 'string'), 'Invalid arguments');
 
     const chain = isType(chainId, 'string') ? normalizeChainId(chainId) : chainId ? chainId : this.connectedChain;
@@ -277,7 +355,7 @@ class WalletConnection extends BaseAnalytics {
       const { device, system, OS, language } = userInfo ? userInfo : {};
       const data = { walletType, address: account, chainId: chain, device, system, OS, language };
 
-      this.log(logEnums.INFO, 'wallet connected', JSON.stringify(data));
+      this.log(LOG.INFO, 'wallet connected', JSON.stringify(data));
 
       const cacheAddress = getCookie(STORAGE.COOKIES.CACHE_ADDRESS);
       const cacheChain = getCookie(STORAGE.COOKIES.CACHE_CHAIN);

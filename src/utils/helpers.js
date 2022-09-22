@@ -1,3 +1,5 @@
+import { notUndefined } from './validators';
+
 export function setGetValueInStorage() {
   const key = arguments[0];
   const value = arguments[1];
@@ -13,7 +15,7 @@ export function currentTimestamp() {
 }
 
 export function addEvent(element, type, listener) {
-  if (typeof element.addEventListener !== 'undefined') {
+  if (notUndefined(element.addEventListener)) {
     element.addEventListener(type, listener, false);
   }
   // for old browser use attachEvent instead
