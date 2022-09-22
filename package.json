@@ -10,7 +10,7 @@
   ],
   "types": "types/index.d.ts",
   "keywords": [
-    "Spock",
+    "spock",
     "web3-analytics",
     "web3",
     "dapp-analytics",
