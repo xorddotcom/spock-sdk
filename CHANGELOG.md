@@ -15,19 +15,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- On-boarding and credits section in README ([fbe62](https://github.com/xorddotcom/spock-sdk/pull/21/commits/fbe62afaf3d38b992fe02e6b1608fdb8a172a09b))
+- On-boarding and credits section in README.
 
-## [Unreleased]
+## [0.1.0-beta.2] - 2022-09-21
 
-## [0.1.0-beta.2]
+### Changed
+
+- Server endponits
+
+## [0.1.0-beta.3] - 2022-09-22
 
 ### Added
 
 - Value Extraction feature
 - Add license and value extraction in API section of README.
 - Add CHANGELOG.md file.
+- Documented some code.
 
 ### Changed
 
 - Moved `valueContribution` code into generalized function `protocolValue`.
 - Rename brand name from DAppzero to Spock in README.
+- JSON formatting utils.
+
+### Fixed
+
+- Multiple reject txn logging.
+- Wallet disconnect expection.
+- Parse data in ls event.

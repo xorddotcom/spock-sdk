@@ -1,5 +1,5 @@
 import { SERVER_ENDPOINT, TEST_SERVER_ENDPOINT, LOG } from '../constants';
-import { stringify } from '../utils/formatting';
+import { JSON_Formatter } from '../utils/formatting';
 
 class Request {
   constructor({ appKey, log, testENV, testMode }) {
@@ -29,7 +29,7 @@ class Request {
   }
 
   async post(route, { data, callback, withIp, keepalive }) {
-    const formatedData = stringify(data);
+    const formatedData = JSON_Formatter.stringify(data);
     if (formatedData) {
       if (this.testMode) {
         callback && callback();
