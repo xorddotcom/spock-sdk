@@ -147,7 +147,7 @@ Web3Analytics.valueContribution('Add Liquidity', 25_000);
 
 ### Web3Analytics.valueExtraction(label,valueInUSD)
 
-Track amount in USD that end-user will contribute on protocol ecosystem through DApp. You can inovke this method in the callback of transaction submission.
+Track amount in USD that end-user will remove from protocol ecosystem through DApp. You can inovke this method in the callback of transaction submission.
 
 ```js
 Web3Analytics.valueExtraction('Remove Liquidity', 25_000);
@@ -158,7 +158,7 @@ Web3Analytics.valueExtraction('Remove Liquidity', 25_000);
 | Value           | Type    | Description                                        |
 | ----------------| --------| ---------------------------------------------------|
 | label           |`String` | Label to represent extraction. e.g. 'Remove Liquidity', 'Unstake'|
-| valueInUSD      |`number` | Amount in USD that user has contributed.           |
+| valueInUSD      |`number` | Amount in USD that user has removed.           |
 
 ## Supporting Wallets
 
