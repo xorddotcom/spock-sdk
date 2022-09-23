@@ -179,12 +179,15 @@ class WalletConnection extends BaseAnalytics {
     if (notUndefined(provider.request)) {
       const originalReqMethod = provider.request;
       provider.request = attachEvent(originalReqMethod);
+      provider.attachEventRequest = true;
     } else if (notUndefined(provider.sendAsync)) {
       const originalSendAsyncMethod = provider.sendAsync;
       provider.sendAsync = attachEvent(originalSendAsyncMethod, true);
+      provider.attachEventSendAsync = true;
     } else if (notUndefined(provider.send)) {
       const originalSendMethod = provider.send;
       provider.send = attachEvent(originalSendMethod);
+      provider.attachEventSend = true;
     }
   }
 
@@ -228,24 +231,14 @@ class WalletConnection extends BaseAnalytics {
   }
 
   /**
-   *  Check the newly connected provider is same previous one or not
+   *  Check event already attached in provider or not
    *  @param {Web3Provider} provider - wallet provider
    */
   isSameProvider(provider) {
-    const storedProvider = this.store.provider;
-    if (!storedProvider) {
-      return false;
-    }
-
-    if (provider.request && storedProvider.request) {
-      return provider.request.toString().includes('SEND_TXN');
-    } else if (provider.send && storedProvider.send) {
-      return provider.send.toString().includes('SEND_TXN');
-    } else if (provider.sendAsync && storedProvider.sendAsync) {
-      return provider.sendAsync.toString().includes('SEND_TXN');
-    } else {
-      return false;
-    }
+    if (provider.request && provider.attachEventRequest) return true;
+    else if (provider.sendAsync && provider.attachEventSendAsync) return true;
+    else if (provider.send && provider.attachEventSend) return true;
+    else return false;
   }
 
   /**
