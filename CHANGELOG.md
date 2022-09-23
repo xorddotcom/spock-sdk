@@ -43,3 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiple reject txn logging.
 - Wallet disconnect expection.
 - Parse data in ls event.
+
+## [0.1.0-beta.4]
+
+### Changed
+
+- Provider event attach function.
