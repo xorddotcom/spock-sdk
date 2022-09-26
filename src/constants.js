@@ -1,12 +1,12 @@
 /**
  *  production server endpoint for storing analytics data
  */
-export const SERVER_ENDPOINT = 'https://dapp-server.thespock.xyz';
+export const SERVER_ENDPOINT = 'https://dapp-server.spockanalytics.xyz';
 
 /**
  *  testing server endpoint for storing analytics data
  */
-export const TEST_SERVER_ENDPOINT = 'https://dapp-server-test.thespock.xyz';
+export const TEST_SERVER_ENDPOINT = 'https://dapp-server-test.spockanalytics.xyz';
 
 /**
  *  alias to make storage keys unqiue
