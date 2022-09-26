@@ -64,16 +64,16 @@ Web3Analytics.init({ appKey: 'eba6...28c', debug: true });
 <!-- prettier-ignore -->
 | Value                   | Type    | Description                                                 |
 | ------------------------| --------| ------------------------------------------------------------|
-|  appKey                 |`String` | Unique appKey like `eba6...28c` for trackig. Can be obtained by getting [onboarded](#onboarding) in Spock.|
+|  appKey                 |`String` | Unique appKey like `eba6...28c` for tracking. Can be obtained by getting [onboarded](#onboarding) in Spock.|
 | **Optional**            | | |
-|  debug                  |`Boolean`| Deafults to `false`. Enable consoles for all the tracking events.|
-|  testENV                |`Boolean`| Deafults to `false`. Enable testing version of SDK in which SDK will interact with testing servers.|
-|  testMode               |`Boolean`| Deafults to `false`. Enable testMode in which you can test tracking events without logging data onto server. Inordre to avoid store testing data.|
-|  inactivityTimeout      |`number` | Deafults to `30`. This field takes time in mins to specify the inactivity duration in which the session will expires.|
+|  debug                  |`Boolean`| Defaults to `false`. Enable consoles for all the tracking events.|
+|  testENV                |`Boolean`| Defaults to `false`. Enable testing version of SDK in which SDK will interact with testing servers.|
+|  testMode               |`Boolean`| Defaults to `false`. Enable testMode in which you can test tracking events without logging data onto server. Inordre to avoid store testing data.|
+|  inactivityTimeout      |`number` | Defaults to `30`. This field takes time in mins to specify the inactivity duration in which the session will expires.|
 
 ### Web3Analytics.walletProvider(provider)
 
-Pass `web3 provider` to track wallet connectinons for all [Supporting Wallets](#supporting-wallets) and transactions state that are submitted or rejected from DApp.
+Pass `web3 provider` to track wallet connections for all [Supporting Wallets](#supporting-wallets) and transactions state that are submitted or rejected from DApp.
 
 ```js
 Web3Analytics.walletProvider(window.ethereum);
@@ -132,7 +132,7 @@ Web3Analytics.trackPageView('/home');
 
 ### Web3Analytics.valueContribution(label,valueInUSD)
 
-Track amount in USD that end-user has contribute in protocol ecosystem through DApp. You can inovke this method in the callback of transaction submission.
+Track amount in USD that end-user has contribute in protocol ecosystem through DApp. You can invoke this method in the callback of transaction submission.
 
 ```js
 Web3Analytics.valueContribution('Add Liquidity', 25_000);
@@ -147,7 +147,7 @@ Web3Analytics.valueContribution('Add Liquidity', 25_000);
 
 ### Web3Analytics.valueExtraction(label,valueInUSD)
 
-Track amount in USD that end-user has removed from protocol ecosystem through DApp. You can inovke this method in the callback of transaction submission.
+Track amount in USD that end-user has removed from protocol ecosystem through DApp. You can invoke this method in the callback of transaction submission.
 
 ```js
 Web3Analytics.valueExtraction('Remove Liquidity', 25_000);
@@ -168,7 +168,7 @@ Web3Analytics.valueExtraction('Remove Liquidity', 25_000);
 - Portis
 - Fortmatic
 
-To track wallet not includling in the list you can use [trackWalletConnection](#web3analyticstrackwalletconnectionwallettypeaccountchainid) method.
+To track wallet not including in the list you can use [trackWalletConnection](#web3analyticstrackwalletconnectionwallettypeaccountchainid) method.
 
 ## License
 
