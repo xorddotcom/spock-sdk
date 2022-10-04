@@ -44,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Wallet disconnect expection.
 - Parse data in ls event.
 
-## [0.1.0-beta.4]- 2022-09-26
+## [0.1.0-beta.4] - 2022-09-26
 
 ### Changed
 
@@ -54,3 +54,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 -README typo
+
+## [0.1.0-beta.5] - 2022-10-04
+
+### Fixed
+
+-Document reference for same domain.

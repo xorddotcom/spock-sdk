@@ -25,7 +25,7 @@ class Tracking extends BaseAnalytics {
     //preflight req for cors cache
     this.sessionPreflightReq();
 
-    this.reference = notUndefined(document.referrer) ? document.referrer : undefined;
+    this.reference = this.documentReference(document.referrer);
     this.trackUser();
     this.trackSessions();
     this.trackOutboundLink();
@@ -51,6 +51,21 @@ class Tracking extends BaseAnalytics {
       withIp: true,
     });
     this.doneSessionPreflightReq = true;
+  }
+
+  documentReference(reference) {
+    if (notUndefined(document.referrer) && document.referrer !== '') {
+      const pageHost = window.location.host;
+      try {
+        const referenceHost = new URL(reference).host;
+        return referenceHost !== pageHost ? reference : undefined;
+      } catch (error) {
+        this.log(logEnums.ERROR, 'documentReference', error);
+        return undefined;
+      }
+    } else {
+      return undefined;
+    }
   }
 
   trackUser() {
