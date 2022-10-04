@@ -55,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -README typo
 
-## [0.1.0-beta.5]
+## [0.1.0-beta.5] - 2022-10-04
 
 ### Fixed
 
