@@ -144,7 +144,8 @@ class WalletConnection extends BaseAnalytics {
 
     function attachEvent(originalMethod, isLegacy) {
       return function () {
-        const arg = arguments[0];
+        const rpcMethod = arguments[0]?.method ?? arguments[0];
+        const rpcMethodParams = arguments[0]?.params ?? arguments[1];
 
         //add event in callback of send txn method for legacy provider
         if (isLegacy) {
@@ -156,8 +157,8 @@ class WalletConnection extends BaseAnalytics {
               const event = new Event(EVENTS.LEGACY_TXN_CALLBACK);
               event.error = error;
               event.result = result;
-              event.params = arg?.params;
-              allowLog(error, result, arg?.method) && window.dispatchEvent(event);
+              event.params = rpcMethodParams;
+              allowLog(error, result, rpcMethod) && window.dispatchEvent(event);
               originalCallback.apply(this, arguments);
             };
           }
@@ -165,9 +166,9 @@ class WalletConnection extends BaseAnalytics {
 
         const result = originalMethod.apply(this, arguments);
 
-        if (arg?.method === 'eth_sendTransaction') {
+        if (rpcMethod === 'eth_sendTransaction') {
           const event = new Event(EVENTS.SEND_TXN);
-          event.params = arg?.params;
+          event.params = rpcMethodParams;
           event.result = result;
           window.dispatchEvent(event);
         }
