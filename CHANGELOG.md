@@ -66,3 +66,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 -RPC request method and params for new versions of ethers.js.
+
+## [0.1.0-beta.7] - 2022-10-21
+
+### Fixed
+
+-`Fortmatic` typo in wallet constants.
