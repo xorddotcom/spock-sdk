@@ -53,7 +53,7 @@ export const WALLET_TYPE = {
   METAMASK: 'Metamask',
   WALLETCONNECT: 'WalletConnect',
   COINBASE: 'Coinbase',
-  FORTMATIC: 'Fortmaic',
+  FORTMATIC: 'Fortmatic',
   PORTIS: 'Portis',
   OTHER: 'Other',
 };
