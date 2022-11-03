@@ -53,22 +53,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
--README typo
+- README typo
 
 ## [0.1.0-beta.5] - 2022-10-04
 
 ### Fixed
 
--Document reference for same domain.
+- Document reference for same domain.
 
 ## [0.1.0-beta.6] - 2022-10-10
 
 ### Fixed
 
--RPC request method and params for new versions of ethers.js.
+- RPC request method and params for new versions of ethers.js.
 
 ## [0.1.0-beta.7] - 2022-10-21
 
 ### Fixed
 
--`Fortmatic` typo in wallet constants.
+- `Fortmatic` typo in wallet constants.
+
+## [0.1.0] - 2022-11-03
+
+### Changed
+
+- Remove beta tag from sdk
