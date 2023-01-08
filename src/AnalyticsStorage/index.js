@@ -27,6 +27,8 @@ import { notUndefined } from '../utils/validators';
  * @property {PageNavigation[]} pageNavigation - user navigation in current session
  * @property {boolean} doneTxn - is user submitted txn in current session
  * @property {boolean} rejectTxn - is user rejected txn in current session
+ * @property {number} submitTxnCount - total txn rejected in current session
+ * @property {number} rejectTxnCount - total txn submitted txn in current session
  */
 
 /** @type {AnalyticsStore} */
@@ -39,6 +41,8 @@ const initialState = {
   pageNavigation: [],
   doneTxn: false,
   rejectTxn: false,
+  submitTxnCount: 0,
+  rejectTxnCount: 0,
 };
 
 class AnalyticsStorage {

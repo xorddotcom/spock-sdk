@@ -70,6 +70,7 @@ export const EVENTS = {
   LEGACY_TXN_CALLBACK: withAlias('legacyTxnCallback'),
   STORAGE_SET_ITEM: withAlias('storageSetItem'),
   STORAGET_GET_ITEM: withAlias('storageGetItem'),
+  WALLET_CONNECTION: withAlias('walletConnection'),
 };
 
 /**

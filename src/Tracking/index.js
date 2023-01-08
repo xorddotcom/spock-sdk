@@ -1,5 +1,5 @@
 import BaseAnalytics from '../BaseAnalytics';
-import { LOG, STORAGE, DEFAULT_CONFIG, EMPTY_STRING, SERVER_ROUTES } from '../constants';
+import { LOG, STORAGE, DEFAULT_CONFIG, EMPTY_STRING, SERVER_ROUTES, EVENTS } from '../constants';
 import { generateUUID } from './utils';
 import { addEvent, currentTimestamp, setGetValueInStorage, getConfig } from '../utils/helpers';
 import { notUndefined } from '../utils/validators';
@@ -104,6 +104,7 @@ class Tracking extends BaseAnalytics {
     addEvent(window, 'mousemove', this.resetInactivity.bind(this));
     addEvent(window, 'click', this.resetInactivity.bind(this));
     addEvent(window, 'unload', this.endSession.bind(this));
+    addEvent(window, EVENTS.WALLET_CONNECTION, this.endSession.bind(this));
 
     this.generateInactivityInterval();
   }
@@ -115,7 +116,7 @@ class Tracking extends BaseAnalytics {
     this.log(LOG.INFO, 'Session started');
   }
 
-  endSession() {
+  endSession(event) {
     const totalSessionDuration = currentTimestamp() - this.sessionStartTime;
     const sessionDuration = totalSessionDuration - this.sessionTotalInactivetime;
     this.sessionStartTime = 0;
@@ -125,8 +126,8 @@ class Tracking extends BaseAnalytics {
     const userInfo = this.store.userInfo;
     const { device, system, OS, language } = userInfo ? userInfo : {};
     const data = {
-      address: this.store.connectedAccount,
-      chainId: this.store.connectedChain,
+      address: event?.account ?? this.store.connectedAccount,
+      chainId: event?.chainId ?? this.store.connectedChain,
       sessionDuration,
       doneTxn: this.store.doneTxn,
       navigation: this.store.pageNavigation,
@@ -137,6 +138,8 @@ class Tracking extends BaseAnalytics {
       OS,
       language,
       userId: this.store.userId,
+      submitTxnCount: this.store.submitTxnCount,
+      rejectTxnCount: this.store.rejectTxnCount,
     };
     this.log(LOG.INFO, 'Session expired => ', data);
 
@@ -145,7 +148,7 @@ class Tracking extends BaseAnalytics {
       withIp: true,
       keepalive: true,
       callback: () => {
-        this.dispatch({ pageNavigation: [], doneTxn: false, rejectTxn: false });
+        this.dispatch({ pageNavigation: [], doneTxn: false, rejectTxn: false, submitTxnCount: 0, rejectTxnCount: 0 });
         this.pagesFlow = [];
         //add current page in navigation after clearing all navigation data
         this.trackPageView();

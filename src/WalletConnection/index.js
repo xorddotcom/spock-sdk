@@ -98,6 +98,7 @@ class WalletConnection extends BaseAnalytics {
       if (this.store.doneTxn !== true) {
         this.dispatch({ rejectTxn: true });
       }
+      this.dispatch({ rejectTxnCount: this.store.rejectTxnCount + 1 });
       this.log(LOG.INFO, 'Transaction rejected', data);
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
       const userInfo = this.store.userInfo;
@@ -118,7 +119,7 @@ class WalletConnection extends BaseAnalytics {
         pageNavigation[index] = { ...page, doneTxn: true };
         this.dispatch({ pageNavigation });
       }
-      this.dispatch({ doneTxn: true, rejectTxn: false });
+      this.dispatch({ doneTxn: true, rejectTxn: false, submitTxnCount: this.store.submitTxnCount + 1 });
       this.log(LOG.INFO, 'Transaction hash', data);
     }
   }
@@ -328,6 +329,20 @@ class WalletConnection extends BaseAnalytics {
   }
 
   /**
+   *  Fire an event on new wallet connected and chain changed
+   *  @param {String | undefined} account - user coonected wallet address
+   *  @param {String | undefined} chainId - user connected network
+   */
+  fireWalletConnectionEvent(account, chainId) {
+    if (notUndefined(account) && notUndefined(chainId)) {
+      const event = new Event(EVENTS.WALLET_CONNECTION);
+      event.account = account;
+      event.chainId = chainId;
+      window.dispatchEvent(event);
+    }
+  }
+
+  /**
    *  Log wallet connection data on server fired from events
    *  @param {String} walletType - type of connected wallet
    *  @param {String} account - user coonected wallet address
@@ -343,6 +358,8 @@ class WalletConnection extends BaseAnalytics {
 
     // not log already logged conectedWallet with same network
     if (!isSameAddress(this.store.connectedAccount, account) || chain !== this.store.connectedChain) {
+      this.fireWalletConnectionEvent(this.store.connectedAccount, this.store.connectedChain);
+
       this.dispatch({ connectedAccount: account, connectedChain: chain });
 
       const userInfo = this.store.userInfo;
