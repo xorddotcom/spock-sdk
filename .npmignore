@@ -3,5 +3,8 @@ examples/
 src/
 .prettierrc
 .prettierignore
-.eslintrc
+.eslintrc.js
 .eslintignore
+.husky
+commitlint.config.js
+package-lock.json

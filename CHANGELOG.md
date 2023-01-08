@@ -78,3 +78,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Remove beta tag from sdk
+
+## [0.1.1]
+
+### Changed
+
+- End session functionality on account and chain change.
+- Add submit and reject txn count in session data.
+- Config eslint, lint-staged and husky.

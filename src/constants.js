@@ -64,6 +64,7 @@ export const WALLET_TYPE = {
  * LEGACY_TXN_CALLBACK - when txn is initialized by legacy wallet that supports send or sendAsync method.
  * STORAGE_SET_ITEM - when something has added into storage (can be locl,session).
  * STORAGET_GET_ITEM - when something has retrived from storage (can be locl,session).
+ * WALLET_CONNECTION - when user connected account or chain change.
  */
 export const EVENTS = {
   SEND_TXN: withAlias('sendTxn'),
