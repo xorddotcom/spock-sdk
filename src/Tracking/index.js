@@ -60,7 +60,7 @@ class Tracking extends BaseAnalytics {
         const referenceHost = new URL(reference).host;
         return referenceHost !== pageHost ? reference : undefined;
       } catch (error) {
-        this.log(logEnums.ERROR, 'documentReference', error);
+        this.log(LOG.ERROR, 'documentReference', error);
         return undefined;
       }
     } else {
@@ -120,6 +120,7 @@ class Tracking extends BaseAnalytics {
     const sessionDuration = totalSessionDuration - this.sessionTotalInactivetime;
     this.sessionStartTime = 0;
     this.sessionTotalInactivetime = 0;
+
     clearInterval(this.inactivityInterval);
 
     const userInfo = this.store.userInfo;
