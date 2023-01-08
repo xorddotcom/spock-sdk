@@ -24,7 +24,8 @@
     "prettier:write": "prettier --write ./**/*.{ts,js,json,*rc}",
     "prepare": "husky install",
     "lint": "eslint src/**/*.{js,ts}",
-    "commit": "git cz"
+    "commit": "git cz",
+    "semantic-release": "semantic-release --branches main"
   },
   "lint-staged": {
     "src/**/*.{js,ts}": [
@@ -47,6 +48,7 @@
     "husky": "^8.0.0",
     "lint-staged": "^13.1.0",
     "prettier": "^2.8.2",
+    "semantic-release": "^20.0.2",
     "tiny-invariant": "^1.2.0",
     "ua-parser-js": "^1.0.2",
     "webpack": "^4.44.0",
