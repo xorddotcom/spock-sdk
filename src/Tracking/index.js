@@ -48,7 +48,6 @@ class Tracking extends BaseAnalytics {
 
     this.request.post(SERVER_ROUTES.SESSION, {
       data,
-      withIp: true,
     });
     this.doneSessionPreflightReq = true;
   }
@@ -90,7 +89,6 @@ class Tracking extends BaseAnalytics {
     else {
       this.request.post(SERVER_ROUTES.APP_VISIT, {
         data,
-        withIp: true,
         callback: () => {
           setCookie(STORAGE.COOKIES.CACHE_DEVICE_ID, deviceId);
         },
@@ -104,7 +102,10 @@ class Tracking extends BaseAnalytics {
     addEvent(window, 'mousemove', this.resetInactivity.bind(this));
     addEvent(window, 'click', this.resetInactivity.bind(this));
     addEvent(window, 'unload', this.endSession.bind(this));
-    addEvent(window, EVENTS.WALLET_CONNECTION, this.endSession.bind(this));
+    addEvent(window, EVENTS.WALLET_CONNECTION, () => {
+      this.endSession();
+      this.beginSession();
+    });
 
     this.generateInactivityInterval();
   }
@@ -117,8 +118,13 @@ class Tracking extends BaseAnalytics {
   }
 
   endSession(event) {
+    //incase session is ended due to inactivity and after that user unload window without starting new session
+    if (this.sessionStartTime === 0) return;
+
     const totalSessionDuration = currentTimestamp() - this.sessionStartTime;
-    const sessionDuration = totalSessionDuration - this.sessionTotalInactivetime;
+    //TODO: Temp check to test negative duration
+    const sessionDuration =
+      totalSessionDuration - (totalSessionDuration > this.sessionTotalInactivetime ? this.sessionTotalInactivetime : 0);
     this.sessionStartTime = 0;
     this.sessionTotalInactivetime = 0;
 
@@ -146,7 +152,6 @@ class Tracking extends BaseAnalytics {
 
     this.request.post(SERVER_ROUTES.SESSION, {
       data,
-      withIp: true,
       keepalive: true,
       callback: () => {
         this.dispatch({ pageNavigation: [], doneTxn: false, rejectTxn: false, submitTxnCount: 0, rejectTxnCount: 0 });
@@ -188,7 +193,7 @@ class Tracking extends BaseAnalytics {
     const page = _page || window.location.pathname;
     if (page) {
       const pageNavigation = this.store.pageNavigation;
-      const alreadyNavigated = pageNavigation.find(({ page }) => page === page);
+      const alreadyNavigated = pageNavigation.find((nav) => nav.page === page);
       if (!alreadyNavigated) {
         pageNavigation.push({ page, doneTxn: false });
         this.dispatch({ pageNavigation });

@@ -2,11 +2,11 @@ import { SERVER_ENDPOINT, TEST_SERVER_ENDPOINT, LOG } from '../constants';
 import { JSON_Formatter } from '../utils/formatting';
 
 class Request {
-  constructor({ appKey, log, testENV, testMode }) {
+  constructor({ appKey, log, testENV, testMode, store }) {
     this.log = log;
     this.testMode = testMode;
     this.endPoint = testENV ? TEST_SERVER_ENDPOINT : SERVER_ENDPOINT;
-    this.ipaddress = undefined;
+    this.store = store;
     this.headers = {
       appkey: appKey,
       'Content-type': 'application/json; charset=UTF-8',
@@ -14,21 +14,7 @@ class Request {
     this.post = this.post.bind(this);
   }
 
-  async getUserIp() {
-    let ipaddress = this.ipaddress;
-    if (!ipaddress) {
-      const result = await this.externalGet('https://api.ipify.org?format=json');
-      if (result?.ip) {
-        ipaddress = result?.ip;
-        this.ipaddress = ipaddress;
-        return ipaddress;
-      }
-    } else {
-      return ipaddress;
-    }
-  }
-
-  async post(route, { data, callback, withIp, keepalive }) {
+  async post(route, { data, callback, keepalive }) {
     const formatedData = JSON_Formatter.stringify(data);
     if (formatedData) {
       if (this.testMode) {
@@ -37,13 +23,7 @@ class Request {
       }
 
       let headers = this.headers;
-
-      if (withIp) {
-        const ipaddress = await this.getUserIp();
-        if (ipaddress) {
-          headers['ipaddress'] = ipaddress;
-        }
-      }
+      headers['ipaddress'] = this.store.ip;
 
       try {
         const response = await fetch(`${this.endPoint}/${route}`, {
@@ -57,17 +37,6 @@ class Request {
       } catch (e) {
         this.log(LOG.ERROR, `${route} request failed`, e.toString());
       }
-    }
-  }
-
-  async externalGet(api) {
-    try {
-      const response = await fetch(api, {
-        method: 'GET',
-      });
-      return await response.json();
-    } catch (e) {
-      this.log(LOG.ERROR, `externalGet`, e.toString());
     }
   }
 }

@@ -17,9 +17,9 @@ class Web3Analytics extends BaseAnalytics {
     this.valueExtraction = this.valueExtraction.bind(this);
   }
 
-  initialize() {
+  async initialize() {
     this.log(LOG.INFO, 'Web3 Analytics initialized');
-    this.userInfo.getUserInfo();
+    await this.userInfo.getUserInfo();
     this.wallet.initialize();
     this.tracking.initialize();
   }

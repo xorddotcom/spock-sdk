@@ -2,6 +2,7 @@ import { UAParser } from 'ua-parser-js';
 
 import BaseAnalytics from '../BaseAnalytics';
 import { notUndefined } from '../utils/validators';
+import { LOG } from '../constants';
 
 class UserInfo extends BaseAnalytics {
   constructor(config) {
@@ -9,7 +10,7 @@ class UserInfo extends BaseAnalytics {
     this.getUserInfo = this.getUserInfo.bind(this);
   }
 
-  getUserInfo() {
+  async getUserInfo() {
     const userInfo = {};
     if (notUndefined(navigator)) {
       const userAgent = navigator.userAgent;
@@ -22,6 +23,8 @@ class UserInfo extends BaseAnalytics {
       userInfo.language = navigator.language;
       this.dispatch({ userInfo });
     }
+
+    await this.getUserIp();
   }
 
   getDevice(userAgent) {
@@ -48,6 +51,20 @@ class UserInfo extends BaseAnalytics {
 
     // set the device type
     return device;
+  }
+
+  async getUserIp() {
+    try {
+      const response = await fetch('https://api.ipify.org?format=json', {
+        method: 'GET',
+      });
+      const result = await response.json();
+      if (result?.ip) {
+        this.dispatch({ ip: result.ip });
+      }
+    } catch (e) {
+      this.log(LOG.ERROR, `getUserIp`, e.toString());
+    }
   }
 }
 
