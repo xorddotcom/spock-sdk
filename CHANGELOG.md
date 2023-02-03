@@ -79,10 +79,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove beta tag from sdk
 
-## [0.1.1]
+## [0.1.1] - 2023-01-08
 
 ### Changed
 
 - End session functionality on account and chain change.
 - Add submit and reject txn count in session data.
 - Config eslint, lint-staged and husky.
+
+## [0.1.2] - 2023-02-03
+
+### Changed
+
+- Covert user ip fetching as a one time procedure.
+- Add ip support on all server routes.
+- Deprecate value contribution functions.
+
+### Fixed
+
+- Navigation record in session.
+- New session starting on chain change.
+- Session duration bug.

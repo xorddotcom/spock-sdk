@@ -41,11 +41,19 @@ class Web3Analytics extends BaseAnalytics {
     }
   }
 
+  /**
+   * @deprecated This data collection has moved onchain by using spock-adapters.
+   */
   valueContribution(label, valueInUSD) {
+    this.log(LOG.WARNING, 'valueContribution function has been deprecated');
     this.protocolValue(label, valueInUSD, false);
   }
 
+  /**
+   * @deprecated This data collection has moved onchain by using spock-adapters.
+   */
   valueExtraction(label, valueInUSD) {
+    this.log(LOG.WARNING, 'valueExtraction function has been deprecated');
     this.protocolValue(label, valueInUSD, true);
   }
 }
