@@ -91,7 +91,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Covert user ip fetching as a one time procedure.
+- Convert user ip fetching as a one time procedure.
 - Add ip support on all server routes.
 - Deprecate value contribution functions.
 
