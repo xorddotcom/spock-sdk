@@ -18,8 +18,8 @@ Spock aims to accelerate your growth by tracking & analyzing crucial and opportu
     - [Wallet Provider](#web3analyticswalletproviderprovider)
     - [Wallet Connection](#web3analyticstrackwalletconnectionwallettypeaccountchainid)
     - [Page View](#web3analyticstrackpageviewpath)
-    - [Value Contribution](#web3analyticsvaluecontributionlabelvalueinusd)
-    - [Value Extraction](#web3analyticsvalueextractionlabelvalueinusd)
+    - [Value Contribution](#web3analyticsvaluecontributionlabelvalueinusd) (Deprecated)
+    - [Value Extraction](#web3analyticsvalueextractionlabelvalueinusd) (Deprecated)
   - [Supporting Wallets](#supporting-wallets)
   - [License](#license)
   - [Demo](#demo)
@@ -145,6 +145,8 @@ Web3Analytics.valueContribution('Add Liquidity', 25_000);
 | label           |`String` | Label to represent contribution. e.g. 'Add Liquidity', 'Stake'|
 | valueInUSD      |`number` | Amount in USD that user has contributed.           |
 
+**[DEPRECATED] this data collection has moved onchain by using [spock-adapters](https://github.com/xorddotcom/spock-adapters).**
+
 ### Web3Analytics.valueExtraction(label,valueInUSD)
 
 Track amount in USD that end-user has removed from protocol ecosystem through DApp. You can invoke this method in the callback of transaction submission.
@@ -159,6 +161,8 @@ Web3Analytics.valueExtraction('Remove Liquidity', 25_000);
 | ----------------| --------| ---------------------------------------------------|
 | label           |`String` | Label to represent extraction. e.g. 'Remove Liquidity', 'Unstake'|
 | valueInUSD      |`number` | Amount in USD that user has removed.           |
+
+**[DEPRECATED] this data collection has moved onchain by using [spock-adapters](https://github.com/xorddotcom/spock-adapters).**
 
 ## Supporting Wallets
 

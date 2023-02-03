@@ -29,6 +29,7 @@ import { notUndefined } from '../utils/validators';
  * @property {boolean} rejectTxn - is user rejected txn in current session
  * @property {number} submitTxnCount - total txn rejected in current session
  * @property {number} rejectTxnCount - total txn submitted txn in current session
+ * @property {String|undefined} ip - user ip address
  */
 
 /** @type {AnalyticsStore} */
@@ -43,6 +44,7 @@ const initialState = {
   rejectTxn: false,
   submitTxnCount: 0,
   rejectTxnCount: 0,
+  ip: undefined,
 };
 
 class AnalyticsStorage {

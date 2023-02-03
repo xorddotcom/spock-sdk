@@ -93,7 +93,7 @@ class WalletConnection extends BaseAnalytics {
       const userInfo = this.store.userInfo;
       const { device, system, OS, language } = userInfo ? userInfo : {};
       const data = { ...txnObj, chainId, device, system, OS, language };
-      this.request.post(SERVER_ROUTES.TRANSACTION, { data, withIp: true });
+      this.request.post(SERVER_ROUTES.TRANSACTION, { data });
       //not to set rejectTxn if session already have doneTxn
       if (this.store.doneTxn !== true) {
         this.dispatch({ rejectTxn: true });
@@ -106,7 +106,6 @@ class WalletConnection extends BaseAnalytics {
       const data = { ...txnObj, txHash: txnHash, chainId, device, system, OS, language };
       this.request.post(SERVER_ROUTES.TRANSACTION, {
         data,
-        withIp: true,
         callback: () => {
           this.cacheTxnHash = txnHash;
         },
@@ -375,7 +374,6 @@ class WalletConnection extends BaseAnalytics {
       if (!isSameAddress(cacheAddress, account) || Number(cacheChain) !== chain) {
         this.request.post(SERVER_ROUTES.WALLET_CONNECTION, {
           data,
-          withIp: true,
           callback: () => {
             //cache for current date
             setCookie(STORAGE.COOKIES.CACHE_ADDRESS, account);
