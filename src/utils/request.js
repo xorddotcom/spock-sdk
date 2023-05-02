@@ -7,15 +7,15 @@ class Request {
     this.testMode = testMode;
     this.endPoint = testENV ? TEST_SERVER_ENDPOINT : SERVER_ENDPOINT;
     this.store = store;
+    this.appKey = appKey;
     this.headers = {
-      appkey: appKey,
       'Content-type': 'application/json; charset=UTF-8',
     };
     this.post = this.post.bind(this);
   }
 
   async post(route, { data, callback, keepalive }) {
-    const formatedData = JSON_Formatter.stringify(data);
+    const formatedData = JSON_Formatter.stringify({ appKey: this.appKey, ...data });
     if (formatedData) {
       if (this.testMode) {
         callback && callback();
@@ -23,7 +23,7 @@ class Request {
       }
 
       let headers = this.headers;
-      headers['ipaddress'] = this.store.ip;
+      // headers['ipaddress'] = this.store.ip;
 
       try {
         const response = await fetch(`${this.endPoint}/${route}`, {

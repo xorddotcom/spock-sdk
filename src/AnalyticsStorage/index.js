@@ -3,10 +3,16 @@ import { notUndefined } from '../utils/validators';
 /**
  * @typedef UserInfo
  * @type {object}
- * @property {String|undefined} system - user browser
- * @property {String|undefined} OS - user operating sustem
+ * @property {String|undefined} browser - user browser
+ * @property {number|undefined} browserVersion - user browser version
  * @property {String|undefined} device - user device e.g. (pc,mobile)
- * @property {String|undefined} language - user browser language e.g.(en-US)
+ * @property {String|undefined} os - user operating system
+ * @property {String|undefined} referrer -
+ * @property {String|undefined} referringDomain -
+ * @property {String|undefined} searchEngine -
+ * @property {number|undefined} screenHeight -
+ * @property {number|undefined} screenWidth -
+ * @property {String} libVersion -
  */
 
 /**
@@ -30,6 +36,7 @@ import { notUndefined } from '../utils/validators';
  * @property {number} submitTxnCount - total txn rejected in current session
  * @property {number} rejectTxnCount - total txn submitted txn in current session
  * @property {String|undefined} ip - user ip address
+ * @property {String|undefined} sessionId -
  */
 
 /** @type {AnalyticsStore} */
@@ -37,14 +44,12 @@ const initialState = {
   connectedAccount: undefined,
   connectedChain: undefined,
   provider: undefined,
-  userId: undefined,
   userInfo: undefined,
-  pageNavigation: [],
-  doneTxn: false,
-  rejectTxn: false,
-  submitTxnCount: 0,
-  rejectTxnCount: 0,
+  flow: [],
+  txnReject: 0,
+  txnSubmit: 0,
   ip: undefined,
+  sessionId: undefined,
 };
 
 class AnalyticsStorage {

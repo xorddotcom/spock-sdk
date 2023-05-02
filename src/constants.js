@@ -6,7 +6,8 @@ export const SERVER_ENDPOINT = 'https://dapp-server.spockanalytics.xyz';
 /**
  *  testing server endpoint for storing analytics data
  */
-export const TEST_SERVER_ENDPOINT = 'https://dapp-server-test.spockanalytics.xyz';
+// export const TEST_SERVER_ENDPOINT = 'https://dapp-server-test.spockanalytics.xyz';
+export const TEST_SERVER_ENDPOINT = 'http://localhost:3002';
 
 /**
  *  alias to make storage keys unqiue
@@ -26,6 +27,8 @@ export const withAlias = (key) => `${ALIAS}_${key}`;
 export const DEFAULT_CONFIG = {
   DEBUG: false,
   INACTIVITY_TIMEOUT: 30,
+  MIN_TIMEOUT: 2,
+  MAX_TIMEOUT: 1440,
   TEST_MODE: false,
   TEST_ENV: false,
 };
@@ -84,6 +87,8 @@ const COOKIES = {
   CACHE_ADDRESS: withAlias('cache_address'),
   CACHE_CHAIN: withAlias('cache_chain'),
   CACHE_DEVICE_ID: withAlias('cache_deviceId'),
+  CACHE_DISTINCT_ID: withAlias('cache_distinctId'),
+  SESSION: withAlias('session'),
 };
 
 /**
@@ -113,17 +118,22 @@ export const STORAGE = {
  * VALUE_CONTRIBUTION - log user contribute or extract value in protocol tvl.
  * WALLET_CONNECTION - log user connect wallet on DApp.
  */
-export const SERVER_ROUTES = {
-  APP_VISIT: 'app-visits/create',
-  OUTBOUND: 'outbound-links/create',
-  PAGE_VIEW: 'page-views/create',
-  SESSION: 'session/create-session',
-  TRANSACTION: 'transactions/create',
-  VALUE_CONTRIBUTION: 'value-contribution/create',
-  WALLET_CONNECTION: 'wallet-connection/create',
+export const TRACKING_EVENTS = {
+  APP_VISIT: 'app-visit',
+  OUTBOUND: 'outbound',
+  PAGE_VIEW: 'page-view',
+  PAUSE_SESSION: 'pause-session',
+  REWIND_SESSION: 'rewind-session',
+  SESSION: 'session',
+  TRANSACTION: 'transaction',
+  WALLET_CONNECTION: 'wallet-connect',
 };
 
 /**
  * constant for representing empty string
  */
 export const EMPTY_STRING = '';
+
+export const LIB_VERSION = '0.1.2';
+
+export const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];

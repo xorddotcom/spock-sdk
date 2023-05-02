@@ -1,4 +1,4 @@
-import { isType } from '../utils/validators';
+import { isType, notUndefined } from '../utils/validators';
 
 export function normalizeChainId(chainId) {
   if (isType(chainId, 'string')) {
@@ -7,6 +7,16 @@ export function normalizeChainId(chainId) {
     return parsedChainId;
   } else {
     return chainId;
+  }
+}
+
+export function extractDomain(url) {
+  if (notUndefined(url)) {
+    const split = url.split('/');
+    if (split.length >= 3) {
+      return split[2];
+    }
+    return '';
   }
 }
 

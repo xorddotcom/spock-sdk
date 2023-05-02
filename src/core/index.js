@@ -1,60 +1,60 @@
-import invariant from 'tiny-invariant';
-
 import BaseAnalytics from '../BaseAnalytics';
-import WalletConnection from '../WalletConnection';
+import Session from '../Session';
 import UserInfo from '../UserInfo';
-import Tracking from '../Tracking';
-import { SERVER_ROUTES, LOG } from '../constants';
-import { isType, notUndefined } from '../utils/validators';
+import WalletConnection from '../WalletConnection';
+import { TRACKING_EVENTS, LOG } from '../constants';
+import { addEvent } from '../utils/helpers';
+import { extractDomain } from '../utils/formatting';
 
 class Web3Analytics extends BaseAnalytics {
   constructor(config) {
     super(config);
     this.userInfo = new UserInfo(config);
     this.wallet = new WalletConnection(config);
-    this.tracking = new Tracking(config);
-    this.valueContribution = this.valueContribution.bind(this);
-    this.valueExtraction = this.valueExtraction.bind(this);
+    this.session = new Session(config);
+    this.trackPageView = this.trackPageView.bind(this);
   }
 
-  async initialize() {
+  initialize() {
     this.log(LOG.INFO, 'Web3 Analytics initialized');
-    await this.userInfo.getUserInfo();
+    this.userInfo.getUserInfo();
+    this.session.trackSession();
     this.wallet.initialize();
-    this.tracking.initialize();
+
+    this.trackOutboundLink();
   }
 
-  protocolValue(label, valueInUSD, extraction) {
-    invariant(isType(label, 'string') && isType(valueInUSD, 'number'), 'Invalid arguments');
-    if (notUndefined(this.store.connectedAccount) && notUndefined(this.store.connectedChain)) {
-      const data = {
-        label,
-        valueInUSD,
-        extraction,
-        address: this.store.connectedAccount,
-        chainId: this.store.connectedChain,
-      };
-      this.log(LOG.INFO, 'Value Contributed', data);
-      this.request.post(SERVER_ROUTES.VALUE_CONTRIBUTION, { data });
-    } else {
-      this.log(LOG.ERROR, 'Wallet or chain connot undefined');
+  trackPageView(_page) {
+    const page = _page || window.location.pathname;
+    if (page) {
+      //TODO spilt pathname and search
+      const properties = { pathName: page };
+      this.trackEvent({ event: TRACKING_EVENTS.PAGE_VIEW, properties, logMessage: 'Page view' });
     }
   }
 
-  /**
-   * @deprecated This data collection has moved onchain by using spock-adapters.
-   */
-  valueContribution(label, valueInUSD) {
-    this.log(LOG.WARNING, 'valueContribution function has been deprecated');
-    this.protocolValue(label, valueInUSD, false);
-  }
+  trackOutboundLink() {
+    function findParentByTagName(element, tagName) {
+      var parent = element;
 
-  /**
-   * @deprecated This data collection has moved onchain by using spock-adapters.
-   */
-  valueExtraction(label, valueInUSD) {
-    this.log(LOG.WARNING, 'valueExtraction function has been deprecated');
-    this.protocolValue(label, valueInUSD, true);
+      while (parent !== null && parent.tagName !== tagName.toUpperCase()) {
+        parent = parent.parentNode;
+      }
+
+      return parent;
+    }
+
+    function trackAnchorClick(event) {
+      const anchorTag = findParentByTagName(event.target || event.srcElement, 'A');
+      if (anchorTag) {
+        if (anchorTag.hostname !== window.location.hostname) {
+          const properties = { link: anchorTag.href, domain: extractDomain(anchorTag.href) };
+          this.trackEvent({ event: TRACKING_EVENTS.OUTBOUND, properties, logMessage: 'Outbound' });
+        }
+      }
+    }
+
+    addEvent(window, 'click', trackAnchorClick.bind(this));
   }
 }
 

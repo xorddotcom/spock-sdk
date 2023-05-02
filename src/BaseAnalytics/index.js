@@ -1,8 +1,9 @@
 import AnalyticsStorage from '../AnalyticsStorage';
-import { DEFAULT_CONFIG } from '../constants';
+import { DEFAULT_CONFIG, LOG, TRACKING_EVENTS, UTM_KEYS } from '../constants';
 import { getConfig } from '../utils/helpers';
 import { log } from '../utils/logs';
 import Request from '../utils/request';
+import { cheapGuid, getQueryParams, transformUTMKey } from './utils';
 
 /**
  * @typedef Config
@@ -36,6 +37,45 @@ class BaseAnalytics {
       testENV: this.testENV,
       store: this.store,
     });
+  }
+
+  parseFlowProperties(eventName, properties) {
+    if (eventName === TRACKING_EVENTS.TRANSACTION) {
+      return { from: properties.from, to: properties.to };
+    } else {
+      return properties;
+    }
+  }
+
+  trackEvent({ event, properties, logMessage, callback }) {
+    const utmParams = UTM_KEYS.reduce((accum, key) => {
+      const param = getQueryParams(document.URL, key);
+      if (param) {
+        accum[transformUTMKey(key)] = param;
+      }
+      return accum;
+    }, {});
+
+    const data = {
+      ...this.store.userInfo,
+      ...utmParams,
+      chain: this.store.connectedChain,
+      currentUrl: window.location.href,
+      insertId: cheapGuid(),
+      sessionId: this.store.sessionId,
+      time: Date.now() / 1000,
+      ...(properties ?? {}),
+    };
+
+    if (![TRACKING_EVENTS.SESSION, TRACKING_EVENTS.PAUSE_SESSION].includes(event)) {
+      this.dispatch({
+        flow: [...this.store.flow, { event, properties: this.parseFlowProperties(event, properties) }],
+      });
+    }
+
+    this.request.post(`track/${event}`, { data, callback });
+
+    logMessage && this.log(LOG.INFO, logMessage, data);
   }
 }
 
