@@ -100,3 +100,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Navigation record in session.
 - New session starting on chain change.
 - Session duration bug.
+
+## [1.0.0-beta.0] - 2023-05-05
+
+### Added
+
+- Indentification, link distinctId with users(wallet).
+- New meta-data properties with all tracking events.
+- UTM paramters tracking.
+- Opt out support for make tracking consentful for the required application.
+
+### Changed
+
+- Improve session tracking through server support.
+- Removed deprecated value contribution functions.
+- Separated pathname and search parameters for `trackPageView`.

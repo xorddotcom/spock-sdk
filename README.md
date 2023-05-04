@@ -6,19 +6,22 @@ Spock analytics SDK `analytics-web3` is a Javascript module to collect and log a
 
 Spock aims to accelerate your growth by tracking & analyzing crucial and opportunity-centric metrics that will help you to amplify your growth and reach to the right customer segment.
 
-## Table of Contents
+## Table of contents
 
 - [Spock Analytics SDK](#spock-analytics-sdk)
   - [About Spock](#spock)
-  - [Table of Contents](#table-of-contents)
+  - [Table of contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
   - [API](#api)
     - [Initialization](#web3analyticsinitoptions)
-    - [Wallet Provider](#web3analyticswalletproviderprovider)
-    - [Wallet Connection](#web3analyticstrackwalletconnectionwallettypeaccountchainid)
-    - [Page View](#web3analyticstrackpageviewpath)
-  - [Supporting Wallets](#supporting-wallets)
+    - [Wallet provider](#web3analyticswalletproviderprovider)
+    - [Wallet connection](#web3analyticstrackwalletconnectionwallettypeaccountchainid)
+    - [Page view](#web3analyticstrackpageviewpathnamesearch)
+    - [Opt out](#web3analyticsoptouttrackingexpiration)
+    - [Opt in](#web3analyticsoptintrackingexpiration)
+    - [Opt out status](#web3analyticshasoptedouttracking)
+  - [Supporting wallets](#supporting-wallets)
   - [License](#license)
   - [Demo](#demo)
   - [Onboarding](#onboarding)
@@ -68,7 +71,7 @@ Web3Analytics.init({ appKey: 'eba6...28c', debug: true });
 |  testENV                |`Boolean`| Defaults to `false`. Enable testing version of SDK in which SDK will interact with testing servers.|
 |  testMode               |`Boolean`| Defaults to `false`. Enable testMode in which you can test tracking events without logging data onto server. Inordre to avoid store testing data.|
 |  inactivityTimeout      |`number` | Defaults to `30`. This field takes time in mins to specify the inactivity duration in which the session will expires.|
-|  optOut      |`Boolean` | Defaults to `false`. |
+|  optOut      |`Boolean` | Defaults to `false`. Opt users out of tracking. |
 
 ### Web3Analytics.walletProvider(provider)
 
@@ -115,7 +118,7 @@ Web3Analytics.trackWalletConnection('Ledger', '0x...96', 1);
 | account         |`String` | User ethereum address |
 | chainId         |`number` | User connected chainId |
 
-### Web3Analytics.trackPageView(path)
+### Web3Analytics.trackPageView(pathname,search)
 
 Track all the pages visited on a DApp.
 
@@ -130,7 +133,49 @@ Web3Analytics.trackPageView('/home');
 | pathname            |`String` | Path of the page. e.g. '/about', '/dashboard/stats'|
 | search            |`String` | Query string of the pgae. eg: '?id=ab02'|
 
-## Supporting Wallets
+### Web3Analytics.optOutTracking(expiration)
+
+Opt user out from tracking.
+
+```js
+Web3Analytics.optOutTracking();
+```
+
+<!-- Disable table formatting because Prettier messing it up. -->
+<!-- prettier-ignore -->
+| Value           | Type    | Description                                        |
+| ----------------| --------| ---------------------------------------------------|
+| expiration            |`number` | Default `365`. Duration in days for which user is opt-out.|
+
+### Web3Analytics.optInTracking(expiration)
+
+Opt user in tracking.
+
+```js
+Web3Analytics.optInTracking();
+```
+
+<!-- Disable table formatting because Prettier messing it up. -->
+<!-- prettier-ignore -->
+| Value           | Type    | Description                                        |
+| ----------------| --------| ---------------------------------------------------|
+| expiration            |`number` | Default `365`. Duration in days for which user is opt-in.|
+
+### Web3Analytics.hasOptedOutTracking()
+
+Getter method for the status of user tracking consent.
+
+```js
+Web3Analytics.hasOptedOutTracking();
+```
+
+<!-- Disable table formatting because Prettier messing it up. -->
+<!-- prettier-ignore -->
+| Value           | Return Type    | Description                                        |
+| ----------------| --------| ---------------------------------------------------|
+| -            |`Boolean` | Status of user tracking consent.|
+
+## Supporting wallets
 
 - MetaMask
 - WalletConnect
