@@ -1,12 +1,11 @@
 import invariant from 'tiny-invariant';
 
+import { LOG, WALLET_TYPE, EVENTS, TRACKING_EVENTS } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
-import { LOG, WALLET_TYPE, EVENTS, STORAGE, SERVER_ROUTES } from '../constants';
 import { txnRejected } from './utils';
+import { JSON_Formatter, normalizeChainId } from '../utils/formatting';
 import { addEvent } from '../utils/helpers';
 import { notUndefined, isSameAddress, isType } from '../utils/validators';
-import { JSON_Formatter, normalizeChainId } from '../utils/formatting';
-import { getCookie, setCookie } from '../utils/cookies';
 
 class WalletConnection extends BaseAnalytics {
   constructor(config) {
@@ -88,38 +87,15 @@ class WalletConnection extends BaseAnalytics {
    *  @param {String | undefined} txnHash - hash of submitted transaction
    */
   logTransaction(status, txnObj, txnHash) {
-    const chainId = this.store.connectedChain;
     if (status === 'rejected') {
-      const userInfo = this.store.userInfo;
-      const { device, system, OS, language } = userInfo ? userInfo : {};
-      const data = { ...txnObj, chainId, device, system, OS, language };
-      this.request.post(SERVER_ROUTES.TRANSACTION, { data });
-      //not to set rejectTxn if session already have doneTxn
-      if (this.store.doneTxn !== true) {
-        this.dispatch({ rejectTxn: true });
-      }
-      this.dispatch({ rejectTxnCount: this.store.rejectTxnCount + 1 });
-      this.log(LOG.INFO, 'Transaction rejected', data);
+      const properties = { ...txnObj, status: 0 };
+      this.trackEvent({ event: TRACKING_EVENTS.TRANSACTION, properties, logMessage: 'Transaction rejected' });
+      this.dispatch({ txnReject: this.store.txnReject + 1 });
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
-      const userInfo = this.store.userInfo;
-      const { device, system, OS, language } = userInfo ? userInfo : {};
-      const data = { ...txnObj, txHash: txnHash, chainId, device, system, OS, language };
-      this.request.post(SERVER_ROUTES.TRANSACTION, {
-        data,
-        callback: () => {
-          this.cacheTxnHash = txnHash;
-        },
-      });
+      const properties = { ...txnObj, status: 1 };
+      this.trackEvent({ event: TRACKING_EVENTS.TRANSACTION, properties, logMessage: 'Transaction submitted' });
       this.cacheTxnHash = txnHash;
-      const pageNavigation = this.store.pageNavigation;
-      const page = this.store.pageNavigation.find(({ page }) => page === window.location.pathname);
-      const index = pageNavigation.indexOf(page);
-      if (index >= 0) {
-        pageNavigation[index] = { ...page, doneTxn: true };
-        this.dispatch({ pageNavigation });
-      }
-      this.dispatch({ doneTxn: true, rejectTxn: false, submitTxnCount: this.store.submitTxnCount + 1 });
-      this.log(LOG.INFO, 'Transaction hash', data);
+      this.dispatch({ txnSubmit: this.store.txnSubmit + 1 });
     }
   }
 
@@ -361,26 +337,9 @@ class WalletConnection extends BaseAnalytics {
 
       this.dispatch({ connectedAccount: account, connectedChain: chain });
 
-      const userInfo = this.store.userInfo;
-      const { device, system, OS, language } = userInfo ? userInfo : {};
-      const data = { walletType, address: account, chainId: chain, device, system, OS, language };
+      const properties = { walletType, walletAddress: account };
 
-      this.log(LOG.INFO, 'wallet connected', JSON.stringify(data));
-
-      const cacheAddress = getCookie(STORAGE.COOKIES.CACHE_ADDRESS);
-      const cacheChain = getCookie(STORAGE.COOKIES.CACHE_CHAIN);
-
-      // return in-case same wallet with same network is already logged on server
-      if (!isSameAddress(cacheAddress, account) || Number(cacheChain) !== chain) {
-        this.request.post(SERVER_ROUTES.WALLET_CONNECTION, {
-          data,
-          callback: () => {
-            //cache for current date
-            setCookie(STORAGE.COOKIES.CACHE_ADDRESS, account);
-            setCookie(STORAGE.COOKIES.CACHE_CHAIN, chain);
-          },
-        });
-      }
+      this.trackEvent({ event: TRACKING_EVENTS.WALLET_CONNECTION, properties, logMessage: 'Wallet connect' });
     }
   }
 }

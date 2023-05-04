@@ -1,60 +1,96 @@
-import invariant from 'tiny-invariant';
-
+import { TRACKING_EVENTS, LOG, STORAGE } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
-import WalletConnection from '../WalletConnection';
+import Session from '../Session';
 import UserInfo from '../UserInfo';
-import Tracking from '../Tracking';
-import { SERVER_ROUTES, LOG } from '../constants';
+import { getCookie, setCookie } from '../utils/cookies';
+import { extractDomain, JSON_Formatter } from '../utils/formatting';
+import { addEvent, stripEmptyProperties } from '../utils/helpers';
 import { isType, notUndefined } from '../utils/validators';
+import WalletConnection from '../WalletConnection';
 
 class Web3Analytics extends BaseAnalytics {
   constructor(config) {
     super(config);
     this.userInfo = new UserInfo(config);
     this.wallet = new WalletConnection(config);
-    this.tracking = new Tracking(config);
-    this.valueContribution = this.valueContribution.bind(this);
-    this.valueExtraction = this.valueExtraction.bind(this);
+    this.session = new Session(config);
+
+    this.trackPageView = this.trackPageView.bind(this);
+    this.trackOutboundLink = this.trackOutboundLink.bind(this);
+    this.optOutTracking = this.optOutTracking.bind(this);
+    this.optInTracking = this.optInTracking.bind(this);
+    this.hasOptedOutTracking = this.hasOptedOutTracking.bind(this);
   }
 
-  async initialize() {
+  initialize() {
     this.log(LOG.INFO, 'Web3 Analytics initialized');
-    await this.userInfo.getUserInfo();
+    this.userConsent();
+
+    this.userInfo.getUserInfo();
+    this.session.trackSession();
     this.wallet.initialize();
-    this.tracking.initialize();
+
+    this.trackOutboundLink();
   }
 
-  protocolValue(label, valueInUSD, extraction) {
-    invariant(isType(label, 'string') && isType(valueInUSD, 'number'), 'Invalid arguments');
-    if (notUndefined(this.store.connectedAccount) && notUndefined(this.store.connectedChain)) {
-      const data = {
-        label,
-        valueInUSD,
-        extraction,
-        address: this.store.connectedAccount,
-        chainId: this.store.connectedChain,
-      };
-      this.log(LOG.INFO, 'Value Contributed', data);
-      this.request.post(SERVER_ROUTES.VALUE_CONTRIBUTION, { data });
+  trackPageView(pathname, search) {
+    const properties = stripEmptyProperties({
+      pathname: pathname || window.location.pathname,
+      search: search || window.location.search,
+    });
+    this.trackEvent({ event: TRACKING_EVENTS.PAGE_VIEW, properties, logMessage: 'Page view' });
+  }
+
+  trackOutboundLink() {
+    function findParentByTagName(element, tagName) {
+      var parent = element;
+
+      while (parent !== null && parent.tagName !== tagName.toUpperCase()) {
+        parent = parent.parentNode;
+      }
+
+      return parent;
+    }
+
+    function trackAnchorClick(event) {
+      const anchorTag = findParentByTagName(event.target || event.srcElement, 'A');
+      if (anchorTag) {
+        if (anchorTag.hostname !== window.location.hostname) {
+          const properties = { link: anchorTag.href, domain: extractDomain(anchorTag.href) };
+          this.trackEvent({ event: TRACKING_EVENTS.OUTBOUND, properties, logMessage: 'Outbound' });
+        }
+      }
+    }
+
+    addEvent(window, 'click', trackAnchorClick.bind(this));
+  }
+
+  userConsent() {
+    const optOut = getCookie(STORAGE.COOKIES.OPT_OUT);
+
+    if (notUndefined(optOut)) {
+      this.dispatch({ optOut: JSON_Formatter.parse(optOut) });
     } else {
-      this.log(LOG.ERROR, 'Wallet or chain connot undefined');
+      this.dispatch({ optOut: this.defaultOptOut });
     }
   }
 
-  /**
-   * @deprecated This data collection has moved onchain by using spock-adapters.
-   */
-  valueContribution(label, valueInUSD) {
-    this.log(LOG.WARNING, 'valueContribution function has been deprecated');
-    this.protocolValue(label, valueInUSD, false);
+  optTracking(expiration, option) {
+    expiration = isType(expiration) === 'number' && expiration > 0 && expiration <= 365 ? expiration : 365;
+    setCookie(STORAGE.COOKIES.OPT_OUT, option, expiration * 24 * 60 * 60 * 1000);
+    this.dispatch({ optOut: option });
   }
 
-  /**
-   * @deprecated This data collection has moved onchain by using spock-adapters.
-   */
-  valueExtraction(label, valueInUSD) {
-    this.log(LOG.WARNING, 'valueExtraction function has been deprecated');
-    this.protocolValue(label, valueInUSD, true);
+  optOutTracking(expiration) {
+    this.optTracking(expiration, true);
+  }
+
+  optInTracking(expiration) {
+    this.optTracking(expiration, false);
+  }
+
+  hasOptedOutTracking() {
+    return this.store.optOut;
   }
 }
 

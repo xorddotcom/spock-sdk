@@ -6,21 +6,22 @@ Spock analytics SDK `analytics-web3` is a Javascript module to collect and log a
 
 Spock aims to accelerate your growth by tracking & analyzing crucial and opportunity-centric metrics that will help you to amplify your growth and reach to the right customer segment.
 
-## Table of Contents
+## Table of contents
 
 - [Spock Analytics SDK](#spock-analytics-sdk)
   - [About Spock](#spock)
-  - [Table of Contents](#table-of-contents)
+  - [Table of contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
   - [API](#api)
     - [Initialization](#web3analyticsinitoptions)
-    - [Wallet Provider](#web3analyticswalletproviderprovider)
-    - [Wallet Connection](#web3analyticstrackwalletconnectionwallettypeaccountchainid)
-    - [Page View](#web3analyticstrackpageviewpath)
-    - [Value Contribution](#web3analyticsvaluecontributionlabelvalueinusd) (Deprecated)
-    - [Value Extraction](#web3analyticsvalueextractionlabelvalueinusd) (Deprecated)
-  - [Supporting Wallets](#supporting-wallets)
+    - [Wallet provider](#web3analyticswalletproviderprovider)
+    - [Wallet connection](#web3analyticstrackwalletconnectionwallettypeaccountchainid)
+    - [Page view](#web3analyticstrackpageviewpathnamesearch)
+    - [Opt out](#web3analyticsoptouttrackingexpiration)
+    - [Opt in](#web3analyticsoptintrackingexpiration)
+    - [Opt out status](#web3analyticshasoptedouttracking)
+  - [Supporting wallets](#supporting-wallets)
   - [License](#license)
   - [Demo](#demo)
   - [Onboarding](#onboarding)
@@ -31,7 +32,7 @@ Spock aims to accelerate your growth by tracking & analyzing crucial and opportu
 Install analytics-web3 sdk by using npm
 
 ```bash
-npm install analytics-web3 --save
+npm install --save analytics-web3
 ```
 
 or yarn
@@ -70,6 +71,7 @@ Web3Analytics.init({ appKey: 'eba6...28c', debug: true });
 |  testENV                |`Boolean`| Defaults to `false`. Enable testing version of SDK in which SDK will interact with testing servers.|
 |  testMode               |`Boolean`| Defaults to `false`. Enable testMode in which you can test tracking events without logging data onto server. Inordre to avoid store testing data.|
 |  inactivityTimeout      |`number` | Defaults to `30`. This field takes time in mins to specify the inactivity duration in which the session will expires.|
+|  optOut      |`Boolean` | Defaults to `false`. Opt users out of tracking. |
 
 ### Web3Analytics.walletProvider(provider)
 
@@ -116,7 +118,7 @@ Web3Analytics.trackWalletConnection('Ledger', '0x...96', 1);
 | account         |`String` | User ethereum address |
 | chainId         |`number` | User connected chainId |
 
-### Web3Analytics.trackPageView(path)
+### Web3Analytics.trackPageView(pathname,search)
 
 Track all the pages visited on a DApp.
 
@@ -128,43 +130,52 @@ Web3Analytics.trackPageView('/home');
 <!-- prettier-ignore -->
 | Value           | Type    | Description                                        |
 | ----------------| --------| ---------------------------------------------------|
-| path            |`String` | Path of the page. e.g. '/about', '/dashboard/stats'|
+| pathname            |`String` | Path of the page. e.g. '/about', '/dashboard/stats'|
+| search            |`String` | Query string of the pgae. eg: '?id=ab02'|
 
-### Web3Analytics.valueContribution(label,valueInUSD)
+### Web3Analytics.optOutTracking(expiration)
 
-Track amount in USD that end-user has contribute in protocol ecosystem through DApp. You can invoke this method in the callback of transaction submission.
+Opt user out from tracking.
 
 ```js
-Web3Analytics.valueContribution('Add Liquidity', 25_000);
+Web3Analytics.optOutTracking();
 ```
 
 <!-- Disable table formatting because Prettier messing it up. -->
 <!-- prettier-ignore -->
 | Value           | Type    | Description                                        |
 | ----------------| --------| ---------------------------------------------------|
-| label           |`String` | Label to represent contribution. e.g. 'Add Liquidity', 'Stake'|
-| valueInUSD      |`number` | Amount in USD that user has contributed.           |
+| expiration            |`number` | Default `365`. Duration in days for which user is opt-out.|
 
-**[DEPRECATED] this data collection has moved onchain by using [spock-adapters](https://github.com/xorddotcom/spock-adapters).**
+### Web3Analytics.optInTracking(expiration)
 
-### Web3Analytics.valueExtraction(label,valueInUSD)
-
-Track amount in USD that end-user has removed from protocol ecosystem through DApp. You can invoke this method in the callback of transaction submission.
+Opt user in tracking.
 
 ```js
-Web3Analytics.valueExtraction('Remove Liquidity', 25_000);
+Web3Analytics.optInTracking();
 ```
 
 <!-- Disable table formatting because Prettier messing it up. -->
 <!-- prettier-ignore -->
 | Value           | Type    | Description                                        |
 | ----------------| --------| ---------------------------------------------------|
-| label           |`String` | Label to represent extraction. e.g. 'Remove Liquidity', 'Unstake'|
-| valueInUSD      |`number` | Amount in USD that user has removed.           |
+| expiration            |`number` | Default `365`. Duration in days for which user is opt-in.|
 
-**[DEPRECATED] this data collection has moved onchain by using [spock-adapters](https://github.com/xorddotcom/spock-adapters).**
+### Web3Analytics.hasOptedOutTracking()
 
-## Supporting Wallets
+Getter method for the status of user tracking consent.
+
+```js
+Web3Analytics.hasOptedOutTracking();
+```
+
+<!-- Disable table formatting because Prettier messing it up. -->
+<!-- prettier-ignore -->
+| Value           | Return Type    | Description                                        |
+| ----------------| --------| ---------------------------------------------------|
+| -            |`Boolean` | Status of user tracking consent.|
+
+## Supporting wallets
 
 - MetaMask
 - WalletConnect

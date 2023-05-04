@@ -5,15 +5,18 @@ declare namespace Web3Analytics {
     testENV?: boolean;
     testMode?: boolean;
     inactivityTimeout?: number;
+    optOut?: boolean;
   }): void;
 
-  export function trackPageView(path: string): void;
+  export function hasOptedOutTracking(): boolean;
+
+  export function optInTracking(expiration?: number): void;
+
+  export function optOutTracking(expiration?: number): void;
+
+  export function trackPageView(pathname?: string, search?: string): void;
 
   export function trackWalletConnection(walletType: string, account: string, chainId: number): void;
-
-  export function valueContribution(label: string, valueInUSD: number): void;
-
-  export function valueExtraction(label: string, valueInUSD: number): void;
 
   export function walletProvider(provider: any): void;
 }

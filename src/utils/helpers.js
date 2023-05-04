@@ -27,3 +27,18 @@ export function addEvent(element, type, listener) {
 export function getConfig(value, defaultValue) {
   return value ? value : defaultValue;
 }
+
+export function includes(str, needle) {
+  return str.indexOf(needle) !== -1;
+}
+
+export function stripEmptyProperties(obj) {
+  return Object.entries(obj).reduce((accum, entry) => {
+    let value = entry[1];
+    value = notUndefined(value) ? value.toString() : '';
+    if (value.trim() !== '') {
+      accum[entry[0]] = value;
+    }
+    return accum;
+  }, {});
+}
