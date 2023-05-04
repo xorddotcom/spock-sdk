@@ -1,10 +1,12 @@
+import { TRACKING_EVENTS, LOG, STORAGE } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
 import Session from '../Session';
 import UserInfo from '../UserInfo';
+import { getCookie, setCookie } from '../utils/cookies';
+import { extractDomain, JSON_Formatter } from '../utils/formatting';
+import { addEvent, stripEmptyProperties } from '../utils/helpers';
+import { isType, notUndefined } from '../utils/validators';
 import WalletConnection from '../WalletConnection';
-import { TRACKING_EVENTS, LOG } from '../constants';
-import { addEvent } from '../utils/helpers';
-import { extractDomain } from '../utils/formatting';
 
 class Web3Analytics extends BaseAnalytics {
   constructor(config) {
@@ -12,11 +14,18 @@ class Web3Analytics extends BaseAnalytics {
     this.userInfo = new UserInfo(config);
     this.wallet = new WalletConnection(config);
     this.session = new Session(config);
+
     this.trackPageView = this.trackPageView.bind(this);
+    this.trackOutboundLink = this.trackOutboundLink.bind(this);
+    this.optOutTracking = this.optOutTracking.bind(this);
+    this.optInTracking = this.optInTracking.bind(this);
+    this.hasOptedOutTracking = this.hasOptedOutTracking.bind(this);
   }
 
   initialize() {
     this.log(LOG.INFO, 'Web3 Analytics initialized');
+    this.userConsent();
+
     this.userInfo.getUserInfo();
     this.session.trackSession();
     this.wallet.initialize();
@@ -24,13 +33,12 @@ class Web3Analytics extends BaseAnalytics {
     this.trackOutboundLink();
   }
 
-  trackPageView(_page) {
-    const page = _page || window.location.pathname;
-    if (page) {
-      //TODO spilt pathname and search
-      const properties = { pathName: page };
-      this.trackEvent({ event: TRACKING_EVENTS.PAGE_VIEW, properties, logMessage: 'Page view' });
-    }
+  trackPageView(pathname, search) {
+    const properties = stripEmptyProperties({
+      pathname: pathname || window.location.pathname,
+      search: search || window.location.search,
+    });
+    this.trackEvent({ event: TRACKING_EVENTS.PAGE_VIEW, properties, logMessage: 'Page view' });
   }
 
   trackOutboundLink() {
@@ -55,6 +63,34 @@ class Web3Analytics extends BaseAnalytics {
     }
 
     addEvent(window, 'click', trackAnchorClick.bind(this));
+  }
+
+  userConsent() {
+    const optOut = getCookie(STORAGE.COOKIES.OPT_OUT);
+
+    if (notUndefined(optOut)) {
+      this.dispatch({ optOut: JSON_Formatter.parse(optOut) });
+    } else {
+      this.dispatch({ optOut: this.defaultOptOut });
+    }
+  }
+
+  optTracking(expiration, option) {
+    expiration = isType(expiration) === 'number' && expiration > 0 && expiration <= 365 ? expiration : 365;
+    setCookie(STORAGE.COOKIES.OPT_OUT, option, expiration * 24 * 60 * 60 * 1000);
+    this.dispatch({ optOut: option });
+  }
+
+  optOutTracking(expiration) {
+    this.optTracking(expiration, true);
+  }
+
+  optInTracking(expiration) {
+    this.optTracking(expiration, false);
+  }
+
+  hasOptedOutTracking() {
+    return this.store.optOut;
   }
 }
 

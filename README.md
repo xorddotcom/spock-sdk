@@ -18,8 +18,6 @@ Spock aims to accelerate your growth by tracking & analyzing crucial and opportu
     - [Wallet Provider](#web3analyticswalletproviderprovider)
     - [Wallet Connection](#web3analyticstrackwalletconnectionwallettypeaccountchainid)
     - [Page View](#web3analyticstrackpageviewpath)
-    - [Value Contribution](#web3analyticsvaluecontributionlabelvalueinusd) (Deprecated)
-    - [Value Extraction](#web3analyticsvalueextractionlabelvalueinusd) (Deprecated)
   - [Supporting Wallets](#supporting-wallets)
   - [License](#license)
   - [Demo](#demo)
@@ -31,7 +29,7 @@ Spock aims to accelerate your growth by tracking & analyzing crucial and opportu
 Install analytics-web3 sdk by using npm
 
 ```bash
-npm install analytics-web3 --save
+npm install --save analytics-web3
 ```
 
 or yarn
@@ -70,6 +68,7 @@ Web3Analytics.init({ appKey: 'eba6...28c', debug: true });
 |  testENV                |`Boolean`| Defaults to `false`. Enable testing version of SDK in which SDK will interact with testing servers.|
 |  testMode               |`Boolean`| Defaults to `false`. Enable testMode in which you can test tracking events without logging data onto server. Inordre to avoid store testing data.|
 |  inactivityTimeout      |`number` | Defaults to `30`. This field takes time in mins to specify the inactivity duration in which the session will expires.|
+|  optOut      |`Boolean` | Defaults to `false`. |
 
 ### Web3Analytics.walletProvider(provider)
 
@@ -128,41 +127,8 @@ Web3Analytics.trackPageView('/home');
 <!-- prettier-ignore -->
 | Value           | Type    | Description                                        |
 | ----------------| --------| ---------------------------------------------------|
-| path            |`String` | Path of the page. e.g. '/about', '/dashboard/stats'|
-
-### Web3Analytics.valueContribution(label,valueInUSD)
-
-Track amount in USD that end-user has contribute in protocol ecosystem through DApp. You can invoke this method in the callback of transaction submission.
-
-```js
-Web3Analytics.valueContribution('Add Liquidity', 25_000);
-```
-
-<!-- Disable table formatting because Prettier messing it up. -->
-<!-- prettier-ignore -->
-| Value           | Type    | Description                                        |
-| ----------------| --------| ---------------------------------------------------|
-| label           |`String` | Label to represent contribution. e.g. 'Add Liquidity', 'Stake'|
-| valueInUSD      |`number` | Amount in USD that user has contributed.           |
-
-**[DEPRECATED] this data collection has moved onchain by using [spock-adapters](https://github.com/xorddotcom/spock-adapters).**
-
-### Web3Analytics.valueExtraction(label,valueInUSD)
-
-Track amount in USD that end-user has removed from protocol ecosystem through DApp. You can invoke this method in the callback of transaction submission.
-
-```js
-Web3Analytics.valueExtraction('Remove Liquidity', 25_000);
-```
-
-<!-- Disable table formatting because Prettier messing it up. -->
-<!-- prettier-ignore -->
-| Value           | Type    | Description                                        |
-| ----------------| --------| ---------------------------------------------------|
-| label           |`String` | Label to represent extraction. e.g. 'Remove Liquidity', 'Unstake'|
-| valueInUSD      |`number` | Amount in USD that user has removed.           |
-
-**[DEPRECATED] this data collection has moved onchain by using [spock-adapters](https://github.com/xorddotcom/spock-adapters).**
+| pathname            |`String` | Path of the page. e.g. '/about', '/dashboard/stats'|
+| search            |`String` | Query string of the pgae. eg: '?id=ab02'|
 
 ## Supporting Wallets
 

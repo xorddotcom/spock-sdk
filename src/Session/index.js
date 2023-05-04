@@ -1,18 +1,17 @@
+import { LOG, TRACKING_EVENTS, STORAGE } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
-import { DEFAULT_CONFIG, LOG, TRACKING_EVENTS, STORAGE } from '../constants';
-import { addEvent, currentTimestamp, getConfig } from '../utils/helpers';
-import { getCookie, setCookie } from '../utils/cookies';
-import { JSON_Formatter } from '../utils/formatting';
-import { notUndefined } from '../utils/validators';
 import { limitedTimeout, sessionUUID } from './utils';
+import { getCookie } from '../utils/cookies';
+import { JSON_Formatter } from '../utils/formatting';
+import { addEvent, currentTimestamp } from '../utils/helpers';
+import { notUndefined } from '../utils/validators';
 
 const ONE_MINUTE = 60 * 1000;
 
 class Session extends BaseAnalytics {
   constructor(config) {
     super(config);
-    this.inActivityTimeout =
-      limitedTimeout(getConfig(config.inactivityTimeout, DEFAULT_CONFIG.INACTIVITY_TIMEOUT)) * 60 * 1000;
+    this.inActivityTimeout = limitedTimeout(this.inActivityTimeout) * 60 * 1000;
     this.documentHidden = false;
     this.storedDuration = 0;
     this.inActivityCounter = 0;
@@ -27,6 +26,12 @@ class Session extends BaseAnalytics {
     this.inActivityInterval();
 
     addEvent(window, 'beforeunload', this.pauseSession.bind(this));
+
+    //TODO should we expire on new wallet connect
+    // addEvent(window, EVENTS.WALLET_CONNECTION, () => {
+    //   this.endSession();
+    //   this.beginSession();
+    // });
 
     this.visibilityEvents();
 
@@ -66,7 +71,7 @@ class Session extends BaseAnalytics {
   pauseSession() {
     if (!this.sessionExpired) {
       const duration = this.sessionDuration();
-      const { flow, sessionId, txnReject, txnSubmit } = this.store;
+      const { connectedAccount, flow, sessionId, txnReject, txnSubmit } = this.store;
       const properties = {
         duration,
         flow,
@@ -75,21 +80,23 @@ class Session extends BaseAnalytics {
         timeout: this.inActivityTimeout,
         txnReject,
         txnSubmit,
+        walletConnected: Boolean(connectedAccount),
       };
       this.trackEvent({ event: TRACKING_EVENTS.PAUSE_SESSION, properties, logMessage: 'Pause session' });
-      setCookie(STORAGE.COOKIES.SESSION, JSON_Formatter.stringify(properties), this.inActivityTimeout);
+      this.setConsetCookie(STORAGE.COOKIES.SESSION, JSON_Formatter.stringify(properties), this.inActivityTimeout);
     }
   }
 
   endSession() {
     const duration = this.sessionDuration();
-    const { flow, sessionId, txnReject, txnSubmit } = this.store;
+    const { connectedAccount, flow, sessionId, txnReject, txnSubmit } = this.store;
     const properties = {
       duration,
       flow,
       sessionId,
       txnReject,
       txnSubmit,
+      walletConnected: Boolean(connectedAccount),
     };
     this.trackEvent({ event: TRACKING_EVENTS.SESSION, properties, logMessage: 'Session expired' });
   }

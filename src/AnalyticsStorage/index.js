@@ -7,7 +7,7 @@ import { notUndefined } from '../utils/validators';
  * @property {number|undefined} browserVersion - user browser version
  * @property {String|undefined} device - user device e.g. (pc,mobile)
  * @property {String|undefined} os - user operating system
- * @property {String|undefined} referrer -
+ * @property {String|undefined} referrer - url fr
  * @property {String|undefined} referringDomain -
  * @property {String|undefined} searchEngine -
  * @property {number|undefined} screenHeight -
@@ -37,6 +37,7 @@ import { notUndefined } from '../utils/validators';
  * @property {number} rejectTxnCount - total txn submitted txn in current session
  * @property {String|undefined} ip - user ip address
  * @property {String|undefined} sessionId -
+ * @property {Boolean|undefined} optOut -
  */
 
 /** @type {AnalyticsStore} */
@@ -50,6 +51,7 @@ const initialState = {
   txnSubmit: 0,
   ip: undefined,
   sessionId: undefined,
+  optOut: undefined,
 };
 
 class AnalyticsStorage {

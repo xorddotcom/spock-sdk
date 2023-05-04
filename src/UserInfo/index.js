@@ -1,9 +1,9 @@
-import BaseAnalytics from '../BaseAnalytics';
-import { notUndefined } from '../utils/validators';
-import { includes, stripEmptyProperties } from '../utils/helpers';
-import { extractDomain } from '../utils/formatting';
 import { LIB_VERSION, STORAGE, TRACKING_EVENTS } from '../constants';
-import { getCookie, setCookie } from '../utils/cookies';
+import BaseAnalytics from '../BaseAnalytics';
+import { getCookie } from '../utils/cookies';
+import { extractDomain } from '../utils/formatting';
+import { includes, stripEmptyProperties } from '../utils/helpers';
+import { notUndefined } from '../utils/validators';
 
 class UserInfo extends BaseAnalytics {
   constructor(config) {
@@ -216,7 +216,7 @@ class UserInfo extends BaseAnalytics {
 
     const newDistinctId = this.uuid(userAgent);
     const ONE_YEAR = 365 * 24 * 60 * 60 * 1000;
-    setCookie(STORAGE.COOKIES.CACHE_DISTINCT_ID, newDistinctId, ONE_YEAR);
+    this.setConsetCookie(STORAGE.COOKIES.CACHE_DISTINCT_ID, newDistinctId, ONE_YEAR);
     return newDistinctId;
   }
 
@@ -243,8 +243,6 @@ class UserInfo extends BaseAnalytics {
       userInfo.screenHeight = screen.height;
       userInfo.screenWidth = screen.width;
       userInfo.distinctId = this.distinctId(userAgent);
-
-      console.log({ userInfo });
 
       this.dispatch({ userInfo });
 

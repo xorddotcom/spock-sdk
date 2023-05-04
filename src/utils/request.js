@@ -15,6 +15,9 @@ class Request {
   }
 
   async post(route, { data, callback, keepalive }) {
+    if (this.store.optOut) {
+      return;
+    }
     const formatedData = JSON_Formatter.stringify({ appKey: this.appKey, ...data });
     if (formatedData) {
       if (this.testMode) {
@@ -22,13 +25,10 @@ class Request {
         return;
       }
 
-      let headers = this.headers;
-      // headers['ipaddress'] = this.store.ip;
-
       try {
         const response = await fetch(`${this.endPoint}/${route}`, {
           method: 'POST',
-          headers,
+          headers: this.headers,
           body: formatedData,
           keepalive,
         });

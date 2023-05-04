@@ -1,14 +1,13 @@
 import { DEFAULT_CONFIG } from '../constants';
 
 export function limitedTimeout(timeout) {
-  if (timeout < DEFAULT_CONFIG.MIN_TIMEOUT || timeout > DEFAULT_CONFIG.MIN_TIMEOUT) {
+  if (timeout < 2 || timeout > 30) {
     return DEFAULT_CONFIG.INACTIVITY_TIMEOUT;
   } else {
     return timeout;
   }
 }
 
-// Get generateUUID
 export function sessionUUID() {
   let d = new Date().getTime();
   const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {

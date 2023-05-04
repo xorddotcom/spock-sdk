@@ -37,9 +37,12 @@ Web3Analytics.init = function (config) {
 
   const web3AnalyticsInstance = new Web3AnalyticsClass(userConfig);
   web3AnalyticsInstance.initialize();
+  Web3Analytics.hasOptedOutTracking = web3AnalyticsInstance.hasOptedOutTracking;
+  Web3Analytics.optInTracking = web3AnalyticsInstance.optInTracking;
+  Web3Analytics.optOutTracking = web3AnalyticsInstance.optOutTracking;
   Web3Analytics.trackPageView = web3AnalyticsInstance.trackPageView;
-  Web3Analytics.walletProvider = web3AnalyticsInstance.wallet.walletProvider;
   Web3Analytics.trackWalletConnection = web3AnalyticsInstance.wallet.trackWalletConnection;
+  Web3Analytics.walletProvider = web3AnalyticsInstance.wallet.walletProvider;
 };
 
 export default Web3Analytics;

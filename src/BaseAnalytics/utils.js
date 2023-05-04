@@ -1,3 +1,5 @@
+import { TRACKING_EVENTS } from '../constants';
+
 export function cheapGuid(maxlen) {
   const guid = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
   return maxlen ? guid.substring(0, maxlen) : guid;
@@ -24,4 +26,12 @@ export function getQueryParams(url, param) {
 export function transformUTMKey(key) {
   const splittedKey = key.split('_');
   return splittedKey[0] + splittedKey[1][0].toUpperCase() + splittedKey[1].slice(1);
+}
+
+export function parseFlowProperties(eventName, properties) {
+  if (eventName === TRACKING_EVENTS.TRANSACTION) {
+    return { from: properties.from, to: properties.to };
+  } else {
+    return properties;
+  }
 }
