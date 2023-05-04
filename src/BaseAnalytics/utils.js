@@ -17,7 +17,7 @@ export function getQueryParams(url, param) {
     try {
       result = decodeURIComponent(result);
     } catch (err) {
-      console.error('Skipping decoding for malformed query param: ' + result);
+      // console.error('Skipping decoding for malformed query param: ' + result);
     }
     return result.replace(/\+/g, ' ');
   }
