@@ -209,14 +209,14 @@ class UserInfo extends BaseAnalytics {
   }
 
   distinctId(userAgent) {
-    const cachedDistinctId = getCookie(STORAGE.COOKIES.CACHE_DISTINCT_ID);
+    const cachedDistinctId = getCookie(STORAGE.COOKIES.DISTINCT_ID);
     if (notUndefined(cachedDistinctId)) {
       return cachedDistinctId;
     }
 
     const newDistinctId = this.uuid(userAgent);
     const ONE_YEAR = 365 * 24 * 60 * 60 * 1000;
-    this.setConsetCookie(STORAGE.COOKIES.CACHE_DISTINCT_ID, newDistinctId, ONE_YEAR);
+    this.setConsetCookie(STORAGE.COOKIES.DISTINCT_ID, newDistinctId, ONE_YEAR);
     return newDistinctId;
   }
 
