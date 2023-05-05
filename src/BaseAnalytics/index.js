@@ -45,7 +45,7 @@ class BaseAnalytics {
   }
 
   setConsetCookie(cName, cValue, expiry) {
-    this.store.optOut && setCookie(cName, cValue, expiry);
+    !this.store.optOut && setCookie(cName, cValue, expiry);
   }
 
   trackEvent({ event, properties, logMessage, callback }) {
