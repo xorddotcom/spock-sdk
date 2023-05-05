@@ -25,10 +25,11 @@ export const withAlias = (key) => `${ALIAS}_${key}`;
  */
 export const DEFAULT_CONFIG = {
   DEBUG: false,
+  GEOLOCATION: true,
   INACTIVITY_TIMEOUT: 30,
-  TEST_MODE: false,
-  TEST_ENV: false,
   OPT_OUT: false,
+  TEST_ENV: false,
+  TEST_MODE: false,
 };
 
 /**

@@ -115,3 +115,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve session tracking through server support.
 - Removed deprecated value contribution functions.
 - Separated pathname and search parameters for `trackPageView`.
+
+## [1.0.0-beta.1] - 2023-05-05
+
+### Added
+
+- Make gelocation tracking optional.

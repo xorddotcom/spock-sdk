@@ -68,10 +68,11 @@ Web3Analytics.init({ appKey: 'eba6...28c', debug: true });
 |  appKey                 |`String` | Unique appKey like `eba6...28c` for tracking. Can be obtained by getting [onboarded](#onboarding) in Spock.|
 | **Optional**            | | |
 |  debug                  |`Boolean`| Defaults to `false`. Enable consoles for all the tracking events.|
-|  testENV                |`Boolean`| Defaults to `false`. Enable testing version of SDK in which SDK will interact with testing servers.|
-|  testMode               |`Boolean`| Defaults to `false`. Enable testMode in which you can test tracking events without logging data onto server. Inordre to avoid store testing data.|
+|  geolocation      |`number` | Defaults to `true`. Users gelocation tracking.|
 |  inactivityTimeout      |`number` | Defaults to `30`. This field takes time in mins to specify the inactivity duration in which the session will expires.|
 |  optOut      |`Boolean` | Defaults to `false`. Opt users out of tracking. |
+|  testENV                |`Boolean`| Defaults to `false`. Enable testing version of SDK in which SDK will interact with testing servers.|
+|  testMode               |`Boolean`| Defaults to `false`. Enable testMode in which you can test tracking events without logging data onto server. Inordre to avoid store testing data.|
 
 ### Web3Analytics.walletProvider(provider)
 

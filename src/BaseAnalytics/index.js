@@ -27,6 +27,7 @@ class BaseAnalytics {
     this.appKey = config.appKey;
     this.inActivityTimeout = getConfig(config.inactivityTimeout, DEFAULT_CONFIG.INACTIVITY_TIMEOUT);
     this.debug = getConfig(config.debug, DEFAULT_CONFIG.DEBUG);
+    this.trackGeolocation = getConfig(config.geolocation, DEFAULT_CONFIG.GEOLOCATION);
     this.testENV = getConfig(config.testENV, DEFAULT_CONFIG.TEST_ENV);
     this.testMode = getConfig(config.testMode, DEFAULT_CONFIG.TEST_MODE);
     this.defaultOptOut = getConfig(config.optOut, DEFAULT_CONFIG.OPT_OUT);

@@ -18,7 +18,7 @@ class Request {
     if (this.store.optOut) {
       return;
     }
-    const formatedData = JSON_Formatter.stringify({ appKey: this.appKey, ...data });
+    const formatedData = JSON_Formatter.stringify({ appKey: this.appKey, ip: this.store.ip, ...data });
     if (formatedData) {
       if (this.testMode) {
         callback && callback();
