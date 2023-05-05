@@ -22,11 +22,11 @@ class Web3Analytics extends BaseAnalytics {
     this.hasOptedOutTracking = this.hasOptedOutTracking.bind(this);
   }
 
-  initialize() {
+  async initialize() {
     this.log(LOG.INFO, 'Web3 Analytics initialized');
     this.userConsent();
 
-    this.userInfo.getUserInfo();
+    await this.userInfo.getUserInfo();
     this.session.trackSession();
     this.wallet.initialize();
 

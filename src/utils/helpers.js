@@ -25,7 +25,7 @@ export function addEvent(element, type, listener) {
 }
 
 export function getConfig(value, defaultValue) {
-  return value ? value : defaultValue;
+  return notUndefined(value) ? value : defaultValue;
 }
 
 export function includes(str, needle) {

@@ -2,10 +2,11 @@ declare namespace Web3Analytics {
   export function init(config: {
     appKey: string;
     debug?: boolean;
-    testENV?: boolean;
-    testMode?: boolean;
+    geolocation?: boolean;
     inactivityTimeout?: number;
     optOut?: boolean;
+    testENV?: boolean;
+    testMode?: boolean;
   }): void;
 
   export function hasOptedOutTracking(): boolean;

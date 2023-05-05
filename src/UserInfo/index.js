@@ -1,4 +1,4 @@
-import { LIB_VERSION, STORAGE, TRACKING_EVENTS } from '../constants';
+import { LIB_VERSION, STORAGE, TRACKING_EVENTS, LOG } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
 import { getCookie } from '../utils/cookies';
 import { extractDomain } from '../utils/formatting';
@@ -220,7 +220,7 @@ class UserInfo extends BaseAnalytics {
     return newDistinctId;
   }
 
-  getUserInfo() {
+  async getUserInfo() {
     if (notUndefined(navigator)) {
       const userAgent = navigator.userAgent;
       const vendor = navigator.vendor;
@@ -246,25 +246,27 @@ class UserInfo extends BaseAnalytics {
 
       this.dispatch({ userInfo });
 
+      if (this.trackGeolocation) {
+        await this.getUserIp();
+      }
+
       this.trackEvent({ event: TRACKING_EVENTS.APP_VISIT, logMessage: 'App visit' });
     }
-
-    // await this.getUserIp();
   }
 
-  // async getUserIp() {
-  //   try {
-  //     const response = await fetch('https://api.ipify.org?format=json', {
-  //       method: 'GET',
-  //     });
-  //     const result = await response.json();
-  //     if (result?.ip) {
-  //       this.dispatch({ ip: result.ip });
-  //     }
-  //   } catch (e) {
-  //     this.log(LOG.ERROR, `getUserIp`, e.toString());
-  //   }
-  // }
+  async getUserIp() {
+    try {
+      const response = await fetch('https://api.ipify.org?format=json', {
+        method: 'GET',
+      });
+      const result = await response.json();
+      if (result?.ip) {
+        this.dispatch({ ip: result.ip });
+      }
+    } catch (e) {
+      this.log(LOG.ERROR, `getUserIp`, e.toString());
+    }
+  }
 }
 
 export default UserInfo;
