@@ -48,7 +48,7 @@ class BaseAnalytics {
     !this.store.optOut && setCookie(cName, cValue, expiry);
   }
 
-  trackEvent({ event, properties, logMessage, callback }) {
+  trackEvent({ event, properties, logMessage }) {
     const utmParams = UTM_KEYS.reduce((accum, key) => {
       const param = getQueryParams(document.URL, key);
       if (param) {
@@ -74,9 +74,20 @@ class BaseAnalytics {
       });
     }
 
-    this.request.post(`track/${event}`, { data, callback });
+    if (this.store.initialized) {
+      this.request.post(`track/${event}`, { data });
+    } else {
+      this.dispatch({ trackingQueue: [...this.store.trackingQueue, { event, data }] });
+    }
 
     logMessage && this.log(LOG.INFO, logMessage, data);
+  }
+
+  processQueue() {
+    this.store.trackingQueue.forEach(({ event, data }) => {
+      this.request.post(`track/${event}`, { data });
+    });
+    this.dispatch({ trackingQueue: [] });
   }
 }
 

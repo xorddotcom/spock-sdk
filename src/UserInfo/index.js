@@ -246,11 +246,16 @@ class UserInfo extends BaseAnalytics {
 
       this.dispatch({ userInfo });
 
+      this.trackEvent({ event: TRACKING_EVENTS.APP_VISIT, logMessage: 'App visit' });
+
       if (this.trackGeolocation) {
         await this.getUserIp();
       }
 
-      this.trackEvent({ event: TRACKING_EVENTS.APP_VISIT, logMessage: 'App visit' });
+      //getUserIp is an async method so it take times to relsove uptil then we queue all tracking events
+      //then process all events after resolve
+      this.dispatch({ initialized: true });
+      this.processQueue();
     }
   }
 

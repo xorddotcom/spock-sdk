@@ -120,7 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Make gelocation tracking optional.
+- Make geolocation tracking optional.
 
 ## [1.0.0-beta.2] - 2023-05-05
 
@@ -128,3 +128,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Cookie handling with consent.
 - DistinctId key bug.
+
+## [1.0.0-beta.3] - 2023-05-06
+
+### Fixed
+
+- Events flow in session.
+- Geolocation tracking on intial events.
