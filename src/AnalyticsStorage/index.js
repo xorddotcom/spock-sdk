@@ -16,42 +16,36 @@ import { notUndefined } from '../utils/validators';
  */
 
 /**
- * @typedef PageNavigation
- * @type {object}
- * @property {String} page - page path
- * @property {boolean} doneTxn - is user submitted txn in that page
- */
-
-/**
  * @typedef AnalyticsStore
  * @type {object}
  * @property {String|undefined} connectedAccount - user wallet address
  * @property {number|undefined} connectedChain - user connected network
- * @property {Web3Provider|undefined} provider - wallet provider
- * @property {String|undefined} userId - user unique device provider
- * @property {UserInfo|undefined} userInfo - user metadata
- * @property {PageNavigation[]} pageNavigation - user navigation in current session
- * @property {boolean} doneTxn - is user submitted txn in current session
- * @property {boolean} rejectTxn - is user rejected txn in current session
- * @property {number} submitTxnCount - total txn rejected in current session
- * @property {number} rejectTxnCount - total txn submitted txn in current session
+ * @property {object[]} flow -
+ * @property {boolean} initialized -
  * @property {String|undefined} ip - user ip address
- * @property {String|undefined} sessionId -
  * @property {Boolean|undefined} optOut -
+ * @property {Web3Provider|undefined} provider - wallet provider
+ * @property {String|undefined} sessionId -
+ * @property {object[]} trackingQueue -
+ * @property {number} txnReject - total txn rejected in current session
+ * @property {number} txnSubmit - total txn submitted txn in current session
+ * @property {UserInfo|undefined} userInfo - user metadata
  */
 
 /** @type {AnalyticsStore} */
 const initialState = {
   connectedAccount: undefined,
   connectedChain: undefined,
-  provider: undefined,
-  userInfo: undefined,
   flow: [],
+  initialized: false,
+  ip: undefined,
+  optOut: undefined,
+  provider: undefined,
+  sessionId: undefined,
+  trackingQueue: [],
   txnReject: 0,
   txnSubmit: 0,
-  ip: undefined,
-  sessionId: undefined,
-  optOut: undefined,
+  userInfo: undefined,
 };
 
 class AnalyticsStorage {

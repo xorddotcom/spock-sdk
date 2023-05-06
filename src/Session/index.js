@@ -48,7 +48,20 @@ class Session extends BaseAnalytics {
       this.rewindSession(cachedSession);
     } else {
       this.startTime = currentTimestamp();
-      this.dispatch({ sessionId: sessionUUID(), flow: [], txnReject: 0, txnSubmit: 0 });
+      this.dispatch({ sessionId: sessionUUID() });
+
+      //session start with inactivity
+      if (this.store.flow.length === 0) {
+        this.dispatch({
+          flow: [
+            {
+              event: TRACKING_EVENTS.PAGE_VIEW,
+              properties: { pathname: window.location.pathname, search: window.location.search },
+            },
+          ],
+        });
+      }
+
       //clear states
       this.storedDuration = 0;
       this.inActivityCounter = 0;
@@ -63,7 +76,7 @@ class Session extends BaseAnalytics {
     const properties = JSON_Formatter.parse(cachedSession);
     const { duration, flow, pauseTime, sessionId, txnReject, txnSubmit } = properties;
     this.startTime = pauseTime;
-    this.dispatch({ sessionId, txnReject, txnSubmit, flow });
+    this.dispatch({ sessionId, txnReject, txnSubmit, flow: [...flow, ...this.store.flow] });
     this.storedDuration = duration;
     this.request.post(`track/${TRACKING_EVENTS.REWIND_SESSION}`, { data: { sessionId } });
   }
@@ -99,6 +112,7 @@ class Session extends BaseAnalytics {
       walletConnected: Boolean(connectedAccount),
     };
     this.trackEvent({ event: TRACKING_EVENTS.SESSION, properties, logMessage: 'Session expired' });
+    this.dispatch({ flow: [], txnReject: 0, txnSubmit: 0 });
   }
 
   sessionDuration() {
