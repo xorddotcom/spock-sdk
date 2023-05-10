@@ -1,7 +1,7 @@
-import { LOG, TRACKING_EVENTS, STORAGE } from '../constants';
+import { LOG, TRACKING_EVENTS, STORAGE, EVENTS } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
 import { limitedTimeout, sessionUUID } from './utils';
-import { getCookie } from '../utils/cookies';
+import { deleteCookie, getCookie } from '../utils/cookies';
 import { JSON_Formatter } from '../utils/formatting';
 import { addEvent, currentTimestamp } from '../utils/helpers';
 import { notUndefined } from '../utils/validators';
@@ -28,10 +28,10 @@ class Session extends BaseAnalytics {
     addEvent(window, 'beforeunload', this.pauseSession.bind(this));
 
     //TODO should we expire on new wallet connect
-    // addEvent(window, EVENTS.WALLET_CONNECTION, () => {
-    //   this.endSession();
-    //   this.beginSession();
-    // });
+    addEvent(window, EVENTS.WALLET_CONNECTION, () => {
+      this.endSession();
+      this.beginSession();
+    });
 
     this.visibilityEvents();
 
@@ -79,6 +79,7 @@ class Session extends BaseAnalytics {
     this.dispatch({ sessionId, txnReject, txnSubmit, flow: [...flow, ...this.store.flow] });
     this.storedDuration = duration;
     this.request.post(`track/${TRACKING_EVENTS.REWIND_SESSION}`, { data: { sessionId } });
+    deleteCookie(STORAGE.COOKIES.SESSION);
   }
 
   pauseSession() {
