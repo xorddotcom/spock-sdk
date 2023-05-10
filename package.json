@@ -1,6 +1,6 @@
 {
   "name": "analytics-web3",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "Spock analytics SDK analytics-web3 is a js module to collect and log all the data and events of DApp for analytics.",
   "main": "dist/analytics-web3.min.js",
   "license": "UNLICENSED",

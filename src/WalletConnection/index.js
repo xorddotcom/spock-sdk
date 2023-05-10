@@ -92,7 +92,7 @@ class WalletConnection extends BaseAnalytics {
       this.trackEvent({ event: TRACKING_EVENTS.TRANSACTION, properties, logMessage: 'Transaction rejected' });
       this.dispatch({ txnReject: this.store.txnReject + 1 });
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
-      const properties = { ...txnObj, status: 1 };
+      const properties = { ...txnObj, hash: txnHash, status: 1 };
       this.trackEvent({ event: TRACKING_EVENTS.TRANSACTION, properties, logMessage: 'Transaction submitted' });
       this.cacheTxnHash = txnHash;
       this.dispatch({ txnSubmit: this.store.txnSubmit + 1 });
@@ -181,7 +181,7 @@ class WalletConnection extends BaseAnalytics {
       }
     }
 
-    if (provider.isMetaMask) return WALLET_TYPE.METAMASK;
+    if (provider.isMetaMask || provider.connection?.url === 'metamask') return WALLET_TYPE.METAMASK;
     else if (provider.isWalletConnect) return WALLET_TYPE.WALLETCONNECT;
     else if (provider.isCoinbaseWallet) return WALLET_TYPE.COINBASE;
     else if (provider.isFortmatic) return WALLET_TYPE.FORTMATIC;
