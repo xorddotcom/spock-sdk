@@ -107,6 +107,7 @@ export const STORAGE = {
  */
 export const TRACKING_EVENTS = {
   APP_VISIT: 'app-visit',
+  EXPIRE_OLD_SESSION: 'expire-old-session',
   OUTBOUND: 'outbound',
   PAGE_VIEW: 'page-view',
   PAUSE_SESSION: 'pause-session',
