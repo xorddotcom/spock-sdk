@@ -14,28 +14,48 @@ class Request {
     this.post = this.post.bind(this);
   }
 
-  async post(route, { data, callback, keepalive }) {
+  async sendFetch(url, data) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: this.headers,
+        body: data,
+      });
+      await response.json();
+    } catch (e) {
+      this.log(LOG.ERROR, `${url} sendFetch`, e?.toString());
+    }
+  }
+
+  async sendBeacon(url, data) {
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([data], { type: 'text/plain' });
+        navigator.sendBeacon(url, blob);
+      }
+    } catch (e) {
+      this.log(LOG.ERROR, `${url} sendBeacon`, e?.toString());
+    }
+  }
+
+  async post(route, { data, sendBeacon }) {
     if (this.store.optOut) {
       return;
     }
+
     const formatedData = JSON_Formatter.stringify({ appKey: this.appKey, ip: this.store.ip, ...data });
+
     if (formatedData) {
       if (this.testMode) {
-        callback && callback();
         return;
       }
 
-      try {
-        const response = await fetch(`${this.endPoint}/${route}`, {
-          method: 'POST',
-          headers: this.headers,
-          body: formatedData,
-          keepalive,
-        });
-        await response.json();
-        callback && callback();
-      } catch (e) {
-        this.log(LOG.ERROR, `${route} request failed`, e.toString());
+      const url = `${this.endPoint}/${route}`;
+
+      if (sendBeacon) {
+        await this.sendBeacon(url, formatedData);
+      } else {
+        await this.sendFetch(url, formatedData);
       }
     }
   }

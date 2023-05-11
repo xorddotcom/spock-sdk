@@ -1,7 +1,8 @@
 import AnalyticsStorage from '../AnalyticsStorage';
-import { DEFAULT_CONFIG, LOG, TRACKING_EVENTS, UTM_KEYS } from '../constants';
+import { DEFAULT_CONFIG, LOG, TRACKING_EVENTS, STORAGE, UTM_KEYS } from '../constants';
 import { cheapGuid, getQueryParams, parseFlowProperties, transformUTMKey } from './utils';
 import { setCookie } from '../utils/cookies';
+import { JSON_Formatter } from '../utils/formatting';
 import { getConfig } from '../utils/helpers';
 import { log } from '../utils/logs';
 import Request from '../utils/request';
@@ -48,7 +49,7 @@ class BaseAnalytics {
     !this.store.optOut && setCookie(cName, cValue, expiry);
   }
 
-  trackEvent({ event, properties, logMessage }) {
+  trackEvent({ event, properties, logMessage, sendBeacon }) {
     const utmParams = UTM_KEYS.reduce((accum, key) => {
       const param = getQueryParams(document.URL, key);
       if (param) {
@@ -65,8 +66,19 @@ class BaseAnalytics {
       insertId: cheapGuid(),
       sessionId: this.store.sessionId,
       time: Date.now() / 1000,
+      walletAddress: this.store.connectedAccount,
       ...(properties ?? {}),
     };
+
+    // store complete data in a cookie so if pause-load req aboarded due to unload the data will be there in cookie
+    // and when user cameback the session record will be created
+    if (event === TRACKING_EVENTS.PAUSE_SESSION) {
+      this.setConsetCookie(
+        STORAGE.COOKIES.SESSION,
+        JSON_Formatter.stringify({ ...data, ip: this.store.ip }),
+        7 * 24 * 60 * 60 * 1000
+      );
+    }
 
     if (![TRACKING_EVENTS.SESSION, TRACKING_EVENTS.PAUSE_SESSION].includes(event)) {
       this.dispatch({
@@ -75,7 +87,7 @@ class BaseAnalytics {
     }
 
     if (this.store.initialized) {
-      this.request.post(`track/${event}`, { data });
+      this.request.post(`track/${event}`, { data, sendBeacon });
     } else {
       this.dispatch({ trackingQueue: [...this.store.trackingQueue, { event, data }] });
     }

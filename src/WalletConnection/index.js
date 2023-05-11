@@ -335,9 +335,9 @@ class WalletConnection extends BaseAnalytics {
     if (!isSameAddress(this.store.connectedAccount, account) || chain !== this.store.connectedChain) {
       this.fireWalletConnectionEvent(this.store.connectedAccount, this.store.connectedChain);
 
-      this.dispatch({ connectedAccount: account, connectedChain: chain });
+      this.dispatch({ connectedAccount: account?.toLowerCase(), connectedChain: chain });
 
-      const properties = { walletType, walletAddress: account };
+      const properties = { walletType };
 
       this.trackEvent({ event: TRACKING_EVENTS.WALLET_CONNECTION, properties, logMessage: 'Wallet connect' });
     }

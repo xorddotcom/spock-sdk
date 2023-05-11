@@ -26,8 +26,6 @@ class Session extends BaseAnalytics {
     this.inActivityInterval();
 
     addEvent(window, 'beforeunload', this.pauseSession.bind(this));
-
-    //TODO should we expire on new wallet connect
     addEvent(window, EVENTS.WALLET_CONNECTION, () => {
       this.endSession();
       this.beginSession();
@@ -73,13 +71,21 @@ class Session extends BaseAnalytics {
   }
 
   rewindSession(cachedSession) {
-    const properties = JSON_Formatter.parse(cachedSession);
-    const { duration, flow, pauseTime, sessionId, txnReject, txnSubmit } = properties;
-    this.startTime = pauseTime;
-    this.dispatch({ sessionId, txnReject, txnSubmit, flow: [...flow, ...this.store.flow] });
-    this.storedDuration = duration;
-    this.request.post(`track/${TRACKING_EVENTS.REWIND_SESSION}`, { data: { sessionId } });
     deleteCookie(STORAGE.COOKIES.SESSION);
+
+    const data = JSON_Formatter.parse(cachedSession);
+    const { duration, flow, pauseTime, sessionId, timeout, txnReject, txnSubmit } = data;
+    const timePased = currentTimestamp() - pauseTime;
+
+    if (timePased >= timeout / 1000) {
+      this.request.post(`track/${TRACKING_EVENTS.EXPIRE_OLD_SESSION}`, { data });
+      this.beginSession();
+    } else {
+      this.startTime = pauseTime;
+      this.dispatch({ sessionId, txnReject, txnSubmit, flow: [...flow, ...this.store.flow] });
+      this.storedDuration = duration;
+      this.request.post(`track/${TRACKING_EVENTS.REWIND_SESSION}`, { data: { sessionId } });
+    }
   }
 
   pauseSession() {
@@ -96,8 +102,13 @@ class Session extends BaseAnalytics {
         txnSubmit,
         walletConnected: Boolean(connectedAccount),
       };
-      this.trackEvent({ event: TRACKING_EVENTS.PAUSE_SESSION, properties, logMessage: 'Pause session' });
-      this.setConsetCookie(STORAGE.COOKIES.SESSION, JSON_Formatter.stringify(properties), this.inActivityTimeout);
+
+      this.trackEvent({
+        event: TRACKING_EVENTS.PAUSE_SESSION,
+        properties,
+        logMessage: 'Pause session',
+        sendBeacon: true,
+      });
     }
   }
 
