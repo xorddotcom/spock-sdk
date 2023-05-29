@@ -30,7 +30,7 @@ export function transformUTMKey(key) {
 
 export function parseFlowProperties(eventName, properties) {
   if (eventName === TRACKING_EVENTS.TRANSACTION) {
-    return { from: properties.from, to: properties.to };
+    return { from: properties?.from, to: properties?.to, status: properties?.status };
   } else {
     return properties;
   }
