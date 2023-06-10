@@ -154,3 +154,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Add txn status in event flow tracking.
+
+## [1.0.0] - 2023-06-11
+
+### Fixed
+
+- Update constants documentation.
+- Remove beta
