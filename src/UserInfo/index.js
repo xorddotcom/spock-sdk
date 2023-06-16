@@ -2,8 +2,15 @@ import { LIB_VERSION, STORAGE, TRACKING_EVENTS, LOG } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
 import { getCookie } from '../utils/cookies';
 import { extractDomain } from '../utils/formatting';
-import { includes, stripEmptyProperties } from '../utils/helpers';
+import {
+  includes,
+  stripEmptyProperties,
+  setGetValueInLocalStorage,
+  deleteValueFromLocalStorage,
+} from '../utils/helpers';
 import { notUndefined } from '../utils/validators';
+
+const ONE_YEAR = 365 * 24 * 60 * 60 * 1000;
 
 class UserInfo extends BaseAnalytics {
   constructor(config) {
@@ -210,14 +217,19 @@ class UserInfo extends BaseAnalytics {
 
   distinctId(userAgent) {
     const cachedDistinctId = getCookie(STORAGE.COOKIES.DISTINCT_ID);
+    const oldVersionDistincId = setGetValueInLocalStorage(STORAGE.LOCAL_STORAGE.DEVICE_ID);
+
     if (notUndefined(cachedDistinctId)) {
       return cachedDistinctId;
+    } else if (oldVersionDistincId) {
+      this.setConsetCookie(STORAGE.COOKIES.DISTINCT_ID, oldVersionDistincId, ONE_YEAR);
+      deleteValueFromLocalStorage(STORAGE.LOCAL_STORAGE.DEVICE_ID);
+      return oldVersionDistincId;
+    } else {
+      const newDistinctId = this.uuid(userAgent);
+      this.setConsetCookie(STORAGE.COOKIES.DISTINCT_ID, newDistinctId, ONE_YEAR);
+      return newDistinctId;
     }
-
-    const newDistinctId = this.uuid(userAgent);
-    const ONE_YEAR = 365 * 24 * 60 * 60 * 1000;
-    this.setConsetCookie(STORAGE.COOKIES.DISTINCT_ID, newDistinctId, ONE_YEAR);
-    return newDistinctId;
   }
 
   async getUserInfo() {

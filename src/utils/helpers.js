@@ -1,12 +1,25 @@
 import { notUndefined } from './validators';
 
-export function setGetValueInStorage() {
-  const key = arguments[0];
-  const value = arguments[1];
-  if (value) {
-    localStorage.setItem(key, value);
-  } else {
-    return localStorage.getItem(key);
+export function setGetValueInLocalStorage() {
+  try {
+    const key = arguments[0];
+    const value = arguments[1];
+    if (value) {
+      localStorage.setItem(key, value);
+    } else {
+      return localStorage.getItem(key);
+    }
+  } catch (error) {
+    return undefined;
+  }
+}
+
+export function deleteValueFromLocalStorage() {
+  try {
+    const key = arguments[0];
+    localStorage.removeItem(key);
+  } catch (error) {
+    return undefined;
   }
 }
 
