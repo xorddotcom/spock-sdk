@@ -168,3 +168,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Backward compatibility for old version device-id
 - Remove beta
+
+## [1.1.0] -
+
+### Added
+
+- Allow user to limit the tracking of datapoints by passing the desired one on initialization.

@@ -1,8 +1,8 @@
 declare namespace Web3Analytics {
   export function init(config: {
     appKey: string;
+    dataPoints?: ('browser_profile' | 'demographics' | 'navigation' | 'utm_params' | 'web3')[];
     debug?: boolean;
-    geolocation?: boolean;
     inactivityTimeout?: number;
     optOut?: boolean;
     testENV?: boolean;
