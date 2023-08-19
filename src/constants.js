@@ -24,7 +24,7 @@ export const withAlias = (key) => `${ALIAS}_${key}`;
  *  datapoints available to track
  *  BROWSER_PROFILE - properties of browser like, browser_name, version, device, os etc
  *  DEMOGRAPHICS - user geolocation data like city, country, region
- *  NAVIGATION - user navigation data like visits, page-views, outbounds
+ *  NAVIGATION - user navigation data like page-views, outbound-links
  *  UTM_PARAMS - utm params data
  *  WEB3 - user wallet connection and txn data
  */

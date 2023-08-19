@@ -257,9 +257,7 @@ class UserInfo extends BaseAnalytics {
 
       this.dispatch({ userInfo, distinctId: this.distinctId(userAgent) });
 
-      if (this.dataPoints[DATA_POINTS.VISITS]) {
-        this.trackEvent({ event: TRACKING_EVENTS.APP_VISIT, logMessage: 'App visit' });
-      }
+      this.trackEvent({ event: TRACKING_EVENTS.APP_VISIT, logMessage: 'App visit' });
 
       if (this.dataPoints[DATA_POINTS.DEMOGRAPHICS]) {
         await this.getUserIp();
