@@ -1,4 +1,4 @@
-import { TRACKING_EVENTS, LOG, STORAGE } from '../constants';
+import { TRACKING_EVENTS, LOG, STORAGE, DATA_POINTS } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
 import Session from '../Session';
 import UserInfo from '../UserInfo';
@@ -30,15 +30,19 @@ class Web3Analytics extends BaseAnalytics {
     await this.userInfo.getUserInfo();
     this.wallet.initialize();
 
-    this.trackOutboundLink();
+    if (this.dataPoints[DATA_POINTS.NAVIGATION]) {
+      this.trackOutboundLink();
+    }
   }
 
   trackPageView(pathname, search) {
-    const properties = stripEmptyProperties({
-      pathname: pathname || window.location.pathname,
-      search: search || window.location.search,
-    });
-    this.trackEvent({ event: TRACKING_EVENTS.PAGE_VIEW, properties, logMessage: 'Page view' });
+    if (this.dataPoints[DATA_POINTS.NAVIGATION]) {
+      const properties = stripEmptyProperties({
+        pathname: pathname || window.location.pathname,
+        search: search || window.location.search,
+      });
+      this.trackEvent({ event: TRACKING_EVENTS.PAGE_VIEW, properties, logMessage: 'Page view' });
+    }
   }
 
   trackOutboundLink() {

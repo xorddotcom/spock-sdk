@@ -1,4 +1,4 @@
-import { LIB_VERSION, STORAGE, TRACKING_EVENTS, LOG } from '../constants';
+import { LIB_VERSION, STORAGE, TRACKING_EVENTS, LOG, DATA_POINTS } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
 import { getCookie } from '../utils/cookies';
 import { extractDomain } from '../utils/formatting';
@@ -254,13 +254,12 @@ class UserInfo extends BaseAnalytics {
       userInfo.libVersion = LIB_VERSION;
       userInfo.screenHeight = screen.height;
       userInfo.screenWidth = screen.width;
-      userInfo.distinctId = this.distinctId(userAgent);
 
-      this.dispatch({ userInfo });
+      this.dispatch({ userInfo, distinctId: this.distinctId(userAgent) });
 
       this.trackEvent({ event: TRACKING_EVENTS.APP_VISIT, logMessage: 'App visit' });
 
-      if (this.trackGeolocation) {
+      if (this.dataPoints[DATA_POINTS.DEMOGRAPHICS]) {
         await this.getUserIp();
       }
 
@@ -269,6 +268,12 @@ class UserInfo extends BaseAnalytics {
       this.dispatch({ initialized: true });
       this.processQueue();
     }
+
+    //ping server with the enables datapoints info
+    this.request.post('track/ping', {
+      data: { dataPoints: Object.keys(this.dataPoints).sort(), libVersion: LIB_VERSION },
+      sendBeacon: true,
+    });
   }
 
   async getUserIp() {

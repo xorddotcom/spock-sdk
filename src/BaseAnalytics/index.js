@@ -1,5 +1,5 @@
 import AnalyticsStorage from '../AnalyticsStorage';
-import { DEFAULT_CONFIG, LOG, TRACKING_EVENTS, STORAGE, UTM_KEYS } from '../constants';
+import { DEFAULT_CONFIG, LOG, TRACKING_EVENTS, STORAGE, UTM_KEYS, DATA_POINTS } from '../constants';
 import { cheapGuid, getQueryParams, parseFlowProperties, transformUTMKey } from './utils';
 import { setCookie } from '../utils/cookies';
 import { JSON_Formatter } from '../utils/formatting';
@@ -11,7 +11,10 @@ import Request from '../utils/request';
  * @typedef Config
  * @type {object}
  * @property {String} appKey - application unique key
+ * @property {string[]} dataPoints - data that is allowed to track
  * @property {boolean} debug - sdk in debug mode
+ * @property {number} inactivityTimeout - timeout for inactive session
+ * @property {boolean} optOut - opt all users out from tracking on init
  * @property {boolean} testENV - sdk in test environment
  * @property {boolean} testMode - sdk in test mode
  */
@@ -26,12 +29,17 @@ class BaseAnalytics {
    */
   constructor(config) {
     this.appKey = config.appKey;
-    this.inActivityTimeout = getConfig(config.inactivityTimeout, DEFAULT_CONFIG.INACTIVITY_TIMEOUT);
+    this.dataPoints = getConfig(config.dataPoints, DEFAULT_CONFIG.DATA_POINTS)
+      .concat('web3') //default datapoint
+      .reduce((accum, dataPoint) => {
+        accum[dataPoint] = true;
+        return accum;
+      }, {});
     this.debug = getConfig(config.debug, DEFAULT_CONFIG.DEBUG);
-    this.trackGeolocation = getConfig(config.geolocation, DEFAULT_CONFIG.GEOLOCATION);
+    this.defaultOptOut = getConfig(config.optOut, DEFAULT_CONFIG.OPT_OUT);
+    this.inActivityTimeout = getConfig(config.inactivityTimeout, DEFAULT_CONFIG.INACTIVITY_TIMEOUT);
     this.testENV = getConfig(config.testENV, DEFAULT_CONFIG.TEST_ENV);
     this.testMode = getConfig(config.testMode, DEFAULT_CONFIG.TEST_MODE);
-    this.defaultOptOut = getConfig(config.optOut, DEFAULT_CONFIG.OPT_OUT);
 
     this.store = AnalyticsStorage.store;
     this.dispatch = AnalyticsStorage.dispatch;
@@ -45,24 +53,39 @@ class BaseAnalytics {
     });
   }
 
+  /**
+   *  store cookies with user consent
+   *  @param {string} cName - cookie name
+   *  @param {string} cValue - cookie value
+   *  @param {number} expiry - cookie expiry
+   */
   setConsetCookie(cName, cValue, expiry) {
     !this.store.optOut && setCookie(cName, cValue, expiry);
   }
 
+  /**
+   *  send event to the server with metadata
+   */
   trackEvent({ event, properties, logMessage, sendBeacon }) {
-    const utmParams = UTM_KEYS.reduce((accum, key) => {
-      const param = getQueryParams(document.URL, key);
-      if (param) {
-        accum[transformUTMKey(key)] = param;
-      }
-      return accum;
-    }, {});
+    const utmParams = this.dataPoints[DATA_POINTS.UTM_PARAMS]
+      ? UTM_KEYS.reduce((accum, key) => {
+          const param = getQueryParams(document.URL, key);
+          if (param) {
+            accum[transformUTMKey(key)] = param;
+          }
+          return accum;
+        }, {})
+      : {};
+
+    const browserProfile = this.dataPoints[DATA_POINTS.BROWSER_PROFILE]
+      ? { ...this.store.userInfo, currentUrl: window.location.href }
+      : {};
 
     const data = {
-      ...this.store.userInfo,
+      ...browserProfile,
       ...utmParams,
       chain: this.store.connectedChain,
-      currentUrl: window.location.href,
+      distinctId: this.store.distinctId,
       insertId: cheapGuid(),
       sessionId: this.store.sessionId,
       time: Date.now() / 1000,
@@ -80,12 +103,14 @@ class BaseAnalytics {
       );
     }
 
+    //not to add these events in session flow
     if (![TRACKING_EVENTS.SESSION, TRACKING_EVENTS.PAUSE_SESSION].includes(event)) {
       this.dispatch({
         flow: [...this.store.flow, { event, properties: parseFlowProperties(event, properties) }],
       });
     }
 
+    //move event to the queue until SDK init is complete
     if (this.store.initialized) {
       this.request.post(`track/${event}`, { data, sendBeacon });
     } else {
@@ -95,6 +120,9 @@ class BaseAnalytics {
     logMessage && this.log(LOG.INFO, logMessage, data);
   }
 
+  /**
+   *  send all the queued events
+   */
   processQueue() {
     this.store.trackingQueue.forEach(({ event, data }) => {
       this.request.post(`track/${event}`, { data });

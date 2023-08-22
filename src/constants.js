@@ -21,11 +21,32 @@ const ALIAS = 'spock';
 export const withAlias = (key) => `${ALIAS}_${key}`;
 
 /**
+ *  datapoints available to track
+ *  BROWSER_PROFILE - properties of browser like, browser_name, version, device, os etc
+ *  DEMOGRAPHICS - user geolocation data like city, country, region
+ *  NAVIGATION - user navigation data like page-views, outbound-links
+ *  UTM_PARAMS - utm params data
+ *  WEB3 - user wallet connection and txn data
+ */
+export const DATA_POINTS = {
+  BROWSER_PROFILE: 'browser_profile',
+  DEMOGRAPHICS: 'demographics',
+  NAVIGATION: 'navigation',
+  UTM_PARAMS: 'utm_params',
+  WEB3: 'web3',
+};
+
+/**
  *  default values for sdk configuration
+ *  DATA_POINTS - data that is allowed to track
+ *  DEBUG - enable / disable the logs
+ *  INACTIVITY_TIMEOUT - Time in mins after which inactive session get expired
+ *  TEST_ENV - Toggle b/w sdk prod and testing servers
+ *  TEST_MODE - stop all the event requests sending to the server
  */
 export const DEFAULT_CONFIG = {
+  DATA_POINTS: Object.values(DATA_POINTS),
   DEBUG: false,
-  GEOLOCATION: true,
   INACTIVITY_TIMEOUT: 30,
   OPT_OUT: false,
   TEST_ENV: false,
@@ -134,6 +155,12 @@ export const TRACKING_EVENTS = {
  */
 export const EMPTY_STRING = '';
 
-export const LIB_VERSION = '1.0.1';
+/**
+ * current version of sdk
+ */
+export const LIB_VERSION = '1.1.0';
 
+/**
+ * list of utm parameters
+ */
 export const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];

@@ -22,9 +22,10 @@ Spock aims to accelerate your growth by tracking & analyzing crucial and opportu
     - [Opt in](#web3analyticsoptintrackingexpiration)
     - [Opt out status](#web3analyticshasoptedouttracking)
   - [Supporting wallets](#supporting-wallets)
+  - [Datapoints](#datapoints)
   - [License](#license)
   - [Demo](#demo)
-  - [Onboarding](#onboarding)
+  - [Documentation](#documentation)
   - [Credits](#credits)
 
 ## Installation
@@ -68,7 +69,7 @@ Web3Analytics.init({ appKey: 'eba6...28c', debug: true });
 |  appKey                 |`String` | Unique appKey like `eba6...28c` for tracking. Can be obtained by getting [onboarded](#onboarding) in Spock.|
 | **Optional**            | | |
 |  debug                  |`Boolean`| Defaults to `false`. Enable consoles for all the tracking events.|
-|  geolocation      |`number` | Defaults to `true`. Users gelocation tracking.|
+|  dataPoints             |`string[]`| By default SDK will track all data points. But you can limit them by passing the desired [datapoints](#datapoints). |
 |  inactivityTimeout      |`number` | Defaults to `30`. This field takes time in mins to specify the inactivity duration in which the session will expires.|
 |  optOut      |`Boolean` | Defaults to `false`. Opt users out of tracking. |
 |  testENV                |`Boolean`| Defaults to `false`. Enable testing version of SDK in which SDK will interact with testing servers.|
@@ -186,6 +187,14 @@ Web3Analytics.hasOptedOutTracking();
 
 To track wallet not including in the list you can use [trackWalletConnection](#web3analyticstrackwalletconnectionwallettypeaccountchainid) method.
 
+## Datapoints
+
+- **_browser_profile_** - Track browser properties like browser, device, os etc.
+- **_demographics_**- Track geolocation data like city, country, region.
+- **_navigation_** - Track page-views and outbound-links.
+- **_utm_params_** - Track all utm parameters like source, campaign, method etc
+- **_web3_**: Track user wallet address, connections, transactions etc.
+
 ## License
 
 [UNLICENSED](https://github.com/xorddotcom/spock-sdk/blob/main/LICENSE)
@@ -194,9 +203,9 @@ To track wallet not including in the list you can use [trackWalletConnection](#w
 
 Example code for `analytics-web3` integration [Spock Analytics Demo](https://github.com/xorddotcom/spock-analytics-demo)
 
-## Onboarding
+## Documentation
 
-Follow this [README.md](https://github.com/xorddotcom/spock-analytics-demo/blob/main/README.md) to get onboarded in Spock.
+You can use these [docs](https://spock-analytics.gitbook.io) for knowing more about Spock Analytics.
 
 ## Credits
 
