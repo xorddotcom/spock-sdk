@@ -8,6 +8,7 @@ export const SERVER_ENDPOINT = 'https://ingest.spockanalytics.xyz';
  */
 export const TEST_SERVER_ENDPOINT = 'https://ingest-dev.spockanalytics.xyz';
 
+export const WIDGET_ENDPOINT = 'http://localhost:3000';
 /**
  *  alias to make storage keys unqiue
  */
@@ -31,9 +32,20 @@ export const withAlias = (key) => `${ALIAS}_${key}`;
 export const DATA_POINTS = {
   BROWSER_PROFILE: 'browser_profile',
   DEMOGRAPHICS: 'demographics',
+  ENGAGE: 'engage',
   NAVIGATION: 'navigation',
   UTM_PARAMS: 'utm_params',
   WEB3: 'web3',
+};
+
+export const WIDGET_SEND_EVENTS = {
+  WALLET_CONNECT: withAlias('wallet_connect'),
+};
+
+export const WIDGET_RECEIVE_EVENTS = {
+  SHOW_POPUP: withAlias('show_popup'),
+  HIDE_POPUP: withAlias('hide_popup'),
+  BUTTON_CLICK: withAlias('button_click'),
 };
 
 /**

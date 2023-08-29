@@ -1,6 +1,6 @@
 import invariant from 'tiny-invariant';
 
-import { LOG, WALLET_TYPE, EVENTS, TRACKING_EVENTS } from '../constants';
+import { LOG, WALLET_TYPE, EVENTS, TRACKING_EVENTS, WIDGET_SEND_EVENTS } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
 import { txnRejected } from './utils';
 import { JSON_Formatter, normalizeChainId } from '../utils/formatting';
@@ -340,6 +340,8 @@ class WalletConnection extends BaseAnalytics {
       const properties = { walletType };
 
       this.trackEvent({ event: TRACKING_EVENTS.WALLET_CONNECTION, properties, logMessage: 'Wallet connect' });
+
+      this.widgetController.postMessage(WIDGET_SEND_EVENTS.WALLET_CONNECT, { address: account?.toLowerCase(), chain });
     }
   }
 }

@@ -7,6 +7,8 @@ import { getConfig } from '../utils/helpers';
 import { log } from '../utils/logs';
 import Request from '../utils/request';
 
+import WidgetController from '../Widget';
+
 /**
  * @typedef Config
  * @type {object}
@@ -51,6 +53,8 @@ class BaseAnalytics {
       testENV: this.testENV,
       store: this.store,
     });
+
+    this.widgetController = WidgetController;
   }
 
   /**

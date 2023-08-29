@@ -1,6 +1,7 @@
 import Web3AnalyticsClass from './core';
 import { EVENTS } from './constants';
 import { addEvent } from './utils/helpers';
+import WidgetController from './Widget';
 
 function overrideLocalStorage() {
   Storage.prototype._setItem = Storage.prototype.setItem;
@@ -43,6 +44,7 @@ Web3Analytics.init = function (config) {
   Web3Analytics.trackPageView = web3AnalyticsInstance.trackPageView;
   Web3Analytics.trackWalletConnection = web3AnalyticsInstance.wallet.trackWalletConnection;
   Web3Analytics.walletProvider = web3AnalyticsInstance.wallet.walletProvider;
+  Web3Analytics.widgetOnClick = WidgetController.setUserDefinedOnClick;
 };
 
 export default Web3Analytics;
