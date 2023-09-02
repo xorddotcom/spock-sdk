@@ -1,5 +1,5 @@
 import AnalyticsStorage from '../AnalyticsStorage';
-import { DEFAULT_CONFIG, LOG, TRACKING_EVENTS, STORAGE, UTM_KEYS, DATA_POINTS } from '../constants';
+import { DEFAULT_CONFIG, LOG, TRACKING_EVENTS, STORAGE, UTM_KEYS, DATA_POINTS, withAlias } from '../constants';
 import { cheapGuid, getQueryParams, parseFlowProperties, transformUTMKey } from './utils';
 import { setCookie } from '../utils/cookies';
 import { JSON_Formatter } from '../utils/formatting';
@@ -120,6 +120,26 @@ class BaseAnalytics {
     } else {
       this.dispatch({ trackingQueue: [...this.store.trackingQueue, { event, data }] });
     }
+
+    if (this.dataPoints[DATA_POINTS.ENGAGE]) {
+      const { ip, flow, optOut, initialized, txnReject, txnSubmit, sessionDuration } = this.store;
+      this.widgetController.postMessage(withAlias(event.replace(/-/g, '_')), {
+        ...data,
+        store: {
+          duration: typeof sessionDuration === 'function' ? sessionDuration() : 0,
+          flow,
+          initialized,
+          ip,
+          optOut,
+          txnReject,
+          txnSubmit,
+        },
+      });
+    }
+
+    // if (event === TRACKING_EVENTS.WALLET_CONNECTION) {
+    //   this.widgetController.postMessage(WIDGET_SEND_EVENTS.WALLET_CONNECT, data);
+    // }
 
     logMessage && this.log(LOG.INFO, logMessage, data);
   }

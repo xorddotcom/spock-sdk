@@ -1,6 +1,6 @@
 import invariant from 'tiny-invariant';
 
-import { LOG, WALLET_TYPE, EVENTS, TRACKING_EVENTS, WIDGET_SEND_EVENTS } from '../constants';
+import { LOG, WALLET_TYPE, EVENTS, TRACKING_EVENTS } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
 import { txnRejected } from './utils';
 import { JSON_Formatter, normalizeChainId } from '../utils/formatting';
@@ -89,13 +89,13 @@ class WalletConnection extends BaseAnalytics {
   logTransaction(status, txnObj, txnHash) {
     if (status === 'rejected') {
       const properties = { ...txnObj, status: 0 };
-      this.trackEvent({ event: TRACKING_EVENTS.TRANSACTION, properties, logMessage: 'Transaction rejected' });
       this.dispatch({ txnReject: this.store.txnReject + 1 });
+      this.trackEvent({ event: TRACKING_EVENTS.TRANSACTION, properties, logMessage: 'Transaction rejected' });
     } else if (status === 'submitted' && this.cacheTxnHash !== txnHash) {
       const properties = { ...txnObj, hash: txnHash, status: 1 };
+      this.dispatch({ txnSubmit: this.store.txnSubmit + 1 });
       this.trackEvent({ event: TRACKING_EVENTS.TRANSACTION, properties, logMessage: 'Transaction submitted' });
       this.cacheTxnHash = txnHash;
-      this.dispatch({ txnSubmit: this.store.txnSubmit + 1 });
     }
   }
 
@@ -341,7 +341,7 @@ class WalletConnection extends BaseAnalytics {
 
       this.trackEvent({ event: TRACKING_EVENTS.WALLET_CONNECTION, properties, logMessage: 'Wallet connect' });
 
-      this.widgetController.postMessage(WIDGET_SEND_EVENTS.WALLET_CONNECT, { address: account?.toLowerCase(), chain });
+      // this.widgetController.postMessage(WIDGET_SEND_EVENTS.WALLET_CONNECT, { address: account?.toLowerCase(), chain });
     }
   }
 }

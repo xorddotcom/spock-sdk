@@ -19,6 +19,8 @@ class Session extends BaseAnalytics {
     this.hiddenTime = 0;
     this.totalHiddenTime = 0;
     this.hidden = 'hidden';
+
+    this.dispatch({ sessionDuration: this.sessionDuration.bind(this) });
   }
 
   trackSession() {

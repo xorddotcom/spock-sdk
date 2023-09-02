@@ -38,16 +38,6 @@ export const DATA_POINTS = {
   WEB3: 'web3',
 };
 
-export const WIDGET_SEND_EVENTS = {
-  WALLET_CONNECT: withAlias('wallet_connect'),
-};
-
-export const WIDGET_RECEIVE_EVENTS = {
-  SHOW_POPUP: withAlias('show_popup'),
-  HIDE_POPUP: withAlias('hide_popup'),
-  BUTTON_CLICK: withAlias('button_click'),
-};
-
 /**
  *  default values for sdk configuration
  *  DATA_POINTS - data that is allowed to track
@@ -160,6 +150,12 @@ export const TRACKING_EVENTS = {
   SESSION: 'session',
   TRANSACTION: 'transaction',
   WALLET_CONNECTION: 'wallet-connect',
+};
+
+export const WIDGET_RECEIVE_EVENTS = {
+  SHOW_POPUP: withAlias('show_popup'),
+  HIDE_POPUP: withAlias('hide_popup'),
+  BUTTON_CLICK: withAlias('button_click'),
 };
 
 /**

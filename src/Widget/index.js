@@ -4,16 +4,16 @@ import { addEvent } from '../utils/helpers';
 const iframwStyles = {
   display: 'none',
   position: 'fixed',
-  bottom: '3%',
-  right: '3%',
+  // bottom: '3%',
+  // right: '3%',
   borderRadius: '0',
   border: 'none',
-  width: '350px',
+  // width: '350px',
   zIndex: '2147483647',
 };
 
-function applyStyles(elemment) {
-  for (const [cssProperty, value] of Object.entries(iframwStyles)) {
+function applyStyles(elemment, styles) {
+  for (const [cssProperty, value] of Object.entries(styles)) {
     elemment.style[cssProperty] = value;
   }
 }
@@ -30,7 +30,7 @@ class WidgetController {
       iframe.title = 'Spock Widget';
       iframe.id = 'spock-widget';
       iframe.dataset.spockIframeLabel = new URL(WIDGET_ENDPOINT).host;
-      applyStyles(iframe);
+      applyStyles(iframe, iframwStyles);
       document.body.appendChild(iframe);
       return iframe;
     };
@@ -45,7 +45,7 @@ class WidgetController {
     if (origin === WIDGET_ENDPOINT) {
       switch (data?.message) {
         case WIDGET_RECEIVE_EVENTS.SHOW_POPUP:
-          this.show(data?.body?.height);
+          this.show(data?.body);
           break;
         case WIDGET_RECEIVE_EVENTS.HIDE_POPUP:
           this.hide();
@@ -66,13 +66,13 @@ class WidgetController {
 
   postMessage(message, body) {
     if (this.iframe && this.iframe.contentWindow) {
+      console.log({ message, body });
       this.iframe.contentWindow.postMessage({ message, body }, WIDGET_ENDPOINT);
     }
   }
 
-  show(height) {
-    this.iframe.style.height = height;
-    this.iframe.style.display = 'block';
+  show(styles) {
+    applyStyles(this.iframe, styles);
   }
 
   hide() {
