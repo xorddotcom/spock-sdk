@@ -134,12 +134,11 @@ class BaseAnalytics {
           txnReject,
           txnSubmit,
         },
+        browserProps: {
+          innerWidth: window.innerWidth,
+        },
       });
     }
-
-    // if (event === TRACKING_EVENTS.WALLET_CONNECTION) {
-    //   this.widgetController.postMessage(WIDGET_SEND_EVENTS.WALLET_CONNECT, data);
-    // }
 
     logMessage && this.log(LOG.INFO, logMessage, data);
   }

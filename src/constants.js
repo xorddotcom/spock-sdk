@@ -8,7 +8,11 @@ export const SERVER_ENDPOINT = 'https://ingest.spockanalytics.xyz';
  */
 export const TEST_SERVER_ENDPOINT = 'https://ingest-dev.spockanalytics.xyz';
 
-export const WIDGET_ENDPOINT = 'http://localhost:3000';
+/**
+ *  spock-widget hosting url
+ */
+export const WIDGET_ENDPOINT = 'https://widget.spockanalytics.xyz';
+
 /**
  *  alias to make storage keys unqiue
  */

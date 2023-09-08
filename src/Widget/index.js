@@ -4,11 +4,8 @@ import { addEvent } from '../utils/helpers';
 const iframwStyles = {
   display: 'none',
   position: 'fixed',
-  // bottom: '3%',
-  // right: '3%',
   borderRadius: '0',
   border: 'none',
-  // width: '350px',
   zIndex: '2147483647',
 };
 
@@ -64,8 +61,18 @@ class WidgetController {
     }
   }
 
-  postMessage(message, body) {
+  async documentLoaded(counter) {
+    if (document.readyState != 'complete') {
+      await new Promise((resolve) => setTimeout(resolve, 5 * 1000));
+      //counter for protecting from infinite recursion
+      counter < 5 && (await this.documentLoaded(counter + 1));
+    }
+  }
+
+  async postMessage(message, body) {
     if (this.iframe && this.iframe.contentWindow) {
+      //wait util document loading is complete
+      await this.documentLoaded(0);
       console.log({ message, body });
       this.iframe.contentWindow.postMessage({ message, body }, WIDGET_ENDPOINT);
     }
