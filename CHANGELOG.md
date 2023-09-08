@@ -174,3 +174,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Allow user to limit the tracking of datapoints by passing the desired one on initialization.
+
+## [1.2.0] - 2023-09-08
+
+### Added
+
+- Revert the latest version back to 1.1.0 state.
