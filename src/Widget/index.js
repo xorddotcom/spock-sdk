@@ -73,7 +73,6 @@ class WidgetController {
     if (this.iframe && this.iframe.contentWindow) {
       //wait util document loading is complete
       await this.documentLoaded(0);
-      console.log({ message, body });
       this.iframe.contentWindow.postMessage({ message, body }, WIDGET_ENDPOINT);
     }
   }

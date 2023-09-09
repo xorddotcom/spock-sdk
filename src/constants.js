@@ -156,6 +156,12 @@ export const TRACKING_EVENTS = {
   WALLET_CONNECTION: 'wallet-connect',
 };
 
+/**
+ * events received from widget
+ * SHOW_POPUP - show the popup to user
+ * HIDE_POPUP - close popup
+ * BUTTON_CLICK - onclick action
+ */
 export const WIDGET_RECEIVE_EVENTS = {
   SHOW_POPUP: withAlias('show_popup'),
   HIDE_POPUP: withAlias('hide_popup'),
