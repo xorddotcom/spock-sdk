@@ -26,6 +26,10 @@ class Web3Analytics extends BaseAnalytics {
     this.log(LOG.INFO, 'Web3 Analytics initialized');
     this.userConsent();
 
+    if (this.dataPoints[DATA_POINTS.ENGAGE]) {
+      this.widgetController.init(this.appKey);
+    }
+
     this.session.trackSession();
     await this.userInfo.getUserInfo();
     this.wallet.initialize();

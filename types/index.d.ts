@@ -1,7 +1,9 @@
+declare type WidgetOnClickMethod = (params: { campaignId: string }) => void;
+
 declare namespace Web3Analytics {
   export function init(config: {
     appKey: string;
-    dataPoints?: ('browser_profile' | 'demographics' | 'navigation' | 'utm_params' | 'web3')[];
+    dataPoints?: ('browser_profile' | 'demographics' | 'engage' | 'navigation' | 'utm_params' | 'web3')[];
     debug?: boolean;
     inactivityTimeout?: number;
     optOut?: boolean;
@@ -20,6 +22,8 @@ declare namespace Web3Analytics {
   export function trackWalletConnection(walletType: string, account: string, chainId: number): void;
 
   export function walletProvider(provider: any): void;
+
+  export function widgetOnClick(method: WidgetOnClickMethod): void;
 }
 
 export default Web3Analytics;

@@ -1,11 +1,13 @@
 import AnalyticsStorage from '../AnalyticsStorage';
-import { DEFAULT_CONFIG, LOG, TRACKING_EVENTS, STORAGE, UTM_KEYS, DATA_POINTS } from '../constants';
+import { DEFAULT_CONFIG, LOG, TRACKING_EVENTS, STORAGE, UTM_KEYS, DATA_POINTS, withAlias } from '../constants';
 import { cheapGuid, getQueryParams, parseFlowProperties, transformUTMKey } from './utils';
 import { setCookie } from '../utils/cookies';
 import { JSON_Formatter } from '../utils/formatting';
 import { getConfig } from '../utils/helpers';
 import { log } from '../utils/logs';
 import Request from '../utils/request';
+
+import WidgetController from '../Widget';
 
 /**
  * @typedef Config
@@ -51,6 +53,8 @@ class BaseAnalytics {
       testENV: this.testENV,
       store: this.store,
     });
+
+    this.widgetController = WidgetController;
   }
 
   /**
@@ -115,6 +119,25 @@ class BaseAnalytics {
       this.request.post(`track/${event}`, { data, sendBeacon });
     } else {
       this.dispatch({ trackingQueue: [...this.store.trackingQueue, { event, data }] });
+    }
+
+    if (this.dataPoints[DATA_POINTS.ENGAGE]) {
+      const { ip, flow, optOut, initialized, txnReject, txnSubmit, sessionDuration } = this.store;
+      this.widgetController.postMessage(withAlias(event.replace(/-/g, '_')), {
+        ...data,
+        store: {
+          duration: typeof sessionDuration === 'function' ? sessionDuration() : 0,
+          flow,
+          initialized,
+          ip,
+          optOut,
+          txnReject,
+          txnSubmit,
+        },
+        browserProps: {
+          innerWidth: window.innerWidth,
+        },
+      });
     }
 
     logMessage && this.log(LOG.INFO, logMessage, data);

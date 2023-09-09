@@ -31,6 +31,7 @@ import { notUndefined } from '../utils/validators';
  * @property {number} txnReject - total txn rejected in current session
  * @property {number} txnSubmit - total txn submitted txn in current session
  * @property {UserInfo|undefined} userInfo - user metadata
+ * @property {()=>number} sessionDuration - method to calculate current session duration
  */
 
 /** @type {AnalyticsStore} */
@@ -48,6 +49,7 @@ const initialState = {
   txnReject: 0,
   txnSubmit: 0,
   userInfo: undefined,
+  sessionDuration: () => 0,
 };
 
 class AnalyticsStorage {

@@ -180,3 +180,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Revert the latest version back to 1.1.0 state.
+
+## [1.3.0] - 2023-09-10
+
+### Added
+
+- Widget support through iframe.
+- Pass events data into to widget.
+- Custom widget on-click handling.
+- Add engage data point.
