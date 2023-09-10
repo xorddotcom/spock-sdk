@@ -189,11 +189,12 @@ To track wallet not including in the list you can use [trackWalletConnection](#w
 
 ## Datapoints
 
+- **_web3_**: Track user wallet address, connections, transactions etc.
 - **_browser_profile_** - Track browser properties like browser, device, os etc.
 - **_demographics_**- Track geolocation data like city, country, region.
 - **_navigation_** - Track page-views and outbound-links.
 - **_utm_params_** - Track all utm parameters like source, campaign, method etc
-- **_web3_**: Track user wallet address, connections, transactions etc.
+- **_engage_**: Campaign Pop-ups, campaign tracking.
 
 ## License
 
