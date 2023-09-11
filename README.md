@@ -182,13 +182,6 @@ Web3Analytics.hasOptedOutTracking();
 
 For custom on-click implementation of widget button.
 
-<!-- Disable table formatting because Prettier messing it up. -->
-<!-- prettier-ignore -->
-| Param           | Type    | Description                                        |
-| ----------------| --------| ---------------------------------------------------|
-| campaignId      |`number` | Unique campaign id belongs to the widget.|
-| redirectUrl      |`string  / undefined` | Redirect url set on the campaign button click.|
-
 ```js
 Web3Analytics.widgetOnClick(({ campaignId }) => {
   if (campaignId === YOUR_CAMPAIGN_ID) {
@@ -196,6 +189,13 @@ Web3Analytics.widgetOnClick(({ campaignId }) => {
   }
 });
 ```
+
+<!-- Disable table formatting because Prettier messing it up. -->
+<!-- prettier-ignore -->
+| Param           | Type    | Description                                        |
+| ----------------| --------| ---------------------------------------------------|
+| campaignId      |`number` | Unique campaign id belongs to the widget.|
+| redirectUrl      |`string  / undefined` | Redirect url set on the campaign button click.|
 
 ## Supporting wallets
 
