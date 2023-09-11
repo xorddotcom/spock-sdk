@@ -1,4 +1,4 @@
-declare type WidgetOnClickMethod = (params: { campaignId: string }) => void;
+declare type WidgetOnClickMethod = (params: { campaignId: number; redirectUrl?: string }) => void;
 
 declare namespace Web3Analytics {
   export function init(config: {
