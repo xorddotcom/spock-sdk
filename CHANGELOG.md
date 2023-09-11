@@ -189,3 +189,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pass events data into to widget.
 - Custom widget on-click handling.
 - Add engage data point.
+
+## [1.3.1] - 2023-09-11
+
+### Added
+
+- Engage data-points in README.
+- Widget on-click method in API section of README.
+
+### Fixed
+
+- Type of widget on-click method params.

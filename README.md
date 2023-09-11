@@ -21,6 +21,7 @@ Spock aims to accelerate your growth by tracking & analyzing crucial and opportu
     - [Opt out](#web3analyticsoptouttrackingexpiration)
     - [Opt in](#web3analyticsoptintrackingexpiration)
     - [Opt out status](#web3analyticshasoptedouttracking)
+    - [Widget On-click](#web3analyticswidgetonclickmethod)
   - [Supporting wallets](#supporting-wallets)
   - [Datapoints](#datapoints)
   - [License](#license)
@@ -177,6 +178,25 @@ Web3Analytics.hasOptedOutTracking();
 | ----------------| --------| ---------------------------------------------------|
 | -            |`Boolean` | Status of user tracking consent.|
 
+### Web3Analytics.widgetOnClick(method)
+
+For custom on-click implementation of widget button.
+
+<!-- Disable table formatting because Prettier messing it up. -->
+<!-- prettier-ignore -->
+| Param           | Type    | Description                                        |
+| ----------------| --------| ---------------------------------------------------|
+| campaignId      |`number` | Unique campaign id belongs to the widget.|
+| redirectUrl      |`string  / undefined` | Redirect url set on the campaign button click.|
+
+```js
+Web3Analytics.widgetOnClick(({ campaignId }) => {
+  if (campaignId === YOUR_CAMPAIGN_ID) {
+    //do something
+  }
+});
+```
+
 ## Supporting wallets
 
 - MetaMask
@@ -189,12 +209,12 @@ To track wallet not including in the list you can use [trackWalletConnection](#w
 
 ## Datapoints
 
-- **_web3_**: Track user wallet address, connections, transactions etc.
-- **_browser_profile_** - Track browser properties like browser, device, os etc.
-- **_demographics_**- Track geolocation data like city, country, region.
-- **_navigation_** - Track page-views and outbound-links.
-- **_utm_params_** - Track all utm parameters like source, campaign, method etc
-- **_engage_**: Campaign Pop-ups, campaign tracking.
+- **_web3_** (**Mandatory**) - Wallet Address, Chain ID, Wallet Type, Wallet Connection, Max Gas Fee, Quoted Gas Fee, Transaction Hash, Transaction Status, Submitted and Rejected Transaction Count and Failed Transactions.
+- **_browser_profile_** - Current URL, Operating System, Browser, Referrer, Device, Referring Domain, Screen Width, Screen height, and Search Engine.
+- **_demographics_** - Country,City and Region.
+- **_navigation_** - Page Views and External Links.
+- **_utm_params_** - UTM Campaign, UTM Content, UTM Medium, UTM Source and UTM Term.
+- **_engage_** - Session Time, Last Function, Session Transaction Count, Rejected Transaction Count, Failed Transaction Count, Clicks, Click Through Rate (CTR), Unique Wallets, Transactions/Conversions, Transaction Through Rate (TTR), Number of Sessions, Avg. Session Duration, Avg. Pages Per Session, Dialogs Served, and Dialogs Closed.
 
 ## License
 
@@ -206,7 +226,7 @@ Example code for `analytics-web3` integration [Spock Analytics Demo](https://git
 
 ## Documentation
 
-You can use these [docs](https://spock-analytics.gitbook.io) for knowing more about Spock Analytics.
+You can use these [docs](https://spock-analytics.gitbook.io/spock-analytics-v2/) for knowing more about Spock Analytics.
 
 ## Credits
 
