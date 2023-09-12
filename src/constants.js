@@ -176,7 +176,7 @@ export const EMPTY_STRING = '';
 /**
  * current version of sdk
  */
-export const LIB_VERSION = '1.3.3';
+export const LIB_VERSION = '1.4.0';
 
 /**
  * list of utm parameters

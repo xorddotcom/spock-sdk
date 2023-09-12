@@ -1,3 +1,4 @@
+import AnalyticsStorage from '../AnalyticsStorage';
 import { WIDGET_ENDPOINT, WIDGET_RECEIVE_EVENTS } from '../constants';
 import { addEvent } from '../utils/helpers';
 
@@ -18,6 +19,8 @@ function applyStyles(elemment, styles) {
 class WidgetController {
   constructor() {
     this.setUserDefinedOnClick = this.setUserDefinedOnClick.bind(this);
+    this.store = AnalyticsStorage.store;
+    this.dispatch = AnalyticsStorage.dispatch;
   }
 
   init(appKey) {
@@ -37,15 +40,21 @@ class WidgetController {
     addEvent(window, 'message', this.eventHandler.bind(this));
   }
 
+  addFlow(event, properties) {
+    this.dispatch({ flow: [...this.store.flow, { event, properties }] });
+  }
+
   eventHandler(event) {
     const { origin, data } = event;
     if (origin === WIDGET_ENDPOINT) {
       switch (data?.message) {
         case WIDGET_RECEIVE_EVENTS.SHOW_POPUP:
-          this.show(data?.body);
+          this.show(data?.body?.styles);
+          data?.body?.campaignId && this.addFlow('show-popup', { campaignId: data?.body?.campaignId });
           break;
         case WIDGET_RECEIVE_EVENTS.HIDE_POPUP:
           this.hide();
+          this.addFlow('hide-popup', { campaignId: data?.body?.campaignId });
           break;
         case WIDGET_RECEIVE_EVENTS.BUTTON_CLICK:
           this.hide();
@@ -54,6 +63,7 @@ class WidgetController {
           } else if (this.userDefinedClickMethod) {
             this.userDefinedClickMethod(data?.body);
           }
+          this.addFlow('click-popup', { campaignId: data?.body?.campaignId });
           break;
         default:
           break;
