@@ -3,7 +3,7 @@ declare type WidgetOnClickMethod = (params: { campaignId: number; redirectUrl?: 
 declare namespace Web3Analytics {
   export function init(config: {
     appKey: string;
-    dataPoints?: ('browser_profile' | 'demographics' | 'engage' | 'navigation' | 'utm_params' | 'web3')[];
+    dataPoints?: ('demographics' | 'engage' | 'web2' | 'web3')[];
     debug?: boolean;
     inactivityTimeout?: number;
     optOut?: boolean;

@@ -34,11 +34,9 @@ export const withAlias = (key) => `${ALIAS}_${key}`;
  *  WEB3 - user wallet connection and txn data
  */
 export const DATA_POINTS = {
-  BROWSER_PROFILE: 'browser_profile',
   DEMOGRAPHICS: 'demographics',
   ENGAGE: 'engage',
-  NAVIGATION: 'navigation',
-  UTM_PARAMS: 'utm_params',
+  WEB2: 'web2',
   WEB3: 'web3',
 };
 

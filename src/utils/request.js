@@ -43,7 +43,7 @@ class Request {
       return;
     }
 
-    const formatedData = JSON_Formatter.stringify({ appKey: this.appKey, ip: this.store.ip, ...data });
+    const formatedData = JSON_Formatter.stringify({ appKey: this.appKey, ...data });
 
     if (formatedData) {
       if (this.testMode) {

@@ -257,23 +257,19 @@ class UserInfo extends BaseAnalytics {
 
       this.dispatch({ userInfo, distinctId: this.distinctId(userAgent) });
 
-      this.trackEvent({ event: TRACKING_EVENTS.APP_VISIT, logMessage: 'App visit' });
+      this.trackEvent({
+        event: TRACKING_EVENTS.APP_VISIT,
+        logMessage: 'App visit',
+        allowTrack: this.dataPoints[DATA_POINTS.WEB2],
+      });
 
-      if (this.dataPoints[DATA_POINTS.DEMOGRAPHICS]) {
-        await this.getUserIp();
-      }
+      await this.getUserIp();
 
       //getUserIp is an async method so it take times to relsove uptil then we queue all tracking events
       //then process all events after resolve
       this.dispatch({ initialized: true });
       this.processQueue();
     }
-
-    //ping server with the enables datapoints info
-    this.request.post('track/ping', {
-      data: { dataPoints: Object.keys(this.dataPoints).sort(), libVersion: LIB_VERSION },
-      sendBeacon: true,
-    });
   }
 
   async getUserIp() {

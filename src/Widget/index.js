@@ -80,6 +80,13 @@ class WidgetController {
   }
 
   async postMessage(message, body) {
+    // if (this.store.optOut) {
+    //   console.log('a');
+    //   return;
+    // }
+
+    // console.log('b');
+
     if (this.iframe && this.iframe.contentWindow) {
       //wait util document loading is complete
       await this.documentLoaded(0);

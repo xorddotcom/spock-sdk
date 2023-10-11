@@ -1,4 +1,4 @@
-import { LOG, TRACKING_EVENTS, STORAGE, EVENTS } from '../constants';
+import { LOG, TRACKING_EVENTS, STORAGE, EVENTS, DATA_POINTS } from '../constants';
 import BaseAnalytics from '../BaseAnalytics';
 import { limitedTimeout, sessionUUID } from './utils';
 import { deleteCookie, getCookie } from '../utils/cookies';
@@ -110,6 +110,7 @@ class Session extends BaseAnalytics {
         properties,
         logMessage: 'Pause session',
         sendBeacon: true,
+        allowTrack: true, //session duration handling for engage
       });
     }
   }
@@ -125,7 +126,12 @@ class Session extends BaseAnalytics {
       txnSubmit,
       walletConnected: Boolean(connectedAccount),
     };
-    this.trackEvent({ event: TRACKING_EVENTS.SESSION, properties, logMessage: 'Session expired' });
+    this.trackEvent({
+      event: TRACKING_EVENTS.SESSION,
+      properties,
+      logMessage: 'Session expired',
+      allowTrack: this.dataPoints[DATA_POINTS.WEB2],
+    });
     this.dispatch({ flow: [], txnReject: 0, txnSubmit: 0 });
   }
 
