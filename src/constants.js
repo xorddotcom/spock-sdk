@@ -14,6 +14,11 @@ export const TEST_SERVER_ENDPOINT = 'https://ingest-dev.spockanalytics.xyz';
 export const WIDGET_ENDPOINT = 'https://widget.spockanalytics.xyz';
 
 /**
+ *  spock-widget test version hosting url
+ */
+export const TEST_WIDGET_ENDPOINT = 'https://spock-widget-56b11.web.app';
+
+/**
  *  alias to make storage keys unqiue
  */
 const ALIAS = 'spock';
@@ -34,11 +39,9 @@ export const withAlias = (key) => `${ALIAS}_${key}`;
  *  WEB3 - user wallet connection and txn data
  */
 export const DATA_POINTS = {
-  BROWSER_PROFILE: 'browser_profile',
   DEMOGRAPHICS: 'demographics',
   ENGAGE: 'engage',
-  NAVIGATION: 'navigation',
-  UTM_PARAMS: 'utm_params',
+  WEB2: 'web2',
   WEB3: 'web3',
 };
 
@@ -176,7 +179,7 @@ export const EMPTY_STRING = '';
 /**
  * current version of sdk
  */
-export const LIB_VERSION = '1.4.0';
+export const LIB_VERSION = '1.5.0-beta.0';
 
 /**
  * list of utm parameters

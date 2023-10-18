@@ -27,26 +27,27 @@ class Web3Analytics extends BaseAnalytics {
     this.userConsent();
 
     if (this.dataPoints[DATA_POINTS.ENGAGE]) {
-      this.widgetController.init(this.appKey);
+      this.widgetController.init(this.appKey, this.testENV);
     }
 
     this.session.trackSession();
     await this.userInfo.getUserInfo();
+    this.trackOutboundLink();
     this.wallet.initialize();
-
-    if (this.dataPoints[DATA_POINTS.NAVIGATION]) {
-      this.trackOutboundLink();
-    }
   }
 
   trackPageView(pathname, search) {
-    if (this.dataPoints[DATA_POINTS.NAVIGATION]) {
-      const properties = stripEmptyProperties({
-        pathname: pathname || window.location.pathname,
-        search: search || window.location.search,
-      });
-      this.trackEvent({ event: TRACKING_EVENTS.PAGE_VIEW, properties, logMessage: 'Page view' });
-    }
+    const properties = stripEmptyProperties({
+      pathname: pathname || window.location.pathname,
+      search: search || window.location.search,
+    });
+
+    this.trackEvent({
+      event: TRACKING_EVENTS.PAGE_VIEW,
+      properties,
+      logMessage: 'Page view',
+      allowTrack: this.dataPoints[DATA_POINTS.WEB2],
+    });
   }
 
   trackOutboundLink() {
@@ -65,7 +66,12 @@ class Web3Analytics extends BaseAnalytics {
       if (anchorTag) {
         if (anchorTag.hostname !== window.location.hostname) {
           const properties = { link: anchorTag.href, domain: extractDomain(anchorTag.href) };
-          this.trackEvent({ event: TRACKING_EVENTS.OUTBOUND, properties, logMessage: 'Outbound' });
+          this.trackEvent({
+            event: TRACKING_EVENTS.OUTBOUND,
+            properties,
+            logMessage: 'Outbound',
+            allowTrack: this.dataPoints[DATA_POINTS.WEB2],
+          });
         }
       }
     }

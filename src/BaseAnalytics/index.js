@@ -70,30 +70,29 @@ class BaseAnalytics {
   /**
    *  send event to the server with metadata
    */
-  trackEvent({ event, properties, logMessage, sendBeacon }) {
-    const utmParams = this.dataPoints[DATA_POINTS.UTM_PARAMS]
-      ? UTM_KEYS.reduce((accum, key) => {
-          const param = getQueryParams(document.URL, key);
-          if (param) {
-            accum[transformUTMKey(key)] = param;
-          }
-          return accum;
-        }, {})
-      : {};
+  trackEvent({ event, properties, logMessage, sendBeacon, allowTrack }) {
+    const utmParams = UTM_KEYS.reduce((accum, key) => {
+      const param = getQueryParams(document.URL, key);
+      if (param) {
+        accum[transformUTMKey(key)] = param;
+      }
+      return accum;
+    }, {});
 
-    const browserProfile = this.dataPoints[DATA_POINTS.BROWSER_PROFILE]
-      ? { ...this.store.userInfo, currentUrl: window.location.href }
-      : {};
+    const browserProfile = { ...this.store.userInfo, currentUrl: window.location.href };
+
+    const web2 = { ...browserProfile, ...utmParams };
 
     const data = {
-      ...browserProfile,
-      ...utmParams,
+      ...(this.dataPoints[DATA_POINTS.WEB2] ? web2 : {}),
+      ip: this.dataPoints[DATA_POINTS.DEMOGRAPHICS] ? this.store.ip : undefined,
       chain: this.store.connectedChain,
       distinctId: this.store.distinctId,
       insertId: cheapGuid(),
       sessionId: this.store.sessionId,
       time: Date.now() / 1000,
       walletAddress: this.store.connectedAccount,
+      dataPoints: Object.keys(this.dataPoints).sort(),
       ...(properties ?? {}),
     };
 
@@ -114,17 +113,21 @@ class BaseAnalytics {
       });
     }
 
-    //move event to the queue until SDK init is complete
-    if (this.store.initialized) {
-      this.request.post(`track/${event}`, { data, sendBeacon });
-    } else {
-      this.dispatch({ trackingQueue: [...this.store.trackingQueue, { event, data }] });
+    //is the tracking of particular event is allowed
+    if (allowTrack) {
+      //move event to the queue until SDK init is complete
+      if (this.store.initialized) {
+        this.request.post(`track/${event}`, { data, sendBeacon });
+      } else {
+        this.dispatch({ trackingQueue: [...this.store.trackingQueue, { event, data }] });
+      }
     }
 
     if (this.dataPoints[DATA_POINTS.ENGAGE]) {
       const { ip, flow, optOut, initialized, txnReject, txnSubmit, sessionDuration } = this.store;
       this.widgetController.postMessage(withAlias(event.replace(/-/g, '_')), {
         ...data,
+        ...web2, //in-case web2 is exlude in analytics datapoint
         store: {
           duration: typeof sessionDuration === 'function' ? sessionDuration() : 0,
           flow,

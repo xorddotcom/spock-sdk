@@ -212,3 +212,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add popup events in session flow.
+
+## [1.5.0-beta.0] - 2023-10-18
+
+### Changed
+
+- Datapoints category.
+- Make web2 tracking optional, like sessions, visits.
+- Allow widget to serve campaign for exlcuded datapoints. (Just to serve camapaign not to track user data).
+
+### Added
+
+- Test version for widget.
