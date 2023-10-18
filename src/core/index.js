@@ -27,7 +27,7 @@ class Web3Analytics extends BaseAnalytics {
     this.userConsent();
 
     if (this.dataPoints[DATA_POINTS.ENGAGE]) {
-      this.widgetController.init(this.appKey);
+      this.widgetController.init(this.appKey, this.testENV);
     }
 
     this.session.trackSession();

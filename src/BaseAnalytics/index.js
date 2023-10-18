@@ -81,10 +81,10 @@ class BaseAnalytics {
 
     const browserProfile = { ...this.store.userInfo, currentUrl: window.location.href };
 
-    const web2 = this.dataPoints[DATA_POINTS.WEB2] ? { ...browserProfile, ...utmParams } : {};
+    const web2 = { ...browserProfile, ...utmParams };
 
     const data = {
-      ...web2,
+      ...(this.dataPoints[DATA_POINTS.WEB2] ? web2 : {}),
       ip: this.dataPoints[DATA_POINTS.DEMOGRAPHICS] ? this.store.ip : undefined,
       chain: this.store.connectedChain,
       distinctId: this.store.distinctId,

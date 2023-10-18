@@ -1,5 +1,5 @@
 import AnalyticsStorage from '../AnalyticsStorage';
-import { WIDGET_ENDPOINT, WIDGET_RECEIVE_EVENTS } from '../constants';
+import { TEST_WIDGET_ENDPOINT, WIDGET_ENDPOINT, WIDGET_RECEIVE_EVENTS } from '../constants';
 import { addEvent } from '../utils/helpers';
 
 const iframwStyles = {
@@ -23,13 +23,16 @@ class WidgetController {
     this.dispatch = AnalyticsStorage.dispatch;
   }
 
-  init(appKey) {
+  init(appKey, testENV) {
+    const widgetEndpoint = testENV ? TEST_WIDGET_ENDPOINT : WIDGET_ENDPOINT;
+    this.widgetEndpoint = widgetEndpoint;
+
     const createIframe = () => {
       const iframe = document.createElement('iframe');
-      iframe.src = WIDGET_ENDPOINT + `/?appKey=${appKey}`;
+      iframe.src = widgetEndpoint + `/?appKey=${appKey}`;
       iframe.title = 'Spock Widget';
       iframe.id = 'spock-widget';
-      iframe.dataset.spockIframeLabel = new URL(WIDGET_ENDPOINT).host;
+      iframe.dataset.spockIframeLabel = new URL(widgetEndpoint).host;
       applyStyles(iframe, iframwStyles);
       document.body.appendChild(iframe);
       return iframe;
@@ -46,7 +49,7 @@ class WidgetController {
 
   eventHandler(event) {
     const { origin, data } = event;
-    if (origin === WIDGET_ENDPOINT) {
+    if (origin === this.widgetEndpoint) {
       switch (data?.message) {
         case WIDGET_RECEIVE_EVENTS.SHOW_POPUP:
           this.show(data?.body?.styles);
@@ -80,17 +83,10 @@ class WidgetController {
   }
 
   async postMessage(message, body) {
-    // if (this.store.optOut) {
-    //   console.log('a');
-    //   return;
-    // }
-
-    // console.log('b');
-
     if (this.iframe && this.iframe.contentWindow) {
       //wait util document loading is complete
       await this.documentLoaded(0);
-      this.iframe.contentWindow.postMessage({ message, body }, WIDGET_ENDPOINT);
+      this.iframe.contentWindow.postMessage({ message, body }, this.widgetEndpoint);
     }
   }
 
