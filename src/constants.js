@@ -32,10 +32,9 @@ export const withAlias = (key) => `${ALIAS}_${key}`;
 
 /**
  *  datapoints available to track
- *  BROWSER_PROFILE - properties of browser like, browser_name, version, device, os etc
  *  DEMOGRAPHICS - user geolocation data like city, country, region
- *  NAVIGATION - user navigation data like page-views, outbound-links
- *  UTM_PARAMS - utm params data
+ *  ENGAGE - user engage related campaign serving and data tracking
+ *  WEB2 - user browser profile data
  *  WEB3 - user wallet connection and txn data
  */
 export const DATA_POINTS = {
@@ -179,7 +178,7 @@ export const EMPTY_STRING = '';
 /**
  * current version of sdk
  */
-export const LIB_VERSION = '1.5.0-beta.0';
+export const LIB_VERSION = '1.5.0';
 
 /**
  * list of utm parameters

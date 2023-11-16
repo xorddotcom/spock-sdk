@@ -224,3 +224,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Test version for widget.
+
+## [1.5.0] - 2023-11-16
+
+### Changed
+
+- Data points section in README.
+- Move beta changes to stable version.

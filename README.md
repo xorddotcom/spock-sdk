@@ -210,11 +210,9 @@ To track wallet not including in the list you can use [trackWalletConnection](#w
 ## Datapoints
 
 - **_web3_** (**Mandatory**) - Wallet Address, Chain ID, Wallet Type, Wallet Connection, Max Gas Fee, Quoted Gas Fee, Transaction Hash, Transaction Status, Submitted and Rejected Transaction Count and Failed Transactions.
-- **_browser_profile_** - Current URL, Operating System, Browser, Referrer, Device, Referring Domain, Screen Width, Screen height, and Search Engine.
-- **_demographics_** - Country,City and Region.
-- **_navigation_** - Page Views and External Links.
-- **_utm_params_** - UTM Campaign, UTM Content, UTM Medium, UTM Source and UTM Term.
-- **_engage_** - Session Time, Last Function, Session Transaction Count, Rejected Transaction Count, Failed Transaction Count, Clicks, Click Through Rate (CTR), Unique Wallets, Transactions/Conversions, Transaction Through Rate (TTR), Number of Sessions, Avg. Session Duration, Avg. Pages Per Session, Dialogs Served, and Dialogs Closed.
+- **web2** - Current URL, Operating System, Browser, Referrer, Device, Referring Domain, Screen Width, Screen height, Search Engine, Page Views, External Links and UTM Params.
+- **_demographics_** - Country, City and Region.
+- **_engage_** - Campaign Serving, Campaign Clicks, Click Through Rate (CTR), Transaction Through Rate (TTR), Unique Wallets, Dialogs Served, and Dialogs Closed.
 
 ## License
 
